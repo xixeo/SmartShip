@@ -63,11 +63,12 @@ function getComparator(order, orderBy) {
 const headCells = [
   { id: 'category1', numeric: false, disablePadding: true, label: 'Category 1' },
   { id: 'category2', numeric: false, disablePadding: false, label: 'Category 2' },
-  { id: 'itemName', numeric: false, disablePadding: false, label: 'Item Name' },
+  { id: 'itemName', numeric: false, disablePadding: false, label: '물품명' },
   { id: 'partNo1', numeric: true, disablePadding: false, label: 'Part No. 1' },
   { id: 'partNo2', numeric: true, disablePadding: false, label: 'Part No. 2' },
-  { id: 'price', numeric: true, disablePadding: false, label: 'Price' },
-  { id: 'supplier', numeric: false, disablePadding: false, label: 'Supplier' },
+  { id: 'price', numeric: true, disablePadding: false, label: '가격' },
+  { id: 'supplier', numeric: false, disablePadding: false, label: '발주처' },
+  { id: 'leadTime', numeric: false, disablePadding: false, label: '리드타임' }, // 리드타임 열 추가
 ];
 
 function EnhancedTableHead(props) {
@@ -152,7 +153,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Item List
+          선용품 리스트
         </Typography>
       )}
 
@@ -184,16 +185,16 @@ function EnhancedTableToolbar(props) {
           ))}
         </TextField>
         <TextField
-          label="Search Item"
+          label="품목명 검색"
           value={searchValue}
           onChange={onSearchChange}
-          sx={{ mr: 2, flexGrow: 1 }}
+          sx={{ mr: 2, minWidth: 120 }}
         />
         <Button variant="contained" onClick={onSearchClick} sx={{ mr: 1 }}>
-          Search
+          검색
         </Button>
         <Button variant="outlined" onClick={onAddClick}>
-          Add
+          등록
         </Button>
       </Box>
 
@@ -375,12 +376,17 @@ function ListTable() {
                       <TableCell component="th" id={labelId} scope="row" padding="none">
                         {row.category1}
                       </TableCell>
-                      <TableCell align="right">{row.category2}</TableCell>
-                      <TableCell align="right">{row.itemName}</TableCell>
+                      <TableCell align="left">{row.category2}</TableCell>
+                      <TableCell align="left">{row.itemName}</TableCell>
                       <TableCell align="right">{row.partNo1}</TableCell>
                       <TableCell align="right">{row.partNo2}</TableCell>
                       <TableCell align="right">{row.price}</TableCell>
-                      <TableCell align="right">{row.supplier}</TableCell>
+                      <TableCell align="left">{row.supplier}</TableCell>
+                      <TableCell align="left"> {/* 새로운 열 추가 */}
+                        <Button variant="outlined" size="small">
+                          리드타임
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
