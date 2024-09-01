@@ -13,7 +13,7 @@ function App() {
         <div className="flex flex-1">
           <Navi />
           <div className="flex flex-col flex-1">
-            <main className="flex-1 p-4">
+            <main className="flex-1 p-4 bg-gradient-to-b from-black to-[#1a1b41]"> 
               <Routes>
                 <Route path="/" element={<MainApp />} />
                 <Route path="/schedule" element={<Schedule />} />
@@ -31,7 +31,7 @@ function App() {
 function MainApp() {
   return (
     <div className="w-full h-full flex items-center justify-center">
-      <h1 className="text-3xl font-bold">Welcome to the Main App</h1>
+      <h1 className="text-3xl font-bold text-white">Welcome to the Main App</h1>
     </div>
   );
 }
