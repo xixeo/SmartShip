@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import './Schedule.css';
@@ -29,6 +29,9 @@ const ChangeData = (events) => {
 };
 export default function Schedule() {
   const [datas, setDatas] = useState([]);
+  const [filteredData, setFilteredData] = useState([]); //검색용 데이터유지
+  const [searchEvent, setSearchEvent] = useState('');
+  const calendarRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,8 +39,8 @@ export default function Schedule() {
       const events = [
         {
           title: '혜인발주',
-          start: '2024-09-03',
-          end: '2024-09-10'
+          start: '2024-08-03',
+          end: '2024-08-10'
         },
         {
           title: '2024-09-12 AWS발주',
@@ -52,25 +55,50 @@ export default function Schedule() {
       ];
       const changeDatas = ChangeData(events);
       setDatas(changeDatas);
+      setFilteredData(changeDatas);
     };
     fetchData();
-  })
+  },[]);
 
+  const searchTitle = ()=>{
+    const filterData = datas.filter(event => event.title.toLowerCase().includes(searchEvent.toLowerCase()));
+    setFilteredData(filterData);
+    console.log("검색",filterData);
 
+    // 검색된 일정으로 이동
+    const calendarApi = calendarRef.current.getApi();
+    if (filterData.length > 0) {
+        const firstEventDate = new Date(filterData[0].start); //검색한 event의 처음 날짜 추출
+        console.log("검색날짜확인",firstEventDate);
+        calendarApi.changeView('dayGridMonth'); //fullcalendar의 특정달로 이동하는 함수
+        calendarApi.gotoDate(firstEventDate); //검색한 title의 처음 날짜로 이동
+      }
+    
+  }
 
+  const handleKeyDown = (e) => {
+    if(e.key === 'Enter'){
+      searchTitle();
+    }
+  };
 
+  //modal
+  // const handleModal = (event) =>{
 
+  // }
 
   return (
     <div className="w-full">
       <div className='w-full flex justify-end'>\
-        <input className='m-5' />
-        <button className='bg-indigo-500 m-3 p-2'>검색</button>
+        <input className='m-5' placeholder='견적서 제목' value={searchEvent} onChange={(e) => setSearchEvent(e.target.value)} onKeyDown={handleKeyDown}/>
+        <button className='bg-indigo-500 m-3 p-2' onClick={searchTitle}>검색</button>
       </div>
       <FullCalendar
-        defaultView="dayGridMonth"
+        // defaultView="dayGridMonth"
         plugins={[dayGridPlugin]}
         events={datas}
+        ref={calendarRef} // FullCalendar ref 설정 검색시 이동
+        // onClickevent={handleModal}
       />
     </div>
   );
