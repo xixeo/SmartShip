@@ -4,7 +4,7 @@ import 'react-calendar/dist/Calendar.css';
 
 export default function Schedule() {
   return (
-    <div className="w-96">
+    <div className="w-full h-full">
        <Calendar />
     </div>
   )
