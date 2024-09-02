@@ -290,12 +290,18 @@ const handleSelectAllClick = (event) => {
   sx={{
     flexGrow: 1,
     maxWidth: 300,
-    backgroundColor: 'transparent', // Background color transparent
+    backgroundColor: 'transparent',
     '& .MuiInputBase-input': {
-      color: 'white', // Text color white
+      color: 'white', 
     },
     '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white', // Border color white
+      borderColor: 'white',
+    },
+    '&:hover .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'white',
+    },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'white', 
     }
   }}
 />
