@@ -1,0 +1,14 @@
+package com.lead.entity;
+
+public enum Role {
+    ADMIN, USER, GUEST;
+
+    public static Role fromString(String role) {
+        for (Role r : Role.values()) {
+            if (r.name().equalsIgnoreCase(role)) {
+                return r;
+            }
+        }
+        throw new IllegalArgumentException("Unknown role: " + role);
+    }
+}

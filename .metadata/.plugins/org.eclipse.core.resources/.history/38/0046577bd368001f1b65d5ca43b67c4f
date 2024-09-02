@@ -1,0 +1,80 @@
+package com.lead.config.filter;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.Map;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import com.lead.entity.Member;
+
+@Slf4j
+@RequiredArgsConstructor
+public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
+    private final AuthenticationManager authenticationManager;
+
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Member member = mapper.readValue(req.getInputStream(), Member.class);
+            Authentication authToken = new UsernamePasswordAuthenticationToken(member.getUsername(), member.getPw());
+            return authenticationManager.authenticate(authToken);
+        } catch (Exception e) {
+            log.error("Authentication error: {}", e.getMessage());
+            res.setStatus(HttpStatus.UNAUTHORIZED.value());
+            res.setContentType("application/json");
+            try {
+                res.getWriter().write("{\"error\": \"Invalid username or password\"}");
+            } catch (IOException ioException) {
+                log.error("Response writing error: {}", ioException.getMessage());
+            }
+            return null;
+        }
+    }
+
+    @Override
+    protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication authResult)
+            throws IOException, ServletException {
+        log.info("successfulAuthentication");
+        User user = (User) authResult.getPrincipal();
+
+        // 비밀 키를 환경 변수에서 읽어옴
+        String secretKey = System.getenv("JWT_SECRET_KEY"); // 실제로 환경 변수에서 읽어옴
+
+        // 비밀 키가 null이 아니거나 유효해야 함
+        if (secretKey == null) {
+            log.error("JWT secret key is not set in environment variables.");
+            res.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            res.getWriter().write("{\"error\": \"Server configuration error\"}");
+            return;
+        }
+
+        String token = JWT.create()
+                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 1000)) // 1000분 동안 유효
+                .withClaim("username", user.getUsername())
+                .sign(Algorithm.HMAC256(secretKey));
+
+        res.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        res.setContentType("application/json");
+        res.getWriter().write(new ObjectMapper().writeValueAsString(Map.of("token", token, "username", user.getUsername())));
+        res.setStatus(HttpStatus.OK.value());
+    }
+}

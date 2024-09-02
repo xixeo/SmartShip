@@ -1,0 +1,5 @@
+package com.lead.entity;
+
+public enum Role {
+    admin, user, guest;
+}

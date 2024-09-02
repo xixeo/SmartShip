@@ -1,0 +1,47 @@
+package com.lead.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+
+import com.lead.config.filter.JWTAuthenticationFilter;
+import com.lead.config.filter.JWTAuthorizationFilter;
+import com.lead.repository.MemberRepo;
+
+import lombok.RequiredArgsConstructor;
+
+@Configuration
+@RequiredArgsConstructor
+public class SecurityConfig {
+
+    private final AuthenticationConfiguration authConfig;
+    private final MemberRepo memRepo;
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        AuthenticationManager authManager = authConfig.getAuthenticationManager();
+
+        http.csrf(csrf -> csrf.disable());
+        http.authorizeHttpRequests(auth -> auth
+            .requestMatchers("/members/**").authenticated()
+            .requestMatchers("/admin/**").hasRole("ADMIN")
+            .anyRequest().permitAll());
+        http.addFilter(new JWTAuthenticationFilter(authManager, memRepo, passwordEncoder())); // 수정된 부분
+        http.httpBasic(basic -> basic.disable());
+        http.formLogin(formLogin -> formLogin.disable());
+        http.addFilterBefore(new JWTAuthorizationFilter(memRepo), AuthorizationFilter.class);
+
+        return http.build();
+    }
+}

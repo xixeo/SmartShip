@@ -1,0 +1,15 @@
+package com.lead.entity;
+
+public enum Role {
+    ADMIN, USER, GUEST;
+    
+    // 소문자 문자열을 Role로 변환하는 메서드
+    public static Role fromString(String role) {
+        for (Role r : Role.values()) {
+            if (r.name().equalsIgnoreCase(role)) {
+                return r;
+            }
+        }
+        throw new IllegalArgumentException("Unknown role: " + role);
+    }
+}

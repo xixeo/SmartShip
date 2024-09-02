@@ -1,0 +1,46 @@
+package com.lead.controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.lead.entity.Member;
+import com.lead.service.MemberService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@RestController
+@RequiredArgsConstructor
+@Slf4j
+public class MemberController {
+    private final MemberService memberService; 
+
+    // 회원 가입
+    @PostMapping("/signup")
+    public ResponseEntity<String> joinMembers(@RequestBody Member member) {
+        log.info("회원 가입 요청: {}", member.getUsername());
+        String response = memberService.joinMembers(member); 
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+    
+    // 회원 탈퇴
+    @PostMapping("/members/unsub")
+    public ResponseEntity<String> unsubMembers(@AuthenticationPrincipal User user) {
+        log.info("회원 탈퇴 요청: {}", user.getUsername());
+        String response = memberService.unsubMembers(user);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    
+    // 특정 사용자 조회
+    @GetMapping("/api/users/{username}")
+    public Member getMemberById(@PathVariable String username) {
+        return memberService.getMemberById(username);
+    }
+}

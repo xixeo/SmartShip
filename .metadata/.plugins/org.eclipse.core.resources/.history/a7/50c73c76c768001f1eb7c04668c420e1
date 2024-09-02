@@ -1,0 +1,5 @@
+package com.lead.dto;
+
+public class SuppliersDTO {
+
+}

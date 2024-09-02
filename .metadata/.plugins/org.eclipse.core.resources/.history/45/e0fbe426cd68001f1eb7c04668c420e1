@@ -1,0 +1,56 @@
+package com.lead.controller;
+
+import com.lead.entity.Member;
+import com.lead.service.MemberService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/members")
+public class MemberController {
+
+    @Autowired
+    private MemberService memberService;
+
+    @GetMapping
+    public ResponseEntity<List<Member>> getAllMembers() {
+        List<Member> members = memberService.getAllMembers();
+        return new ResponseEntity<>(members, HttpStatus.OK);
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<Member> getMemberByUsername(@PathVariable String username) {
+        Optional<Member> member = memberService.getMemberByUsername(username);
+        return member.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                     .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @PostMapping
+    public ResponseEntity<Member> createMember(@RequestBody Member member) {
+        Member savedMember = memberService.saveMember(member);
+        return new ResponseEntity<>(savedMember, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{username}")
+    public ResponseEntity<Member> updateMember(@PathVariable String username, @RequestBody Member member) {
+        Optional<Member> existingMember = memberService.getMemberByUsername(username);
+        if (existingMember.isPresent()) {
+            member.setUsername(username);
+            Member updatedMember = memberService.saveMember(member);
+            return new ResponseEntity<>(updatedMember, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/{username}")
+    public ResponseEntity<Void> deleteMember(@PathVariable String username) {
+        memberService.deleteMember(username);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+}

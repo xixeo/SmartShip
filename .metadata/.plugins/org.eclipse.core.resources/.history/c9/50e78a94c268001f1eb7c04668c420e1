@@ -1,0 +1,9 @@
+package com.lead.persistence;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.lead.domain.Items;
+
+
+public interface ItemssRepo extends JpaRepository<Items, Long> {
+    // query 
+}

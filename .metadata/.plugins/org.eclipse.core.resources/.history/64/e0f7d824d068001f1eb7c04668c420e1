@@ -1,0 +1,43 @@
+package com.lead.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "Category2")
+public class Category2 {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int category2Id;
+
+    @ManyToOne
+    @JoinColumn(name = "category1_id", nullable = false)
+    private Category1 category1;
+
+    private String category2Name;
+
+    // Getters and Setters
+    public int getCategory2Id() {
+        return category2Id;
+    }
+
+    public void setCategory2Id(int category2Id) {
+        this.category2Id = category2Id;
+    }
+
+    public Category1 getCategory1() {
+        return category1;
+    }
+
+    public void setCategory1(Category1 category1) {
+        this.category1 = category1;
+    }
+
+    public String getCategory2Name() {
+        return category2Name;
+    }
+
+    public void setCategory2Name(String category2Name) {
+        this.category2Name = category2Name;
+    }
+}

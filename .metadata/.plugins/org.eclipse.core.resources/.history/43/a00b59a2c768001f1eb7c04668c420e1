@@ -1,0 +1,16 @@
+package com.lead.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class SuppliersDTO {
+
+    private int supplierId;
+    private String supplierName;
+}

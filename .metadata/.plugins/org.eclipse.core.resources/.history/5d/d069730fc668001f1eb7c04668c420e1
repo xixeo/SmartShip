@@ -1,0 +1,5 @@
+package com.lead.repository;
+
+public class OrderDetailRepo {
+
+}

@@ -1,0 +1,17 @@
+package com.lead.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Category2Dto {
+
+    private int category2Id;
+    private int category1Id; // Parent Category ID
+    private String category2Name;
+}

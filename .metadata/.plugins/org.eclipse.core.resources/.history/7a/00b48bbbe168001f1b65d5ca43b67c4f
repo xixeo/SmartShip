@@ -1,0 +1,81 @@
+package com.lead.config.filter;
+
+import java.io.IOException;
+import java.util.Date;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lead.entity.Member;
+import com.lead.repository.MemberRepo;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
+    private final AuthenticationManager authManager; 
+    private final MemberRepo memRepo;
+    private final PasswordEncoder passwordEncoder;
+    
+    public JWTAuthenticationFilter(AuthenticationManager authManager, MemberRepo memRepo, PasswordEncoder passwordEncoder) {
+        this.authManager = authManager;
+        this.memRepo = memRepo;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
+        ObjectMapper mapper = new ObjectMapper(); 
+        try { 
+            Member member = mapper.readValue(request.getInputStream(), Member.class); 
+            log.info("인증 시도 사용자: {}", member.getUsername());
+            
+            // 사용자와 비밀번호가 DB에 있는지 확인
+            Member dbMember = memRepo.findById(member.getUsername())
+                .orElseThrow(() -> new RuntimeException("사용자가 존재하지 않습니다."));
+            
+            // 비밀번호 비교
+            if (!passwordEncoder.matches(member.getPw(), dbMember.getPw())) {
+                throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            }
+
+            Authentication authToken = new UsernamePasswordAuthenticationToken(member.getUsername(), member.getPw());
+            return authManager.authenticate(authToken);
+        } catch (Exception e) {
+            log.error("인증 오류 발생: {}", e.getMessage()); 
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType("application/json");
+            try {
+                response.getWriter().write("{\"error\": \"인증 실패: " + e.getMessage() + "\"}");
+            } catch (IOException ioException) {
+                log.error("응답 작성 오류: {}", ioException.getMessage());
+            }
+            return null; 
+        }
+    }
+    
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, 
+                                             FilterChain chain, Authentication authResult) {
+        User user = (User) authResult.getPrincipal(); 
+        String token = JWT.create()
+                          .withExpiresAt(new Date(System.currentTimeMillis() + 1000*60*60))
+                          .withClaim("username", user.getUsername())
+                          .sign(Algorithm.HMAC256("com.lead.jwt"));
+        response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        response.setStatus(HttpStatus.OK.value());
+    }
+}

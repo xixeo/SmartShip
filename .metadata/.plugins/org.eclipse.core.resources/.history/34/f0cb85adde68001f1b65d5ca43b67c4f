@@ -1,0 +1,32 @@
+@Configuration
+public class SecurityConfig {
+    
+    private final AuthenticationConfiguration authConfig;
+    private final MemberRepo memRepo;
+
+    public SecurityConfig(AuthenticationConfiguration authConfig, MemberRepo memRepo) {
+        this.authConfig = authConfig;
+        this.memRepo = memRepo;
+    }
+    
+    @Bean
+    PasswordEncoder passwordEncoder() { 
+        return new BCryptPasswordEncoder();
+    }    
+    
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception { 
+        
+        http.csrf(csrf -> csrf.disable());    
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/members/**").authenticated()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().permitAll()); 
+        http.addFilter(new JWTAuthenticationFilter(authConfig.getAuthenticationManager()));
+        http.httpBasic(basic -> basic.disable()); 
+        http.formLogin(formLogin -> formLogin.disable()); 
+        http.addFilterBefore(new JWTAuthorizationFilter(memRepo), AuthorizationFilter.class);
+        
+        return http.build();
+    }
+}

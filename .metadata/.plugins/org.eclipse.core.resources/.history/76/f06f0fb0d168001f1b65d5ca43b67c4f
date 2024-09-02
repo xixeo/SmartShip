@@ -1,0 +1,9 @@
+spring.application.name=ship
+spring.datasource.url=jdbc:mysql://localhost:3306/ship
+spring.datasource.username=scott
+spring.datasource.password=tiger
+
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.generate-ddl=false
+

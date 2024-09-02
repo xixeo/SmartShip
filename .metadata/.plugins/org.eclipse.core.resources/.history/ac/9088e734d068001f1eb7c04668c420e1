@@ -1,0 +1,25 @@
+package com.lead.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Getter
+@Setter
+@ToString
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "category2")
+public class Category2 {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer category2Id;  // PK로 사용되는 자동 증가 컬럼
+
+    @Column(nullable = false)
+    private Integer category1Id;  // FK로 사용되는 컬럼, 자동 증가 아님
+
+    @Column(nullable = false)
+    private String category2Name; // 카테고리2 이름
+}

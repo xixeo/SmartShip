@@ -1,0 +1,73 @@
+package com.lead.service;
+
+import com.lead.entity.Member;
+import com.lead.entity.Role;
+import com.lead.repository.MemberRepo;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class MemberService {
+
+    @Autowired
+    private final MemberRepo memberRepo;
+    private final PasswordEncoder passwordEncoder; 
+
+    // 사용자 조회
+    public Member getMemberById(String id) {
+        return memberRepo.findById(id).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+    }
+
+    // 회원 가입
+    public String joinMembers(Member member) {
+        String username = member.getUsername(); 
+
+        Optional<Member> memberByUsername = memberRepo.findById(username);
+
+        if (memberByUsername.isPresent()) {
+            if (memberByUsername.get().isEnabled()) {
+                return "이미 가입된 ID 입니다. 다른 ID를 선택하세요.";		
+            } else {
+                return "사용할 수 없는 ID 입니다.";
+            }
+        } else {
+            member.setRole(Role.USER);
+            member.setEnabled(true);
+            member.setPw(passwordEncoder.encode(member.getPw()));
+            memberRepo.save(member);
+            return username + "님, 가입을 축하합니다!";
+        }				
+    }
+
+    // 사용자 인증 (로그인)
+    public Member authenticate(String username, String password) {
+        Member member = memberRepo.findById(username)
+                .orElseThrow(() -> new BadCredentialsException("사용자 이름이 잘못되었습니다."));
+
+        if (!passwordEncoder.matches(password, member.getPw())) {
+            throw new BadCredentialsException("비밀번호 오류");
+        }
+
+        return member;
+    }
+    
+    // 회원 탈퇴
+    public String unsubMembers(User user) {
+        Member member = memberRepo.findById(user.getUsername())
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        
+        // 회원 탈퇴 로직: 예를 들어, 계정을 비활성화 상태로 설정
+        member.setEnabled(false);
+        memberRepo.save(member);
+
+        return "회원 탈퇴가 완료되었습니다.";
+    }
+
+}

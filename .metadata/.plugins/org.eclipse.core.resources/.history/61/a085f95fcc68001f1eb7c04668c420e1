@@ -1,0 +1,32 @@
+package com.lead.service;
+
+import com.lead.entity.Member;
+import com.lead.repository.MemberRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class MemberService {
+
+    @Autowired
+    private MemberRepo memberRepo;
+
+    public List<Member> getAllMembers() {
+        return memberRepo.findAll();
+    }
+
+    public Optional<Member> getMemberByUsername(String username) {
+        return memberRepo.findById(username);
+    }
+
+    public Member saveMember(Member member) {
+        return memberRepo.save(member);
+    }
+
+    public void deleteMember(String username) {
+        memberRepo.deleteById(username);
+    }
+}

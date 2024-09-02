@@ -1,0 +1,23 @@
+package com.lead.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.lead.domain.Items;
+import com.lead.persistence.ItemssRepo;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class ProductsService {
+
+	private final ItemssRepo productsRepo; 
+	
+    public List<Items> findAllProducts() {
+        return productsRepo.findAll();
+    }
+
+    // service methods
+}

@@ -1,0 +1,53 @@
+package com.lead.service;
+
+import com.lead.entity.Member;
+import com.lead.repository.MemberRepo;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class MemberService {
+
+    @Autowired
+    private MemberRepo memberRepo;
+    private final PasswordEncoder passwordEncoder; 
+
+	public Members getMemberById(String id) {
+		return memberRepo.findById(id).get();
+	}
+
+	public String joinMembers(Members member) {
+		String username = member.getUsername(); 
+		String email = member.getEmail(); 		
+		Optional <Members> memberByUsername = memberRepo.findById(username); 
+		Members memberByEmail = memberRepo.findByEmail(email);
+		System.out.println(memberByEmail);	
+
+		if (memberByEmail != null || memberByUsername.isPresent()) {
+			if(memberByUsername.isPresent()) 
+				if (memberByUsername.get().isEnabled() == true)
+					return "이미 가입된 사용자 입니다.";		
+				else 
+					return "사용할 수 없는 아이디 입니다.";
+			else
+				if(memberByEmail.isEnabled() == true)
+					return "이미 가입된 사용자 입니다.";
+				else 
+					return "사용할 수 없는 이메일 입니다.";
+		}			
+		else {
+			member.setRole(Role.ROLE_MEMBER);
+			member.setEnabled(true);
+			member.setPassword(passwordEncoder.encode(member.getPassword()));
+			memberRepo.save(member);
+			return username + "님, 가입을 축하합니다!";
+		}				
+}

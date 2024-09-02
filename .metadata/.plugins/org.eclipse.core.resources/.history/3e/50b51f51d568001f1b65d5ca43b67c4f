@@ -1,0 +1,68 @@
+package com.lead.config.filter;
+
+import java.io.IOException;
+import java.util.Date;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.lead.repository.MemberRepo;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RequiredArgsConstructor
+public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
+    private final AuthenticationManager authManager;
+    private final MemberRepo memberRepo;
+    private final PasswordEncoder passwordEncoder;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/signup", "/login").permitAll() // 로그인 경로도 공개 설정
+                .requestMatchers("/api/users/**").authenticated()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .anyRequest().permitAll())
+            .formLogin(form -> form.disable())
+            .httpBasic(basic -> basic.disable())
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilter(new JWTAuthenticationFilter(authenticationConfiguration.getAuthenticationManager()))
+            .addFilterBefore(new JWTAuthorizationFilter(memRepo), AuthorizationFilter.class);
+
+        return http.build();
+    }
+
+
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+                                            FilterChain chain, Authentication authResult) throws IOException, ServletException {
+        User user = (User) authResult.getPrincipal();
+        String token = JWT.create()
+                          .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                          .withClaim("username", user.getUsername())
+                          .sign(Algorithm.HMAC256("your_secret_key")); // 비밀 키는 설정에서 가져오도록 권장
+
+        response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        response.setStatus(HttpStatus.OK.value());
+    }
+}
