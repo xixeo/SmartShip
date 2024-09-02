@@ -1,32 +1,21 @@
 package com.lead.service;
 
-import com.lead.entity.Category2;
-import com.lead.repository.Category2Repo;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.lead.entity.Category2;
+import com.lead.repository.Category2Repo;
 
 @Service
 public class Category2Service {
 
-    @Autowired
-    private Category2Repo category2Repo;
+	  @Autowired
+	    private Category2Repo category2Repo;
 
-    public List<Category2> getAllCategories2() {
-        return category2Repo.findAll();
-    }
+	    public List<Category2> findItemsByCategory1IdAndName(Integer category1Id, String category2Name) {
+	        return category2Repo.findByCategory1IdAndCategory2Name(category1Id, category2Name);
+	    }
 
-    public Optional<Category2> getCategory2ById(int id) {
-        return category2Repo.findById(id);
-    }
-
-    public Category2 saveCategory2(Category2 category2) {
-        return category2Repo.save(category2);
-    }
-
-    public void deleteCategory2(int id) {
-        category2Repo.deleteById(id);
-    }
 }

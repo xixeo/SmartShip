@@ -1,5 +1,6 @@
 package com.lead.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,26 +11,11 @@ import jakarta.persistence.Table;
 @Table(name = "Suppliers")
 public class Suppliers {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int supplierId;
+	  @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    @Column(name = "supplier_id")
+	    private Integer supplierId;
 
-    private String supplierName;
-
-    // Getters and Setters
-    public int getSupplierId() {
-        return supplierId;
-    }
-
-    public void setSupplierId(int supplierId) {
-        this.supplierId = supplierId;
-    }
-
-    public String getSupplierName() {
-        return supplierName;
-    }
-
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
-    }
+	    @Column(name = "supplier_name", nullable = false)
+	    private String supplierName;
 }

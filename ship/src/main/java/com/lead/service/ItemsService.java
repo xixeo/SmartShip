@@ -1,12 +1,12 @@
 package com.lead.service;
 
-import com.lead.entity.Items;
-import com.lead.repository.ItemsRepo;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.lead.entity.Items;
+import com.lead.repository.ItemsRepo;
 
 @Service
 public class ItemsService {
@@ -14,19 +14,7 @@ public class ItemsService {
     @Autowired
     private ItemsRepo itemsRepo;
 
-    public List<Items> getAllItems() {
-        return itemsRepo.findAll();
-    }
-
-    public Optional<Items> getItemById(int id) {
-        return itemsRepo.findById(id);
-    }
-
-    public Items saveItem(Items item) {
-        return itemsRepo.save(item);
-    }
-
-    public void deleteItem(int id) {
-        itemsRepo.deleteById(id);
+    public List<Items> getItems(Integer category1Id, String category2Name, String itemName, Integer supplierId) {
+        return itemsRepo.findByCategoryAndItem(category1Id, category2Name, itemName, supplierId);
     }
 }

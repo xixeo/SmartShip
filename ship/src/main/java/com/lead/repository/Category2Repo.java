@@ -1,10 +1,13 @@
 package com.lead.repository;
 
-import com.lead.entity.Category2;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.lead.entity.Category2;
+
 @Repository
 public interface Category2Repo extends JpaRepository<Category2, Integer> {
-    // 메서드
+    List<Category2> findByCategory1IdAndCategory2Name(Integer category1Id, String category2Name);
 }
