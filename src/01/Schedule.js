@@ -1,12 +1,9 @@
-import React from 'react'
-import Calendar from 'react-calendar'
+import React, { useEffect, useState } from 'react';
+import Calendar from 'react-calendar';
 import './Calendar.css';
+import Modal from '../Compo/Modal';
 
 export default function Schedule() {
-  return (
-    <div className="w-full h-full">
-       <Calendar />
-    </div>
-  )
-}
 
+ 
+}
