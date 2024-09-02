@@ -5,6 +5,7 @@ import Navi from './Compo/Navi';
 import Footer from './Compo/Footer';
 import Schedule from './01/Schedule';
 import ListTable from './02/ListTable';
+import Order from './03/Order';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
                 <Route path="/" element={<MainApp />} />
                 <Route path="/schedule" element={<Schedule />} />
                 <Route path="/listtable" element={<ListTable />} />
+                <Route path="/order" element={<Order />} />
               </Routes>
             </main>
             <Footer />
