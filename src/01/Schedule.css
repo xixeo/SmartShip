@@ -1,6 +1,7 @@
 :root {
     --fc-today-bg-color: rgb(127 206 225 / 39%);
     --fc-event-border-color: 'white';
+    --fc-event-text-color: 'black';
 }
 /* 일요일 날짜: 빨간색 */
 .fc-day-sun a  {
@@ -52,7 +53,7 @@
 }
 
 .fc-event-main {
-    border-color: var(--fc-event-text-color);
+    border-color: 'white';
 }
 
 .fc-event-main-frame {
