@@ -1,26 +1,26 @@
 package com.lead.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
-@Getter
-@Setter
-@ToString
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Table(name = "category2")
+@Table(name = "Category2")
 public class Category2 {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "category2_id")
-    private Integer category2Id;  
+    @Column(name = "category2_id", nullable = false)
+    private Integer category2Id;
 
-    @Column(name = "category1_id", nullable = false)
-    private Integer category1Id; 
+    @ManyToOne
+    @JoinColumn(name = "category1_id", nullable = false)
+    private Category1 category1;
 
     @Column(name = "category2_name", nullable = false)
-    private String category2Name; 
+    private String category2Name;
 }

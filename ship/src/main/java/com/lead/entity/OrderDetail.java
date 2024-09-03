@@ -1,33 +1,32 @@
 package com.lead.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
-@ToString
-@Builder
+@Entity
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Table(name = "Order_Detail")
 public class OrderDetail {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int orderDetailId;
+    @Column(name = "order_detail_id", nullable = false)
+    private Integer orderDetailId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
-    private OrderHeader orderHeader;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "items_id", nullable = false)
-    private Items items;
+    private Orders order;
 
     @Column(nullable = false)
-    private int quantity;
-
-    @Column(nullable = false)
-    private double price;
+    private Integer quantity;
 }

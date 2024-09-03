@@ -1,18 +1,24 @@
 package com.lead.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import java.util.Set;
 
-@Getter
-@Setter
-@ToString
-@Builder
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Table(name = "Member")
 public class Member {
-
     @Id
     private String username;
 
@@ -22,11 +28,13 @@ public class Member {
     @Column(nullable = false)
     private String alias;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Role role; 
+    @Column(nullable = false)
+    private Role role;
 
     @Column(nullable = false)
     private boolean enabled;
 
+    @OneToMany(mappedBy = "member")
+    private Set<Orders> orders;
 }

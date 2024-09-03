@@ -11,11 +11,5 @@ import com.lead.repository.Category2Repo;
 @Service
 public class Category2Service {
 
-	  @Autowired
-	    private Category2Repo category2Repo;
-
-	    public List<Category2> findItemsByCategory1IdAndName(Integer category1Id, String category2Name) {
-	        return category2Repo.findByCategory1IdAndCategory2Name(category1Id, category2Name);
-	    }
 
 }

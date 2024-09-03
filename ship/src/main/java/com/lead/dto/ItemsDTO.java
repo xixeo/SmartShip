@@ -1,6 +1,13 @@
 package com.lead.dto;
 
-import lombok.*;
+import java.math.BigDecimal;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
@@ -10,12 +17,12 @@ import lombok.*;
 @AllArgsConstructor
 public class ItemsDTO {
 
-    private int itemsId;
-    private int category2Id; // Category2 ID
-    private String itemName;
+	private String itemName;
+    private String category1Name;
+    private String category2Name;
     private String part1;
     private String part2;
-    private double price;
+    private BigDecimal price;
     private String unit;
-    private int supplierId; // Supplier ID
+    private String supplierName;
 }
