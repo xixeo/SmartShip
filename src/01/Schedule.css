@@ -1,3 +1,7 @@
+:root {
+    --fc-today-bg-color: rgb(127 206 225 / 39%);
+    --fc-event-border-color: 'white';
+}
 /* 일요일 날짜: 빨간색 */
 .fc-day-sun a  {
     color: red;
