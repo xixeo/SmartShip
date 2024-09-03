@@ -2,10 +2,13 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Button,Paper, TextField, InputAdornment, Select, MenuItem, Box} from '@mui/material';
+import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Button, Paper, TextField, InputAdornment, Select, MenuItem, Box} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Pagination from '@mui/material/Pagination';
 import RegisterModal from "./RegisterModal";
+import LeadTimeModal from './LeadTimeModal';
+import GradientButton from '../Compo/GradientButton'
+import { useNavigate } from 'react-router-dom';
 
 // 데이터 생성 함수
 function createData(category1, category2, itemName, partNo1, partNo2, price, supplier, leadTime) {
@@ -44,11 +47,17 @@ const formatCellValue = (value) => {
 // 테이블 헤더 컴포넌트
 function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, allRowsSelected }) {
   return (
-    <TableHead>
+    <TableHead
+    sx={{ 
+      backgroundColor: '#f0f0f0', // 연회색 배경
+      '& th': {
+        fontWeight: 'bold', // 글자 굵게
+      }
+    }}>
       <TableRow>
         <TableCell padding="checkbox" style={{ width: '5%' }}>
           <Checkbox
-            color="primary"
+            color="default"
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={allRowsSelected}
             onChange={onSelectAllClick}
@@ -79,6 +88,7 @@ EnhancedTableHead.propTypes = {
 
 // 메인 테이블 컴포넌트
 function ListTable() {
+  const navigate = useNavigate();
   const [selected, setSelected] = useState(new Set()); // 선택된 항목 상태
   const [page, setPage] = useState(1); // 현재 페이지
   const [rowsPerPage, setRowsPerPage] = useState(5); // 페이지당 항목 수
@@ -86,6 +96,8 @@ function ListTable() {
   const [category1, setCategory1] = useState(''); // Category 1 필터
   const [category2, setCategory2] = useState(''); // Category 2 필터
   const [modalOpen, setModalOpen] = useState(false); // 모달 표시 상태
+  const [leadTimeModalOpen, setLeadTimeModalOpen] = useState(false); // LeadTimeModal 표시 상태
+  const [selectedLeadTimeData, setSelectedLeadTimeData] = useState([]); // 선택된 리드타임 데이터
 
   // Category 1의 고유 값 리스트
   const category1Options = [...new Set(initialRows.map((row) => row.category1))];
@@ -187,8 +199,13 @@ const handleSelectAllClick = (event) => {
   // 모달 열기 핸들러
   const openModal = () => setModalOpen(true);
 
-  // 모달 닫기 핸들러
-  const closeModal = () => setModalOpen(false);
+  // 리드타임 버튼 클릭 핸들러
+  const handleLeadTimeClick = (leadTime) => {
+    // 리드타임 데이터를 가공하여 모달에 전달
+    const leadTimeData = Array.from({ length: parseInt(leadTime, 10) }, (_, i) => Math.random() * 10 + 5); // 예시 데이터
+    setSelectedLeadTimeData(leadTimeData);
+    setLeadTimeModalOpen(true); // 모달 열기
+  };
 
   return (
     <div className="p-6">
@@ -214,9 +231,11 @@ const handleSelectAllClick = (event) => {
     '& .MuiSvgIcon-root': {
       color: 'white', // Icon color white
     },
-    // Remove hover effect
     '&:hover .MuiOutlinedInput-notchedOutline': {
       borderColor: 'white', // Keep border color white on hover
+    },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'white', // Keep border color white when focused
     },
   }}
 >
@@ -249,11 +268,12 @@ const handleSelectAllClick = (event) => {
     '& .MuiSvgIcon-root': {
       color: 'white', // Icon color white
     },
-    // Remove hover effect
     '&:hover .MuiOutlinedInput-notchedOutline': {
       borderColor: 'white', // Keep border color white on hover
     },
-    // Disabled state styling
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'white', // Keep border color white when focused
+    },
     '&.Mui-disabled': {
       '& .MuiSelect-select': {
         color: 'white', // Text color white when disabled
@@ -294,15 +314,17 @@ const handleSelectAllClick = (event) => {
     '& .MuiInputBase-input': {
       color: 'white', 
     },
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white',
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: 'white',
+      },
+      '&:hover fieldset': {
+        borderColor: 'white',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: 'white',
+      },
     },
-    '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white',
-    },
-    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white', 
-    }
   }}
 />
 
@@ -323,9 +345,11 @@ const handleSelectAllClick = (event) => {
     '& .MuiSvgIcon-root': {
       color: 'white', // Icon color white
     },
-    // Remove hover effect
     '&:hover .MuiOutlinedInput-notchedOutline': {
       borderColor: 'white', // Keep border color white on hover
+    },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'white', // Keep border color white when focused
     },
   }}
 >
@@ -337,14 +361,11 @@ const handleSelectAllClick = (event) => {
 </Select>
 </div>
         {/* 새상품 등록 버튼 */}
-        <Button
-          variant="contained"
-          color="primary"
-          className="text-white bg-indigo-400"
+        <GradientButton
           onClick={openModal} // 버튼 클릭 시 모달 열기
         >
           새상품 등록
-        </Button>
+        </GradientButton>
       </div>
 
       <Box className="bg-white rounded-lg shadow-md">
@@ -374,6 +395,7 @@ const handleSelectAllClick = (event) => {
                   >
                     <TableCell padding="checkbox" style={{ width: '5%' }}>
                       <Checkbox
+                        color="default"
                         checked={isItemSelected}
                         inputProps={{ 'aria-labelledby': labelId }}
                       />
@@ -388,13 +410,19 @@ const handleSelectAllClick = (event) => {
                     <TableCell align="center">{formatCellValue(row.price)}</TableCell>
                     <TableCell align="center">{formatCellValue(row.supplier)}</TableCell>
                     <TableCell align="center" style={{ width: '9%' }}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        sx={{ ml: 2 }}
-                      >
-                        리드타임
-                      </Button>
+                    <Button onClick={() => handleLeadTimeClick(row.leadTime)}
+                      variant="contained"
+                      sx={{ 
+                        ml: 2,
+                        backgroundColor: '#A0B2FB',
+                        color: 'black', 
+                        '&:hover': {
+                          backgroundColor: '#6685FF', 
+                        },
+                      }}
+                    >
+                      리드타임
+                    </Button>
                     </TableCell>
                   </TableRow>
                 );
@@ -422,12 +450,20 @@ const handleSelectAllClick = (event) => {
       </Box>
       <div className="flex justify-end gap-4 mt-6">
         {/* 발주하기 버튼 */}
-        <Button variant="contained" color="primary" className="text-white bg-indigo-400">
+        <GradientButton
+          onClick={() => navigate('/purchasing')}>
           발주하기
-        </Button>
+        </GradientButton>
       </div>
      {/* 새상품 등록 모달 */}
      <RegisterModal open={modalOpen} setOpen={setModalOpen} />
+
+     {/* 리드타임 모달 */}
+     <LeadTimeModal
+          open={leadTimeModalOpen}
+          setOpen={setLeadTimeModalOpen}
+          leadTimeData={selectedLeadTimeData} // 선택된 리드타임 데이터 전달
+     />
     </div>
   );
 }
