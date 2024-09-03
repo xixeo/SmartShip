@@ -1,5 +1,3 @@
-// TODO : category2 placeholder 흰색으로 처음부터 띄우기, 검색란 hover 수정
-
 import React, { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Button, Paper, TextField, InputAdornment, Select, MenuItem, Box} from '@mui/material';
@@ -48,12 +46,12 @@ const formatCellValue = (value) => {
 function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, allRowsSelected }) {
   return (
     <TableHead
-    sx={{ 
-      backgroundColor: '#f0f0f0', // 연회색 배경
-      '& th': {
-        fontWeight: 'bold', // 글자 굵게
-      }
-    }}>
+      sx={{ 
+        backgroundColor: '#f0f0f0', // 연회색 배경
+        '& th': {
+          fontWeight: 'bold', // 글자 굵게
+        }
+      }}>
       <TableRow>
         <TableCell padding="checkbox" style={{ width: '5%' }}>
           <Checkbox
@@ -220,22 +218,23 @@ const handleSelectAllClick = (event) => {
   displayEmpty
   className="bg-transparent rounded-md"
   sx={{
+    height: 40, 
     minWidth: 120,
-    backgroundColor: 'transparent', // Background color transparent
+    backgroundColor: 'transparent', 
     '& .MuiSelect-select': {
-      color: 'white', // Text color white
+      color: 'white', 
     },
     '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white', // Border color white
+      borderColor: 'white',
     },
     '& .MuiSvgIcon-root': {
-      color: 'white', // Icon color white
+      color: 'white', 
     },
     '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white', // Keep border color white on hover
+      borderColor: 'white', 
     },
     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white', // Keep border color white when focused
+      borderColor: 'white', 
     },
   }}
 >
@@ -257,6 +256,7 @@ const handleSelectAllClick = (event) => {
   className="bg-transparent rounded-md"
   disabled={!category1} // 'Category 1'이 선택되지 않았을 때만 비활성화
   sx={{
+    height: 40, 
     minWidth: 120,
     backgroundColor: 'transparent', // Background color transparent
     '& .MuiSelect-select': {
@@ -302,19 +302,22 @@ const handleSelectAllClick = (event) => {
   InputProps={{
     startAdornment: (
       <InputAdornment position="start">
-        <SearchIcon sx={{ color: 'white' }} />
+        <SearchIcon sx={{ color: 'white' , fontSize: 20}} />
       </InputAdornment>
     ),
   }}
   className="bg-transparent rounded-md"
   sx={{
+    height: 40, 
     flexGrow: 1,
     maxWidth: 300,
     backgroundColor: 'transparent',
     '& .MuiInputBase-input': {
       color: 'white', 
+      height: '100%',
     },
     '& .MuiOutlinedInput-root': {
+      height: 40, 
       '& fieldset': {
         borderColor: 'white',
       },
@@ -334,6 +337,7 @@ const handleSelectAllClick = (event) => {
   onChange={handleChangeRowsPerPage}
   className="bg-transparent rounded-md"
   sx={{
+    height: 40, 
     minWidth: 120,
     backgroundColor: 'transparent', // Background color transparent
     '& .MuiSelect-select': {
@@ -444,14 +448,14 @@ const handleSelectAllClick = (event) => {
             onChange={handleChangePage}
             variant="outlined"
             shape="rounded"
-            color="primary"
+            color="original"
           />
         </Box>
       </Box>
       <div className="flex justify-end gap-4 mt-6">
         {/* 발주하기 버튼 */}
         <GradientButton
-          onClick={() => navigate('/purchasing')}>
+          onClick={() => navigate('/order')}>
           발주하기
         </GradientButton>
       </div>
