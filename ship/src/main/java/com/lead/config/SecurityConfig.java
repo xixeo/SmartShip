@@ -45,4 +45,22 @@ public class SecurityConfig {
 		http.addFilterBefore(new JWTAuthorizationFilter(memRepo), AuthorizationFilter.class);
 		return http.build();
 	}
+	
+//	@Bean
+//	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//	    http.csrf(csrf -> csrf.disable());
+//	    
+//	    // 모든 요청을 인증 없이 접근 허용
+//	    http.authorizeHttpRequests(auth -> auth
+//	            .anyRequest().permitAll());
+//
+//	    http.formLogin(frmLogin -> frmLogin.disable());
+//	    http.httpBasic(basic -> basic.disable());
+//	    http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+//	    http.addFilter(new JWTAuthenticationFilter(authenticationConfiguration.getAuthenticationManager()));
+//	    http.addFilterBefore(new JWTAuthorizationFilter(memRepo), AuthorizationFilter.class);
+//
+//	    return http.build();
+//	}
+
 }

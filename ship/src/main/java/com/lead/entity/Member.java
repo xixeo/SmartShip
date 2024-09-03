@@ -29,7 +29,6 @@ public class Member {
     private String alias;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Role role;
 
     @Column(nullable = false)

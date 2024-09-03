@@ -27,6 +27,10 @@ public class OrderDetail {
     @JoinColumn(name = "order_id", nullable = false)
     private Orders order;
 
+    @ManyToOne
+    @JoinColumn(name = "items_id", nullable = false)
+    private Items item; // 수정된 부분
+
     @Column(nullable = false)
     private Integer quantity;
 }

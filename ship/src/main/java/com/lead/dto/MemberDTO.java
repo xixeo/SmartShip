@@ -1,6 +1,13 @@
 package com.lead.dto;
 
-import lombok.*;
+import com.lead.entity.Role;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
@@ -12,6 +19,6 @@ public class MemberDTO {
 
     private String username;
     private String alias;
-    private String role;
+    private Role role;
     private boolean enabled;
 }
