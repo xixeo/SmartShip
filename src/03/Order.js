@@ -1,26 +1,16 @@
 // TODO: 년월 출력형식 변경, 요일도 알파벳3개 뜨도록
 
-import * as React from 'react';
+import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Collapse from '@mui/material/Collapse';
-import IconButton from '@mui/material/IconButton';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Paper, Select, MenuItem, InputAdornment, TextField, Button, Box, IconButton, Typography, Collapse } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import Pagination from '@mui/material/Pagination';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import CloseIcon from '@mui/icons-material/Close';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
-import { TextField } from '@mui/material';
-import { useState } from 'react';
 
 function createData(name, calories, fat, carbs, protein, price) {
   return {
@@ -250,11 +240,14 @@ function Order() {
             }}>
             <TableRow>
               <TableCell />
-              <TableCell>Dessert (100g serving)</TableCell>
-              <TableCell align="right">Calories</TableCell>
-              <TableCell align="right">Fat&nbsp;(g)</TableCell>
-              <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-              <TableCell align="right">Protein&nbsp;(g)</TableCell>
+              <TableCell align="center">Category 1</TableCell>
+              <TableCell align="center">Category 2</TableCell>
+              <TableCell align="center">물품명</TableCell>
+              <TableCell align="center">단가</TableCell>
+              <TableCell align="center">수량</TableCell>
+              <TableCell align="center">금액</TableCell>
+              <TableCell align="center">최적 발주일</TableCell>
+              <TableCell align="center">과거 리드타임</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
