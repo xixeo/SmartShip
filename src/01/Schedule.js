@@ -85,19 +85,25 @@ export default function Schedule() {
             {
               supplier: 'HaIn',
               category1: '식품',
-              category2: '과일',
-              items: [
-                { itemname: '수박', qnt: '100' },
-                { itemname: '사과', qnt: '50' }
+              category2s: [
+                { category2: '과일',
+                  items: [
+                    { itemname: '수박', qnt: '100' },
+                    { itemname: '사과', qnt: '50' }
+                  ]
+                },
               ]
             },
             {
               supplier: 'TechCorp',
               category1: '전자기기',
-              category2: '컴퓨터',
-              items: [
-                { itemname: '노트북', qnt: '10' },
-                { itemname: '마우스', qnt: '20' }
+              category2s: [
+                { category2: '컴퓨터',
+                  items: [
+                    { itemname: '노트북', qnt: '10' },
+                    { itemname: '마우스', qnt: '20' }
+                  ]
+                },
               ]
             }
           ]
@@ -109,19 +115,67 @@ export default function Schedule() {
             {
               supplier: 'HaIn',
               category1: '식품',
-              category2: '채소',
-              items: [
-                { itemname: '당근', qnt: '200' },
-                { itemname: '양파', qnt: '150' }
+              category2s: [
+                {category2:'채소',
+                  items: [
+                    { itemname: '당근', qnt: '200' },
+                    { itemname: '양파', qnt: '150' }
+                  ]
+                },
+                {category2:'과일',
+                  items: [
+                    { itemname: '수박', qnt: '200' },
+                    { itemname: '토마토', qnt: '150' }
+                  ]
+                },
               ]
             },
             {
               supplier: 'GreenWorld',
               category1: '식품',
-              category2: '곡물',
-              items: [
-                { itemname: '쌀', qnt: '500' },
-                { itemname: '밀가루', qnt: '300' }
+              category2s: [
+                { category2: '곡물',
+                  items: [
+                    { itemname: '쌀', qnt: '500' },
+                    { itemname: '밀가루', qnt: '300' }
+                  ]
+                },
+              ]
+            }
+          ]
+        },
+        {
+          id: 3,
+          title: 'Event 3',
+          categories: [
+            {
+              supplier: '쿠팡',
+              category1: '옷',
+              category2s: [
+                {category2:'작업복',
+                  items: [
+                    { itemname: '상의', qnt: '100' },
+                    { itemname: '하의', qnt: '150' }
+                  ]
+                },
+                {category2:'캐주얼',
+                  items: [
+                    { itemname: '티셔츠', qnt: '50' },
+                    { itemname: '반바지', qnt: '10' }
+                  ]
+                },
+              ]
+            },
+            {
+              supplier: '이마트',
+              category1: '식품',
+              category2s: [
+                { category2: '곡물',
+                  items: [
+                    { itemname: '쌀', qnt: '500' },
+                    { itemname: '밀가루', qnt: '300' }
+                  ]
+                },
               ]
             }
           ]
@@ -165,46 +219,59 @@ export default function Schedule() {
     }
   };
 
-  //modal
+  // Modal 
   const handleeventclick = (e) => {
     const eventtitle = e.event.title;
-    console.log('eventtitle',eventtitle);
+    console.log('eventtitle', eventtitle);
     const eventDetail = detaildatas.find(detail => detail.title === eventtitle);
     console.log('eventde', eventDetail);
-
-    if (eventDetail) {
-      // 공급자별로 카테고리와 품목을 나누기
+  
+    // Modal 콘텐츠 생성 함수
+    const generateModalContent = (eventDetail) => {
+      // 공급자별로 카테고리와 아이템을 정리합니다.
       const suppliers = eventDetail.categories.reduce((acc, category) => {
-        const { supplier, category1, category2, items } = category;
+        const { supplier, category1, category2s } = category;
+  
+        const category2List = category2s || [];
+  
         if (!acc[supplier]) {
           acc[supplier] = [];
         }
-        acc[supplier].push({ category1, category2, items });
+        category2List.forEach(category2 => {
+          category2.items.forEach(item => {
+            acc[supplier].push({
+              category1,
+              category2: category2.category2,
+              itemname: item.itemname,
+              qnt: item.qnt
+            });
+          });
+        });
         return acc;
       }, {});
   
-      // 모달에 표시할 HTML 구성
-    const modalContent = Object.entries(suppliers).map(([supplier, categories], index) => (
-      <div key={index} className="mb-4">
-        <h3 className="text-xl font-semibold mb-2">공급업체: {supplier}</h3>
-        {categories.map((category, catIndex) => (
-          <div key={catIndex} className="mb-4">
-            <table className="min-w-full divide-y divide-gray-200 border border-gray-300">
+      return (
+        <div className="p-6">
+        <h2 className="text-2xl font-bold mb-4">{eventDetail.title}</h2>
+        {Object.keys(suppliers).map((supplier, index) => (
+          <div key={index} className="mb-6">
+            <h3 className="text-xl font-semibold mb-2">Supplier: {supplier}</h3>
+            <table className="w-full min-w-full divide-y divide-gray-200 border border-gray-300">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Category 1</th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Category 2</th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Item Name</th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Quantity</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Category 1</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Category 2</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Item Name</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Quantity</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {category.items.map((item, itemIndex) => (
+                {suppliers[supplier].map((item, itemIndex) => (
                   <tr key={itemIndex}>
-                    <td className="px-4 py-2 text-sm text-gray-600">{category.category1}</td>
-                    <td className="px-4 py-2 text-sm text-gray-600">{category.category2}</td>
-                    <td className="px-4 py-2 text-sm text-gray-600">{item.itemname}</td>
-                    <td className="px-4 py-2 text-sm text-gray-600">{item.qnt}</td>
+                    <td className="px-6 py-2 text-sm text-gray-600">{item.category1}</td>
+                    <td className="px-6 py-2 text-sm text-gray-600">{item.category2}</td>
+                    <td className="px-6 py-2 text-sm text-gray-600">{item.itemname}</td>
+                    <td className="px-6 py-2 text-sm text-gray-600">{item.qnt}</td>
                   </tr>
                 ))}
               </tbody>
@@ -212,21 +279,25 @@ export default function Schedule() {
           </div>
         ))}
       </div>
-    ));
-
-    setModalData(
-      <div className="p-4">
-        <h2 className="text-2xl font-bold mb-4">{eventDetail.title}</h2>
-        {modalContent}
-      </div>
-    );
-      setOpen(true)
+      );
+    };
+  
+    if (eventDetail) {
+      const modalContent = generateModalContent(eventDetail);
+  
+      setModalData(
+        <div className="p-4">
+          {modalContent}
+        </div>
+      );
+      setOpen(true);
     }
   };
+  
 
   return (
     <div className="w-full">
-      <div className='w-full flex justify-end'>\
+      <div className='w-full flex justify-end'>
         <input className='m-5' placeholder='견적서 제목' value={searchEvent} onChange={(e) => setSearchEvent(e.target.value)} onKeyDown={handleKeyDown} />
         <button className='bg-indigo-500 m-3 p-2' onClick={searchTitle}>검색</button>
       </div>
