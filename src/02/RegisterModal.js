@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import {Box, Button, TextField, InputAdornment} from '@mui/material';
+import {Box, TextField, InputAdornment} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Modal from '../Compo/Modal';
+import GradientButton from '../Compo/GradientButton'
 
 // 모달 창 내의 검색 필드 컴포넌트
 function RegisterModal({ open, setOpen }) {
@@ -51,14 +52,11 @@ function RegisterModal({ open, setOpen }) {
             className="bg-white rounded-md"
             sx={{ flexGrow: 1, maxWidth: 300 }}
           />
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ backgroundColor: '#007bff', color: '#fff' }}
+          <GradientButton
             onClick={handleSearchClick}
           >
             검색
-          </Button>
+          </GradientButton>
         </Box>
       </Box>
     </Modal>
