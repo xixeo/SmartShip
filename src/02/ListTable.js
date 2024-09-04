@@ -1,4 +1,4 @@
-// restAPI 추가하기전
+// db연결전 + 연결후 (4개 변경 +)
 
 import React, { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
@@ -9,34 +9,54 @@ import RegisterModal from "./RegisterModal";
 import LeadTimeModal from './LeadTimeModal';
 import GradientButton from '../Compo/GradientButton'
 import { useNavigate } from 'react-router-dom';
+import CloseIcon from '@mui/icons-material/Close';
+import { IconButton } from '@mui/material';
 
+// 1) db연결전
 // 데이터 생성 함수
-function createData(category_name, category2_name, item_name, part1, part2, price, unit, supplier_name, leadtime) {
-  return { category_name, category2_name, item_name, part1, part2, price, unit, supplier_name, leadtime };
+function createData(category1Name, category2Name, itemName, part1, part2, price, unit, supplierName, leadtime) {
+  return { category1Name, category2Name, itemName, part1, part2, price, unit, supplierName, leadtime };
 }
-
 // 초기 데이터
 const initialRows = [
-  createData('식품', '과일', '수박', '012526', '', '180', 'EUR', '쿠팡', '1일'),
-  createData('음료', '탄산음료', '콜라', '015789', '321456', '120', 'USD', '이마트', '2일'),
-  createData('음료', '탄산음료', '사이다', '015782', '321457', '120', 'KRW', '이마트', '2일'),
-  createData('음료', '커피', '', '015783', '321458', '170', 'KRW', '롯데슈퍼', '3일'),
-  createData('간식', '과자', '포테이토칩', '019876', '654321', '1500', 'JPY', '롯데마트', '4일'),
-  createData('유제품', '우유', '서울우유', '021345', '987654', '200', 'KRW', '홈플러스', '5일'),
-  createData('건강식품', '비타민', '비타민C', '023456', '789012', '250', 'EUR', '네이버쇼핑', '6일'),
-  createData('과일', '사과', '후지사과', '025678', '345678', '220', 'USD', '마켓컬리', '7일'),
+  createData('식품', '과일', '수박', '012526', '', '180', 'EUR', '쿠팡', 1),
+  createData('음료', '탄산음료', '콜라', '015789', '321456', '120', 'USD', '이마트', 2),
+  createData('음료', '탄산음료', '사이다', '015782', '321457', '120', 'KRW', '이마트', 2),
+  createData('음료', '커피', '', '015783', '321458', '170', 'KRW', '롯데슈퍼', 3),
+  createData('간식', '과자', '포테이토칩', '019876', '654321', '1500', 'JPY', '롯데마트', 4),
+  createData('유제품', '우유', '서울우유', '021345', '987654', '200', 'KRW', '홈플러스', 5),
+  createData('건강식품', '비타민', '비타민C', '023456', '789012', '250', 'EUR', '네이버쇼핑', 6),
+  createData('과일', '사과', '후지사과', '025678', '345678', '220', 'USD', '마켓컬리', 7),
 ];
+
+// // 2) db연결후
+// // 데이터 요청 함수
+// const fetchItems = async (category1Name, category2Name) => {
+//   try {
+//     const response = await fetch(`/finditem?category1Name=${encodeURIComponent(category1Name)}&category2Name=${encodeURIComponent(category2Name)}`);
+//     if (!response.ok) {
+//       throw new Error('Network response was not ok');
+//     }
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     console.error('Error fetching items:', error);
+//     return [];
+//   }
+// };
+// // 초기 데이터 상태
+// const initialRows = [];
 
 // 테이블 헤더 정의
 const headCells = [
-  { id: 'category_name', numeric: false, disablePadding: true, label: 'Category 1', width: '13%' },
-  { id: 'category2_name', numeric: false, disablePadding: false, label: 'Category 2', width: '13%' },
-  { id: 'item_name', numeric: false, disablePadding: false, label: '물품명', width: '14%' },
-  { id: 'part1', numeric: true, disablePadding: false, label: 'Part No. 1', width: '13%' },
-  { id: 'part2', numeric: true, disablePadding: false, label: 'Part No. 2', width: '13%' },
-  { id: 'price', numeric: true, disablePadding: false, label: '가격', width: '10%' },
-  { id: 'supplier_name', numeric: false, disablePadding: false, label: '발주처', width: '10%' },
-  { id: 'leadtime', numeric: false, disablePadding: false, label: '리드타임', width: '9%' },
+  { id: 'category1Name', label: 'Category 1', width: '13%' },
+  { id: 'category2Name', label: 'Category 2', width: '13%' },
+  { id: 'itemName', label: '물품명', width: '14%' },
+  { id: 'part1', label: 'Part No. 1', width: '13%' },
+  { id: 'part2', label: 'Part No. 2', width: '13%' },
+  { id: 'price', label: '가격', width: '10%' },
+  { id: 'supplierName', label: '발주처', width: '10%' },
+  { id: 'leadtime', label: '리드타임', width: '9%' },
 ];
 
 // null값 처리 & 가격 단위 구분 함수
@@ -68,9 +88,9 @@ function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, allRowsSel
   return (
     <TableHead
       sx={{ 
-        backgroundColor: '#f0f0f0', // 연회색 배경
+        backgroundColor: '#f0f0f0', 
         '& th': {
-          fontWeight: 'bold', // 글자 굵게
+          fontWeight: 'bold', 
         }
       }}>
       <TableRow>
@@ -108,57 +128,68 @@ EnhancedTableHead.propTypes = {
 // 메인 테이블 컴포넌트
 function ListTable() {
   const navigate = useNavigate();
+  const [rows, setRows] = useState(initialRows); // 서버에서 가져온 데이터
   const [selected, setSelected] = useState(new Set()); // 선택된 항목 상태
   const [page, setPage] = useState(1); // 현재 페이지
   const [rowsPerPage, setRowsPerPage] = useState(5); // 페이지당 항목 수
   const [searchQuery, setSearchQuery] = useState(''); // 검색 쿼리
-  const [category_name, setCategory_name] = useState(''); // Category 1 필터
-  const [category2_name, setCategory2_name] = useState(''); // Category 2 필터
+  const [category1Name, setCategoryName] = useState(''); // Category 1 필터
+  const [category2Name, setCategory2Name] = useState(''); // Category 2 필터
   const [modalOpen, setModalOpen] = useState(false); // 모달 표시 상태
   const [leadTimeModalOpen, setLeadTimeModalOpen] = useState(false); // LeadTimeModal 표시 상태
   const [selectedLeadTimeData, setSelectedLeadTimeData] = useState([]); // 선택된 리드타임 데이터
+  const [displayedRows, setDisplayedRows] = useState(initialRows); // 현재 화면에 표시되는 데이터
 
+// 1) db연결전
   // Category 1의 고유 값 리스트
-  const category1Options = [...new Set(initialRows.map((row) => row.category_name))];
-
+  const category1Options = [...new Set(initialRows.map((row) => row.category1Name))];
   // Category 2의 고유 값 리스트 (선택된 Category 1에 따라 필터링됨)
   const category2Options = useMemo(() => {
-    return [...new Set(initialRows.filter((row) => row.category_name === category_name).map((row) => row.category2_name))];
-  }, [category_name]);
+    return [...new Set(initialRows.filter((row) => row.category1Name === category1Name).map((row) => row.category2Name))];
+  }, [category1Name]);
+
+// // 2) db연결후
+//   const category1Options = useMemo(() => {
+//     return [...new Set(rows.map((row) => row.category1Name))];
+//   }, [rows]);
+
+//   const category2Options = useMemo(() => {
+//     return [...new Set(rows.filter((row) => row.category1Name === category1Name).map((row) => row.category2Name))];
+//   }, [category1Name, rows]);
+
+//   useEffect(() => {
+//     const loadItems = async () => {
+//       const data = await fetchItems(category1Name, category2Name);
+//       setRows(data);
+//     };
+
+//     loadItems();
+//   }, [category1Name, category2Name]);
 
   // 필터링된 행 데이터
   const filteredRows = useMemo(() => {
-    return initialRows.filter((row) => {
-      const matchesCategory1 = category_name ? row.category_name === category_name : true;
-      const matchesCategory2 = category2_name ? row.category2_name === category2_name : true;
-      const matchesSearchQuery = searchQuery
-        ? row.category_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          row.category2_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          row.item_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          row.part1.includes(searchQuery) ||
-          row.part2.includes(searchQuery) ||
-          row.price.includes(searchQuery) ||
-          row.supplier_name.toLowerCase().includes(searchQuery.toLowerCase())
-        : true;
-
-      return matchesCategory1 && matchesCategory2 && matchesSearchQuery;
+    return displayedRows.filter((row) => {
+      const matchesCategory1 = category1Name ? row.category1Name === category1Name : true;
+      const matchesCategory2 = category2Name ? row.category2Name === category2Name : true;
+  
+      return matchesCategory1 && matchesCategory2;
     });
-  }, [searchQuery, category_name, category2_name]);
+  }, [displayedRows, category1Name, category2Name]); // `displayedRows`를 의존성 배열에 추가 // 1) db연결전 -> 2) db연결후 rows 추가
 
   // 검색, 카테고리, 페이지 크기 변경 시 페이지를 1로 초기화
   useEffect(() => {
     setPage(1);
-  }, [searchQuery, category_name, category2_name, rowsPerPage]);
+  }, [searchQuery, category1Name, category2Name, rowsPerPage]);
 
  // 전체 선택 핸들러
 const handleSelectAllClick = (event) => {
   if (event.target.checked) {
-    const newSelected = new Set(filteredRows.map((row) => row.item_name));
+    const newSelected = new Set(filteredRows.map((row) => row.itemName));
     setSelected((prevSelected) => new Set([...prevSelected, ...newSelected]));
   } else {
     setSelected((prevSelected) => {
       const newSelected = new Set(
-        [...prevSelected].filter(item => !filteredRows.some(row => row.item_name === item))
+        [...prevSelected].filter(item => !filteredRows.some(row => row.itemName === item))
       );
       return newSelected;
     });
@@ -166,12 +197,12 @@ const handleSelectAllClick = (event) => {
 };
 
   // 행 클릭 핸들러
-  const handleClick = (event, item_name) => {
+  const handleClick = (event, itemName) => {
     const newSelected = new Set(selected);
-    if (newSelected.has(item_name)) {
-      newSelected.delete(item_name);
+    if (newSelected.has(itemName)) {
+      newSelected.delete(itemName);
     } else {
-      newSelected.add(item_name);
+      newSelected.add(itemName);
     }
     setSelected(newSelected);
   };
@@ -189,17 +220,17 @@ const handleSelectAllClick = (event) => {
 
   // Category 1 변경 핸들러
   const handleCategory1Change = (event) => {
-    setCategory_name(event.target.value);
-    setCategory2_name('');
+    setCategoryName(event.target.value);
+    setCategory2Name('');
   };
 
   // Category 2 변경 핸들러
   const handleCategory2Change = (event) => {
-    setCategory2_name(event.target.value);
+    setCategory2Name(event.target.value);
   };
 
   // 항목이 선택되었는지 여부 확인
-  const isSelected = (item_name) => selected.has(item_name);
+  const isSelected = (itemName) => selected.has(itemName);
 
   // 빈 행 계산
   const emptyRows = useMemo(
@@ -212,7 +243,7 @@ const handleSelectAllClick = (event) => {
 
   // 모든 행이 선택되었는지 여부 확인
   const allRowsSelected = useMemo(() => {
-    return filteredRows.length > 0 && filteredRows.every(row => selected.has(row.item_name));
+    return filteredRows.length > 0 && filteredRows.every(row => selected.has(row.itemName));
   }, [filteredRows, selected]);
 
   // 모달 열기 핸들러
@@ -227,164 +258,175 @@ const handleSelectAllClick = (event) => {
   };
 
   return (
-    <div className="p-6">
+    <div className="flex flex-col p-6">
       <div className="text-xl font-semibold text-white mb-4">선용품 리스트</div>
       <div className="flex items-center justify-between gap-4 mb-4">
         <div className="flex items-center gap-4">
 
-{/* Category 1 선택 필터 */}
-<Select
-  value={category_name}
-  onChange={handleCategory1Change}
-  displayEmpty
-  className="bg-transparent rounded-md"
-  sx={{
-    height: 40, 
-    minWidth: 120,
-    backgroundColor: 'transparent', 
-    '& .MuiSelect-select': {
-      color: 'white', 
-    },
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white',
-    },
-    '& .MuiSvgIcon-root': {
-      color: 'white', 
-    },
-    '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white', 
-    },
-    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white', 
-    },
-  }}
->
-  <MenuItem value="">
-    <em>Category 1</em>
-  </MenuItem>
-  {category1Options.map((option) => (
-    <MenuItem key={option} value={option}>
-      {option}
-    </MenuItem>
-  ))}
-</Select>
+          {/* Category 1 선택 필터 */}
+          <Select
+            value={category1Name}
+            onChange={handleCategory1Change}
+            displayEmpty
+            className="bg-transparent rounded-md"
+            sx={{
+              height: 40, 
+              minWidth: 120,
+              backgroundColor: 'transparent', 
+              '& .MuiSelect-select': {
+                color: 'white', 
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'white',
+              },
+              '& .MuiSvgIcon-root': {
+                color: 'white', 
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'white', 
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'white', 
+              },
+            }}
+          >
+            <MenuItem value="">
+              <em>Category 1</em>
+            </MenuItem>
+            {category1Options.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
 
-{/* Category 2 선택 필터 */}
-<Select
-  value={category2_name}
-  onChange={handleCategory2Change}
-  displayEmpty
-  className="bg-transparent rounded-md"
-  disabled={!category_name} // 'Category 1'이 선택되지 않았을 때만 비활성화
-  sx={{
-    height: 40, 
-    minWidth: 120,
-    backgroundColor: 'transparent', // Background color transparent
-    '& .MuiSelect-select': {
-      color: 'white', // Text color white
-    },
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white', // Border color white
-    },
-    '& .MuiSvgIcon-root': {
-      color: 'white', // Icon color white
-    },
-    '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white', // Keep border color white on hover
-    },
-    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white', // Keep border color white when focused
-    },
-    '&.Mui-disabled': {
-      '& .MuiSelect-select': {
-        color: 'white', // Text color white when disabled
-      },
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'white', // Border color white when disabled
-      },
-    },
-  }}
->
-  <MenuItem value="" sx={{ color: 'white' }}>
-    <em>Category 2</em>
-  </MenuItem>
-  {category2Options.map((option) => (
-    <MenuItem key={option} value={option}>
-      {option}
-    </MenuItem>
-  ))}
-</Select>
+          {/* Category 2 선택 필터 */}
+          <Select
+            value={category2Name}
+            onChange={handleCategory2Change}
+            displayEmpty
+            className="bg-transparent rounded-md"
+            disabled={!category1Name} // 'Category 1'이 선택되지 않았을 때만 비활성화
+            sx={{
+              height: 40, 
+              minWidth: 120,
+              backgroundColor: 'transparent',
+              '& .MuiSelect-select': {
+                color: 'white', 
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'white', 
+              },
+              '& .MuiSvgIcon-root': {
+                color: 'white', 
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'white', 
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'white', 
+              },
+              '&.Mui-disabled': {
+                '& .MuiSelect-select': {
+                  color: 'white', 
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'white', 
+                },
+              },
+            }}
+          >
+            <MenuItem value="">
+              <em>Category 2</em>
+            </MenuItem>
+            {category2Options.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
 
-{/* 검색 필드 */}
-<TextField
-  value={searchQuery}
-  onChange={(e) => setSearchQuery(e.target.value)}
-  placeholder="검색"
-  InputProps={{
-    startAdornment: (
-      <InputAdornment position="start">
-        <SearchIcon sx={{ color: 'white' , fontSize: 20}} />
-      </InputAdornment>
-    ),
-  }}
-  className="bg-transparent rounded-md"
-  sx={{
-    height: 40, 
-    flexGrow: 1,
-    maxWidth: 300,
-    backgroundColor: 'transparent',
-    '& .MuiInputBase-input': {
-      color: 'white', 
-      height: '100%',
-    },
-    '& .MuiOutlinedInput-root': {
-      height: 40, 
-      '& fieldset': {
-        borderColor: 'white',
-      },
-      '&:hover fieldset': {
-        borderColor: 'white',
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: 'white',
-      },
-    },
-  }}
-/>
+          {/* 검색 필드 */}
+          <TextField
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="검색"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: 'white', fontSize: 20 }} />
+                </InputAdornment>
+              ),
+              endAdornment: (
+              <InputAdornment position="end">
+                      {searchQuery && (
+                        <IconButton
+                          onClick={() => {
+                            setSearchQuery(''); // 검색 값 초기화
+                            setDisplayedRows(initialRows); // 검색 값 초기화 시 전체 데이터 다시 설정
+                          }}
+                          edge="end"
+                          sx={{ color: 'white' }}
+                        >
+                          <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
+                        </IconButton>
+                      )}
+                    </InputAdornment>
+              ),
+            }}
+            className="bg-transparent rounded-md"
+            sx={{
+              height: 40,
+              flexGrow: 1,
+              maxWidth: 300,
+              backgroundColor: 'transparent',
+              '& .MuiInputBase-input': {
+                color: 'white',
+                height: '100%',
+              },
+              '& .MuiOutlinedInput-root': {
+                height: 40,
+                '& fieldset': {
+                  borderColor: 'white',
+                },
+                '&:hover fieldset': {
+                  borderColor: 'white',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: 'white',
+                },
+              },
+            }}
+          />
+          <Button
+              onClick={() => {
+                // 검색 버튼 클릭 시 필터링된 데이터 설정
+                const filteredData = initialRows.filter((row) => { // db연결 후에는 initialRows 대신 rows 사용
+                  return row.category1Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        row.category2Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        row.itemName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        row.part1.includes(searchQuery) ||
+                        row.part2.includes(searchQuery) ||
+                        row.price.includes(searchQuery) ||
+                        row.supplierName.toLowerCase().includes(searchQuery.toLowerCase());
+                });
+                setDisplayedRows(filteredData);
+                setPage(1); // 검색 시 페이지를 1로 초기화
+              }}
+              variant="contained"
+              sx={{ 
+                ml: 2, mr: 2,
+                backgroundColor: '#A0B2FB',
+                color: 'black',
+                '&:hover': {
+                  backgroundColor: '#6685FF',
+                },
+              }}
+            >
+              검색
+            </Button>
 
-{/* 페이지당 항목 수 선택 */}
-<Select
-  value={rowsPerPage}
-  onChange={handleChangeRowsPerPage}
-  className="bg-transparent rounded-md"
-  sx={{
-    height: 40, 
-    minWidth: 120,
-    backgroundColor: 'transparent', // Background color transparent
-    '& .MuiSelect-select': {
-      color: 'white', // Text color white
-    },
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white', // Border color white
-    },
-    '& .MuiSvgIcon-root': {
-      color: 'white', // Icon color white
-    },
-    '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white', // Keep border color white on hover
-    },
-    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white', // Keep border color white when focused
-    },
-  }}
->
-  {[5, 10, 15].map((option) => (
-    <MenuItem key={option} value={option}>
-      페이지당 항목수 : {option}
-    </MenuItem>
-  ))}
-</Select>
-</div>
+          </div>
         {/* 새상품 등록 버튼 */}
         <GradientButton
           onClick={openModal} // 버튼 클릭 시 모달 열기
@@ -393,8 +435,8 @@ const handleSelectAllClick = (event) => {
         </GradientButton>
       </div>
 
-      <Box className="bg-white rounded-lg shadow-md">
-        <TableContainer component={Paper}>
+      <div className="bg-white rounded-lg shadow-md ">
+        <TableContainer component={Paper} sx={{ minHeight: '400px' }}>
           <Table>
             <EnhancedTableHead
               numSelected={selected.size}
@@ -405,17 +447,17 @@ const handleSelectAllClick = (event) => {
             <TableBody>
               {/* 페이지네이션에 따른 행 데이터 표시 */}
               {filteredRows.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row, index) => {
-                const isItemSelected = isSelected(row.item_name);
+                const isItemSelected = isSelected(row.itemName);
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => handleClick(event, row.item_name)}
+                    onClick={(event) => handleClick(event, row.itemName)}
                     role="checkbox"
                     aria-checked={isItemSelected}
                     tabIndex={-1}
-                    key={row.item_name}
+                    key={row.itemName}
                     selected={isItemSelected}
                   >
                     <TableCell padding="checkbox" style={{ width: '5%' }}>
@@ -426,16 +468,16 @@ const handleSelectAllClick = (event) => {
                       />
                     </TableCell>
                     <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
-                      {formatCellValue(row.category_name)}
+                      {formatCellValue(row.category1Name)}
                     </TableCell>
-                    <TableCell align="center">{formatCellValue(row.category2_name)}</TableCell>
-                    <TableCell align="center">{formatCellValue(row.item_name)}</TableCell>
+                    <TableCell align="center">{formatCellValue(row.category2Name)}</TableCell>
+                    <TableCell align="center">{formatCellValue(row.itemName)}</TableCell>
                     <TableCell align="center">{formatCellValue(row.part1)}</TableCell>
                     <TableCell align="center">{formatCellValue(row.part2)}</TableCell>
                     <TableCell align="center">
                       {formatCellValue(row.price, row.unit)} 
                     </TableCell>
-                    <TableCell align="center">{formatCellValue(row.supplier_name)}</TableCell>
+                    <TableCell align="center">{formatCellValue(row.supplierName)}</TableCell>
                     <TableCell align="center" style={{ width: '9%' }}>
                     <Button onClick={() => handleLeadTimeClick(row.leadtime)}
                       variant="contained"
@@ -474,14 +516,50 @@ const handleSelectAllClick = (event) => {
             color="original"
           />
         </Box>
-      </Box>
-      <div className="flex justify-end gap-4 mt-6">
+      </div>
+      <div className='flex justify-between items-center mt-6'>
+      <div className="flex gap-4">
+          {/* 페이지당 항목 수 선택 */}
+          <Select
+            value={rowsPerPage}
+            onChange={handleChangeRowsPerPage}
+            className="bg-transparent rounded-md"
+            sx={{
+              height: 40, 
+              minWidth: 120,
+              backgroundColor: 'transparent', // Background color transparent
+              '& .MuiSelect-select': {
+                color: 'white', // Text color white
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'white', // Border color white
+              },
+              '& .MuiSvgIcon-root': {
+                color: 'white', // Icon color white
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'white', // Keep border color white on hover
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'white', // Keep border color white when focused
+              },
+            }}
+          >
+            {[5, 10, 15].map((option) => (
+              <MenuItem key={option} value={option}>
+                페이지당 항목수 : {option}
+              </MenuItem>
+            ))}
+          </Select>
+      </div>
+      <div className="flex gap-4">
         {/* 발주하기 버튼 */}
         <GradientButton
           onClick={() => navigate('/order')}>
           발주하기
         </GradientButton>
       </div>
+    </div>
      {/* 새상품 등록 모달 */}
      <RegisterModal open={modalOpen} setOpen={setModalOpen} />
 
