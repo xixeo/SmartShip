@@ -28,6 +28,7 @@ public class OrderDetailService {
             var alias = orderDetail.getOrder().getMember().getAlias();
             return new OrderDetailDTO(
             	orderDetail.getOrderDetailId(),
+            	orderDetail.getOrder().getListName(),
                 item.getItemName(),
                 item.getCategory3().getCategory2().getCategory1().getCategoryName(),
                 item.getCategory3().getCategory2().getCategory2Name(),

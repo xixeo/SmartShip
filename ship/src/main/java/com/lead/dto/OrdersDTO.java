@@ -1,6 +1,7 @@
 package com.lead.dto;
 
 import java.util.Date;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,5 +15,5 @@ public class OrdersDTO {
 	private Date releaseDate;
 	private Date bestOrderDate;
 	private String alias;
-	
+	private List<OrderDetailDTO> orderDetails;
 }
