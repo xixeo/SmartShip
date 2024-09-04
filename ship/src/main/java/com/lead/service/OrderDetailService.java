@@ -27,12 +27,14 @@ public class OrderDetailService {
             var item = orderDetail.getItem();
             var alias = orderDetail.getOrder().getMember().getAlias();
             return new OrderDetailDTO(
-                item.getSupplier().getSupplierName(),
+            	orderDetail.getOrderDetailId(),
+                item.getItemName(),
                 item.getCategory2().getCategory1().getCategoryName(),
                 item.getCategory2().getCategory2Name(),
                 orderDetail.getQuantity(),
                 item.getPrice(),
                 item.getUnit(),
+                item.getSupplier().getSupplierName(),
                 alias
             );
         }).collect(Collectors.toList());

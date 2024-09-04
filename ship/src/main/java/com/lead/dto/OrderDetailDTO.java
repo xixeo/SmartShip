@@ -8,11 +8,13 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class OrderDetailDTO {
-    private String supplierName;
+	private Integer orderDetailId;
+    private String itemName;
     private String category1Name;
     private String category2Name;
     private Integer quantity;
     private BigDecimal price;
     private String unit;
+    private String supplierName;
     private String alias;
 }
