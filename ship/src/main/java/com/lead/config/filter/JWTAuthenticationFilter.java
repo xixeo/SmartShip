@@ -15,43 +15,88 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lead.entity.Member;
+import com.lead.repository.MemberRepo;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RequiredArgsConstructor
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-	private final AuthenticationManager authenticationManager;
-	
-	public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res){
-		
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			Member member = mapper.readValue(req.getInputStream(), Member.class);
-			Authentication authToken = new UsernamePasswordAuthenticationToken(member.getUsername(), member.getPw());
-			return authenticationManager.authenticate(authToken);
-		}catch(Exception e) {
-			log.info(e.getMessage());
-		}
-		res.setStatus(HttpStatus.UNAUTHORIZED.value());
-		return null;
-	}
-	
-	protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-		log.info("successfulAuthentication");
-		User user = (User)authResult.getPrincipal();
-		String token = JWT.create()
-				.withExpiresAt(new Date(System.currentTimeMillis()+1000*60*1000))
-				.withClaim("username", user.getUsername())
-				.sign(Algorithm.HMAC256("com.lead.jwt"));
-		res.addHeader(HttpHeaders.AUTHORIZATION,"Bearer "+ token);
-		res.setStatus(HttpStatus.OK.value());
-	}
-	
+    private final AuthenticationManager authenticationManager;
+    private final MemberRepo memberRepo; // 생성자 주입으로 변경
+    
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, MemberRepo memberRepo) {
+        this.authenticationManager = authenticationManager;
+        this.memberRepo = memberRepo;
+    }
+    
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Member member = mapper.readValue(req.getInputStream(), Member.class);
+            Authentication authToken = new UsernamePasswordAuthenticationToken(member.getUsername(), member.getPw());
+            return authenticationManager.authenticate(authToken);
+        } catch (Exception e) {
+            log.info(e.getMessage());
+        }
+        res.setStatus(HttpStatus.UNAUTHORIZED.value());
+        return null;
+    }
+    
+    @Override
+    protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+        log.info("successfulAuthentication");
+        User user = (User) authResult.getPrincipal();
+        String username = user.getUsername();
+        
+        // MemberRepo를 통해 username으로 Member 객체를 조회
+        Member member = memberRepo.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found")); // 예외 처리를 추가하여 NPE 방지
+
+        String token = JWT.create()
+                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 1000))
+                .withClaim("username", username)
+                .withClaim("alias", member.getAlias()) // alias 추가
+                .sign(Algorithm.HMAC256("com.lead.jwt"));
+
+        res.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        res.setStatus(HttpStatus.OK.value());
+    }
 }
+
+//@Slf4j
+//@RequiredArgsConstructor
+//public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+//
+//	private final AuthenticationManager authenticationManager;
+//	
+//	public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res){
+//		
+//		ObjectMapper mapper = new ObjectMapper();
+//		try {
+//			Member member = mapper.readValue(req.getInputStream(), Member.class);
+//			Authentication authToken = new UsernamePasswordAuthenticationToken(member.getUsername(), member.getPw());
+//			return authenticationManager.authenticate(authToken);
+//		}catch(Exception e) {
+//			log.info(e.getMessage());
+//		}
+//		res.setStatus(HttpStatus.UNAUTHORIZED.value());
+//		return null;
+//	}
+//	
+//	protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+//		log.info("successfulAuthentication");
+//		User user = (User)authResult.getPrincipal();
+//		String token = JWT.create()
+//				.withExpiresAt(new Date(System.currentTimeMillis()+1000*60*1000))
+//				.withClaim("username", user.getUsername())
+//				.sign(Algorithm.HMAC256("com.lead.jwt"));
+//		res.addHeader(HttpHeaders.AUTHORIZATION,"Bearer "+ token);
+//		res.setStatus(HttpStatus.OK.value());
+//	}
+//}

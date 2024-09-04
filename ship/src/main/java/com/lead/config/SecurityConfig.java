@@ -28,39 +28,26 @@ public class SecurityConfig {
 	@Autowired
 	private AuthenticationConfiguration authenticationConfiguration;
 	@Autowired
-	private MemberRepo memRepo;
-	
-	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		
-		http.csrf(csrf->csrf.disable());
-		http.authorizeHttpRequests(auth->auth
-				.requestMatchers("/api/users/**").authenticated()
-				.requestMatchers("/api/admin/**").hasRole("ADMIN")
-				.anyRequest().permitAll());
-		http.formLogin(frmLogin->frmLogin.disable());
-		http.httpBasic(basic->basic.disable());
-		http.sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-		http.addFilter(new JWTAuthenticationFilter(authenticationConfiguration.getAuthenticationManager()));
-		http.addFilterBefore(new JWTAuthorizationFilter(memRepo), AuthorizationFilter.class);
-		return http.build();
-	}
-	
-//	@Bean
-//	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//	    http.csrf(csrf -> csrf.disable());
-//	    
-//	    // 모든 요청을 인증 없이 접근 허용
-//	    http.authorizeHttpRequests(auth -> auth
-//	            .anyRequest().permitAll());
-//
-//	    http.formLogin(frmLogin -> frmLogin.disable());
-//	    http.httpBasic(basic -> basic.disable());
-//	    http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-//	    http.addFilter(new JWTAuthenticationFilter(authenticationConfiguration.getAuthenticationManager()));
-//	    http.addFilterBefore(new JWTAuthorizationFilter(memRepo), AuthorizationFilter.class);
-//
-//	    return http.build();
-//	}
+	private MemberRepo memberRepo;
+
+	 @Bean
+	    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	        
+	        JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter(authenticationConfiguration.getAuthenticationManager(), memberRepo);
+	        jwtAuthenticationFilter.setFilterProcessesUrl("/login"); // 로그인 경로 설정
+	        
+	        http.csrf(csrf -> csrf.disable());
+	        http.authorizeHttpRequests(auth -> auth
+	                .requestMatchers("/api/users/**").authenticated()
+	                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+	                .anyRequest().permitAll());
+	        http.formLogin(frmLogin -> frmLogin.disable());
+	        http.httpBasic(basic -> basic.disable());
+	        http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+	        http.addFilter(jwtAuthenticationFilter); // JWTAuthenticationFilter 추가
+	        http.addFilterBefore(new JWTAuthorizationFilter(memberRepo), AuthorizationFilter.class); // JWTAuthorizationFilter 추가
+	        
+	        return http.build();
+	    }
 
 }
