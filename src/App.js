@@ -22,9 +22,9 @@ function App() {
   return (
     <BrowserRouter>
       <div className="flex flex-col h-screen">
-        {!isAuthenticated ? (
+        {/* {!isAuthenticated ? (
           <SignUpIn setIsAuthenticated={setIsAuthenticated} />  // 로그인 전
-        ) : (
+        ) : ( */}
           <div className="flex flex-1">
             <Navi />
             <div className="flex flex-col flex-1">
@@ -39,7 +39,7 @@ function App() {
               <Footer />
             </div>
           </div>
-        )}
+        {/* )} */}
       </div>
     </BrowserRouter>
   );
@@ -50,7 +50,7 @@ function MainApp() {
   return (
     <div className="w-full h-full flex items-center justify-center">
       <h1 className="text-3xl font-bold text-white">
-        Welcome, {alias ? alias : 'User'}!
+        Welcome, {alias ? alias : 'User'} !
       </h1>
     </div>
   );
