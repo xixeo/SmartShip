@@ -16,7 +16,7 @@ const Modal = ({ open, setOpen, title, children, footer }) => {
             onClick={handleClose} // Close modal when clicking outside
         >
             <div
-                className="bg-white p-6 rounded-lg w-full max-w-lg relative"
+                className="bg-white p-6 rounded-lg w-full max-w-screen-lg relative overflow-y-auto max-h-[80vh]"
                 onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
             >
                 <button

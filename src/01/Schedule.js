@@ -18,10 +18,16 @@ const ChangeData = (events) => {
 
     const eventColor = eventcolors[eventcolorsindex % eventcolors.length];
     eventcolorsindex += 1;
+    
+    const enddate = (event.end).split("T")[0];
+    const startdate = (event.start).split("T")[0];
+    console.log('enddate',enddate);
+    console.log('startdate',startdate);
 
     return {
       ...event,
-      end: addOneDay(event.end),
+      start: startdate,
+      end: addOneDay(enddate),
       backgroundColor: eventColor,
       borderColor: 'white',
     };
@@ -38,34 +44,57 @@ export default function Schedule() {
 
   useEffect(() => {
     //  =====================
-    //|| 전체 스케줄 목록 api ||
+    // | 전체 스케줄 목록 api |
     //  =====================
     const fetchScheduleData = async () => {
       // 목업 이벤트 데이터 생성 (랜덤 색상 적용) > 실제로 받아올땐 받아온 데이터에 랜덤색상함수를 더해줘야한다.(fetch에 쓰게되면 api로 바꿔서 들고오면됨)
-      const events = [
+      const schedules = [
         {
-          title: '혜인발주',
-          start: '2024-08-03',
-          end: '2024-08-10'
+          orderId: 1,
+          listName: '혜인발주',
+          alias: '유승호',
+          bestOrderDate: '2024-08-03T15:00:00.000+00:00',
+          releaseDate: '2024-08-10T15:00:00.000+00:00'
         },
         {
-          title: '20240912 AWS발주',
-          start: '2024-09-03',
-          end: '2024-09-10'
+          orderId: 2,
+          listName: '20240912 AWS발주',
+          alias: '유승호',
+          bestOrderDate: '2024-09-03T15:00:00.000+00:00',
+          releaseDate: '2024-09-10T15:00:00.000+00:00'
         },
         {
-          title: 'Event 3',
-          start: '2024-09-16',
-          end: '2024-09-18'
+          orderId: 3,
+          alias: '유승호',
+          listName: 'Event 3',
+          bestOrderDate: '2024-09-16T15:00:00.000+00:00',
+          releaseDate: '2024-09-18T15:00:00.000+00:00'
+        },
+        {
+          orderId: 4,
+          alias: '유승호',
+          listName: 'Event 4',
+          bestOrderDate: '2024-09-17T15:00:00.000+00:00',
+          releaseDate: '2024-10-16T15:00:00.000+00:00'
         },
       ];
       try {
         // const response = await fetch('/schedule');
         // if (!response.ok) {
-        //   throw new Error('schdule response was not ok');
-        // }
-        // const events = await response.json();
-        //데이터에 색상추가
+          //   throw new Error('schdule response was not ok');
+          // }
+          // const schedules = await response.json();
+          const events = schedules.map(schedule => 
+            ({
+              orderId: schedule.orderId,
+              alias: schedule.alias,
+              title: schedule.listName,
+              start: schedule.bestOrderDate,
+              end: schedule.releaseDate,
+            })
+          ); 
+          console.log('events',events);
+        //데이터에 색상추가 & 날짜시간 분리
         const changeDatas = ChangeData(events);
         setScheduledatas(changeDatas);
         setFilteredData(changeDatas);
@@ -74,119 +103,251 @@ export default function Schedule() {
       }
     };
     //  =====================
-    //|| 스케줄 detail api ||
+    // |  스케줄 detail api   |
     //  =====================
-    const fetchScheduleDetail = async () => {
-      const detailevents = [
+    const fetchScheduleDetail = async (orderId) => {
+      const details = [
         {
-          id: 1,
-          title: '20240912 AWS발주',
-          categories: [
-            {
-              supplier: 'HaIn',
-              category1: '식품',
-              category2s: [
-                { category2: '과일',
-                  items: [
-                    { itemname: '수박', qnt: '100' },
-                    { itemname: '사과', qnt: '50' }
-                  ]
-                },
-              ]
-            },
-            {
-              supplier: 'TechCorp',
-              category1: '전자기기',
-              category2s: [
-                { category2: '컴퓨터',
-                  items: [
-                    { itemname: '노트북', qnt: '10' },
-                    { itemname: '마우스', qnt: '20' }
-                  ]
-                },
-              ]
-            }
-          ]
+          orderDetailId: 1,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 A",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
         },
         {
-          id: 2,
-          title: '혜인발주',
-          categories: [
-            {
-              supplier: 'HaIn',
-              category1: '식품',
-              category2s: [
-                {category2:'채소',
-                  items: [
-                    { itemname: '당근', qnt: '200' },
-                    { itemname: '양파', qnt: '150' }
-                  ]
-                },
-                {category2:'과일',
-                  items: [
-                    { itemname: '수박', qnt: '200' },
-                    { itemname: '토마토', qnt: '150' }
-                  ]
-                },
-              ]
-            },
-            {
-              supplier: 'GreenWorld',
-              category1: '식품',
-              category2s: [
-                { category2: '곡물',
-                  items: [
-                    { itemname: '쌀', qnt: '500' },
-                    { itemname: '밀가루', qnt: '300' }
-                  ]
-                },
-              ]
-            }
-          ]
+          orderDetailId: 2,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 A",
+          category1Name: "패션",
+          category2Name: "남성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 220,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
         },
         {
-          id: 3,
-          title: 'Event 3',
-          categories: [
-            {
-              supplier: '쿠팡',
-              category1: '옷',
-              category2s: [
-                {category2:'작업복',
-                  items: [
-                    { itemname: '상의', qnt: '100' },
-                    { itemname: '하의', qnt: '150' }
-                  ]
-                },
-                {category2:'캐주얼',
-                  items: [
-                    { itemname: '티셔츠', qnt: '50' },
-                    { itemname: '반바지', qnt: '10' }
-                  ]
-                },
-              ]
-            },
-            {
-              supplier: '이마트',
-              category1: '식품',
-              category2s: [
-                { category2: '곡물',
-                  items: [
-                    { itemname: '쌀', qnt: '500' },
-                    { itemname: '밀가루', qnt: '300' }
-                  ]
-                },
-              ]
-            }
-          ]
+          orderDetailId: 3,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 B",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
+        },
+        {
+          orderDetailId: 3,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 B",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
+        },
+        {
+          orderDetailId: 3,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 B",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
+        },
+        {
+          orderDetailId: 3,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 B",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
+        },
+        {
+          orderDetailId: 3,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 B",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
+        },
+        {
+          orderDetailId: 3,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 B",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
+        },
+        {
+          orderDetailId: 3,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 B",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
+        },
+        {
+          orderDetailId: 3,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 B",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
+        },
+        {
+          orderDetailId: 3,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 B",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
+        },
+        {
+          orderDetailId: 3,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 B",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
+        },
+        {
+          orderDetailId: 3,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 B",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
+        },
+        {
+          orderDetailId: 3,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 B",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
+        },
+        {
+          orderDetailId: 3,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 B",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
+        },
+        {
+          orderDetailId: 3,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 B",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
+        },
+        {
+          orderDetailId: 3,
+          listName: "20240912 AWS발주",
+          supplierName: "패션하우스 B",
+          category1Name: "패션",
+          category2Name: "여성의류",
+          category3Name: "바지",
+          itemName: "청바지",
+          quantity: 320,
+          price: 45000.00,
+          unit: "KRW",
+          alias: "유승호"
         },
       ];
       try {
-        // const response = await fetch('/schedule/{id}');
+        // const response = await fetch('/schedule?orderId={orderId}');
         // if (!response.ok) {
         //   throw new Error('schdule detail response was not ok');
         // }
-        // const detailevents = await response.json();
+        // const details = await response.json();
+        const detailevents = details.map(detail => ({
+          detailId: detail.orderDetailId,
+          title: detail.listName,
+          spname: detail.supplierName,
+          c1name: detail.category1Name,
+          c2name: detail.category2Name,
+          c3name: detail.category3Name,
+          itemname: detail.itemName,
+          quantity: detail.quantity,
+          price: detail.price,
+          unit: detail.unit,
+          alias: detail.alias
+        }))
 
         setDetaildatas(detailevents);
       } catch (error) {
@@ -197,8 +358,8 @@ export default function Schedule() {
     fetchScheduleDetail(); // 스케줄 detail 호출
   }, []);
 
-  const searchTitle = () => {
-    const filterData = scheduledatas.filter(event => event.title.toLowerCase().includes(searchEvent.toLowerCase()));
+  const searchlistName = () => {
+    const filterData = scheduledatas.filter(event => event.listName.toLowerCase().includes(searchEvent.toLowerCase()));
     setFilteredData(filterData);
     console.log("검색", filterData);
 
@@ -208,79 +369,96 @@ export default function Schedule() {
       const firstEventDate = new Date(filterData[0].start); //검색한 event의 처음 날짜 추출
       console.log("검색날짜확인", firstEventDate);
       calendarApi.changeView('dayGridMonth'); //fullcalendar의 특정달로 이동하는 함수
-      calendarApi.gotoDate(firstEventDate); //검색한 title의 처음 날짜로 이동
+      calendarApi.gotoDate(firstEventDate); //검색한 listName의 처음 날짜로 이동
     }
 
   }
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      searchTitle();
+      searchlistName();
     }
   };
-
+  
   // Modal 
-  const handleeventclick = (e) => {
-    const eventtitle = e.event.title;
-    console.log('eventtitle', eventtitle);
-    const eventDetail = detaildatas.find(detail => detail.title === eventtitle);
-    console.log('eventde', eventDetail);
-  
+  const handleeventclick = async (e) => {
+    console.log('e.event',e.event);
+    const eventid = e.event.extendedProps.orderId;
+    console.log('eventid',eventid);
+    // const eventAlias = (events.find(event => event.id === eventid)).alias;
+    
+    // 이벤트 아이디를 백으로 넘겨줘서 데이터 받아오기
+    // await fetchScheduleDetail(eventid);
+
+    // 받아온 데이터를 들고오기
+    const eventDetail = detaildatas;
+    console.log('eventdetail', eventDetail);
+
     // Modal 콘텐츠 생성 함수
-    const generateModalContent = (eventDetail) => {
+    const generateModalContent = (eventDetails) => {
       // 공급자별로 카테고리와 아이템을 정리합니다.
-      const suppliers = eventDetail.categories.reduce((acc, category) => {
-        const { supplier, category1, category2s } = category;
-  
-        const category2List = category2s || [];
-  
-        if (!acc[supplier]) {
-          acc[supplier] = [];
+      const suppliers = eventDetails.reduce((acc, detail) => {
+        const {
+          spname,
+          c1name,
+          c2name,
+          c3name,
+          itemname,
+          quantity,
+        } = detail;
+    
+        if (!acc[spname]) {
+          acc[spname] = [];
         }
-        category2List.forEach(category2 => {
-          category2.items.forEach(item => {
-            acc[supplier].push({
-              category1,
-              category2: category2.category2,
-              itemname: item.itemname,
-              qnt: item.qnt
-            });
-          });
+    
+        acc[spname].push({
+          category1: c1name,
+          category2: c2name,
+          category3: c3name,
+          itemName: itemname,
+          quantity: quantity,
         });
+    
         return acc;
       }, {});
-  
+    
       return (
-        <div className="p-6">
-        <h2 className="text-2xl font-bold mb-4">{eventDetail.title}</h2>
-        {Object.keys(suppliers).map((supplier, index) => (
-          <div key={index} className="mb-6">
-            <h3 className="text-xl font-semibold mb-2">Supplier: {supplier}</h3>
-            <table className="w-full min-w-full divide-y divide-gray-200 border border-gray-300">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Category 1</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Category 2</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Item Name</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Quantity</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {suppliers[supplier].map((item, itemIndex) => (
-                  <tr key={itemIndex}>
-                    <td className="px-6 py-2 text-sm text-gray-600">{item.category1}</td>
-                    <td className="px-6 py-2 text-sm text-gray-600">{item.category2}</td>
-                    <td className="px-6 py-2 text-sm text-gray-600">{item.itemname}</td>
-                    <td className="px-6 py-2 text-sm text-gray-600">{item.qnt}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ))}
+        <div className="p-6 w-4/5 mx-auto bg-white rounded-lg shadow-lg"> {/* 모달 넓이를 80%로 설정 */}
+      <div className="flex justify-between mb-6">
+        <h1 className="text-2xl font-bold">{eventDetails[0].title}</h1>
+        <h2 className="text-xl font-semibold">담당자: {eventDetails[0].alias}</h2>
       </div>
+      {Object.keys(suppliers).map((supplier, index) => (
+        <div key={index} className="mb-6">
+          <h4 className="text-lg font-semibold mb-2">발주처: {supplier}</h4>
+          <table className="w-full min-w-full divide-y divide-gray-200 border border-gray-300">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Category 1</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Category 2</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Category 3</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Item Name</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Quantity</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {suppliers[supplier].map((item, itemIndex) => (
+                <tr key={itemIndex}>
+                  <td className="px-6 py-2 text-sm text-gray-600">{item.category1}</td>
+                  <td className="px-6 py-2 text-sm text-gray-600">{item.category2}</td>
+                  <td className="px-6 py-2 text-sm text-gray-600">{item.category3}</td>
+                  <td className="px-6 py-2 text-sm text-gray-600">{item.itemName}</td>
+                  <td className="px-6 py-2 text-sm text-gray-600">{item.quantity}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
+    </div>
       );
     };
+    
   
     if (eventDetail) {
       const modalContent = generateModalContent(eventDetail);
@@ -299,7 +477,7 @@ export default function Schedule() {
     <div className="w-full">
       <div className='w-full flex justify-end'>
         <input className='m-5' placeholder='견적서 제목' value={searchEvent} onChange={(e) => setSearchEvent(e.target.value)} onKeyDown={handleKeyDown} />
-        <button className='bg-indigo-500 m-3 p-2' onClick={searchTitle}>검색</button>
+        <button className='bg-indigo-500 m-3 p-2' onClick={searchlistName}>검색</button>
       </div>
       <FullCalendar
         // defaultView="dayGridMonth"
@@ -309,7 +487,7 @@ export default function Schedule() {
         ref={calendarRef} // FullCalendar ref 설정 검색시 이동
         eventClick={handleeventclick}
       />
-      <Modal open={open} setOpen={setOpen} footer={<strong>담당자 : </strong>}>
+      <Modal open={open} setOpen={setOpen} title={<h2>발주 상세 내역</h2>}>
         {modalData}
       </Modal>
     </div>
