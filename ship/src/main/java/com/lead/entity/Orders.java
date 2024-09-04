@@ -32,6 +32,9 @@ public class Orders {
 
     @Column(name = "release_date", nullable = false)
     private Date releaseDate;
+    
+    @Column(name = "best_order_date", nullable = false)
+    private Date bestOrderDate;
 
     @ManyToOne
     @JoinColumn(name = "username", nullable = false)

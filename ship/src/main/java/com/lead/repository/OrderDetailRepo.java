@@ -10,6 +10,7 @@ import com.lead.entity.OrderDetail;
 
 @Repository
 public interface OrderDetailRepo extends JpaRepository<OrderDetail, Integer> {
+	
 	@EntityGraph(attributePaths = {"item", "item.supplier", "item.category2", "item.category2.category1"})
     List<OrderDetail> findByOrderOrderId(Integer orderId);
 
