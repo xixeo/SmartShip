@@ -26,8 +26,8 @@ public class Items {
     private Integer itemsId;
 
     @ManyToOne
-    @JoinColumn(name = "category2_id", nullable = false)
-    private Category2 category2;
+    @JoinColumn(name = "category3_id", nullable = false)
+    private Category3 category3;
 
     @ManyToOne
     @JoinColumn(name = "supplier_id", nullable = false)

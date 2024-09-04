@@ -29,8 +29,9 @@ public class OrderDetailService {
             return new OrderDetailDTO(
             	orderDetail.getOrderDetailId(),
                 item.getItemName(),
-                item.getCategory2().getCategory1().getCategoryName(),
-                item.getCategory2().getCategory2Name(),
+                item.getCategory3().getCategory2().getCategory1().getCategoryName(),
+                item.getCategory3().getCategory2().getCategory2Name(),
+                item.getCategory3().getCategory3Name(),
                 orderDetail.getQuantity(),
                 item.getPrice(),
                 item.getUnit(),

@@ -16,10 +16,11 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemsDTO {
-
-	private String itemName;
+	private Integer itemId;
     private String category1Name;
     private String category2Name;
+    private String category3Name;    
+	private String itemName;
     private String part1;
     private String part2;
     private BigDecimal price;

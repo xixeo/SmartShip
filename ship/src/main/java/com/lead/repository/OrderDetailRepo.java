@@ -11,7 +11,13 @@ import com.lead.entity.OrderDetail;
 @Repository
 public interface OrderDetailRepo extends JpaRepository<OrderDetail, Integer> {
 	
-	@EntityGraph(attributePaths = {"item", "item.supplier", "item.category2", "item.category2.category1"})
+	@EntityGraph(attributePaths = {
+		    "item", 
+		    "item.supplier", 
+		    "item.category3",        
+		    "item.category3.category2", 
+		    "item.category3.category2.category1"
+		})
     List<OrderDetail> findByOrderOrderId(Integer orderId);
 
 	//OrderDetail 엔티티를 조회할 때, 연관된 Items 또는 Orders 엔티티를 참조할 수 있다. 각 엔티티마다 별도의 쿼리가 발생.

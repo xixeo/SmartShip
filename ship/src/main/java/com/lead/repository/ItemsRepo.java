@@ -23,6 +23,7 @@ import com.lead.entity.Items;
 public interface ItemsRepo extends JpaRepository<Items, Integer> {
 	
 	// 한번만 조회했는데도 5번씩 타길래 삽입.
-	@EntityGraph(attributePaths = {"category2", "category2.category1", "supplier"})
-    List<Items> findByItemNameContaining(String itemName);
+	@EntityGraph(attributePaths = {"category3", "category3.category2", "category3.category2.category1", "supplier"})
+	List<Items> findByItemNameContaining(String itemName);
+
 }

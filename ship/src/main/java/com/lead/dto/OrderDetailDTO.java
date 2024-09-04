@@ -12,6 +12,7 @@ public class OrderDetailDTO {
     private String itemName;
     private String category1Name;
     private String category2Name;
+    private String category3Name;
     private Integer quantity;
     private BigDecimal price;
     private String unit;

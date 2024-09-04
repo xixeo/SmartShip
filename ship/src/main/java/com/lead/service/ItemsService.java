@@ -26,14 +26,16 @@ public class ItemsService {
 
     private ItemsDTO convertToDto(Items item) {
         return ItemsDTO.builder()
-                .itemName(item.getItemName())
-                .category1Name(item.getCategory2().getCategory1().getCategoryName())
-                .category2Name(item.getCategory2().getCategory2Name())
-                .part1(item.getPart1())
-                .part2(item.getPart2())
-                .price(item.getPrice())
-                .unit(item.getUnit())
-                .supplierName(item.getSupplier().getSupplierName())
-                .build();
+        		 .itemId(item.getItemsId())
+                 .itemName(item.getItemName())
+                 .category1Name(item.getCategory3().getCategory2().getCategory1().getCategoryName()) 
+                 .category2Name(item.getCategory3().getCategory2().getCategory2Name()) 
+                 .category3Name(item.getCategory3().getCategory3Name()) 
+                 .part1(item.getPart1())
+                 .part2(item.getPart2())
+                 .price(item.getPrice())
+                 .unit(item.getUnit())
+                 .supplierName(item.getSupplier().getSupplierName())
+                 .build();
     }
 }
