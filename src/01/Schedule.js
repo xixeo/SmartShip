@@ -309,7 +309,7 @@ export default function Schedule() {
         ref={calendarRef} // FullCalendar ref 설정 검색시 이동
         eventClick={handleeventclick}
       />
-      <Modal open={open} setOpen={setOpen}>
+      <Modal open={open} setOpen={setOpen} footer={<strong>담당자 : </strong>}>
         {modalData}
       </Modal>
     </div>
