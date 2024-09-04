@@ -18,7 +18,7 @@ public class OrderDetailService {
     private OrderDetailRepo orderDetailRepository;
 
     public List<OrderDetailDTO> getOrderDetailsByOrderId(Integer orderId) {
-        List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId);
+        List<OrderDetail> orderDetails = orderDetailRepository.findByOrderOrderId(orderId);
 
         return orderDetails.stream().map(orderDetail -> {
             Items item = orderDetail.getItem();

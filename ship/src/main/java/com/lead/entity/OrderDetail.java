@@ -29,7 +29,7 @@ public class OrderDetail {
 
     @ManyToOne
     @JoinColumn(name = "items_id", nullable = false)
-    private Items item; // 수정된 부분
+    private Items item; 
 
     @Column(nullable = false)
     private Integer quantity;

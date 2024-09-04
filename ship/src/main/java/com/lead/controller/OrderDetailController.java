@@ -13,7 +13,7 @@ import com.lead.service.OrderDetailService;
 
 @RestController
 @RequestMapping("/schedule")
-public class OrderController {
+public class OrderDetailController {
 
 	 @Autowired
 	    private OrderDetailService orderDetailService;
