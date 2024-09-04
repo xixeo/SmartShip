@@ -7,6 +7,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import CloseIcon from '@mui/icons-material/Close';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
+import { ko } from 'date-fns/locale'
 
 function createData(category1_name, category2_name, item_name, part1, part2, price, unit, quantity, supplier_name, pre_leadtime_id) {
   return { category1_name, category2_name, item_name, part1, part2, price, unit, quantity, supplier_name, pre_leadtime_id };
@@ -236,7 +237,7 @@ function OrderTEST() {
                 selected={selected}
                 onSelect={setSelected}
                 components={{
-                  Caption: CustomCaption, 
+                  Caption: CustomCaption, // 커스텀 캡션 적용
                 }}
                 locale={{
                   formatCaption: (date) => date.toLocaleDateString('ko-KR', {
