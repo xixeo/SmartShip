@@ -6,6 +6,7 @@ import Footer from './Compo/Footer';
 import Schedule from './01/Schedule';
 import ListTable from './02/ListTable';
 import Order from './03/Order';
+import OrderTEST from './03/OrderTEST'; 
 import SignUpIn from './Compo/SignUpIn';
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
                   <Route path="/schedule" element={<Schedule />} />
                   <Route path="/listtable" element={<ListTable />} />
                   <Route path="/order" element={<Order />} />
+                  <Route path="/ordertest" element={<OrderTEST />} />
                 </Routes>
               </main>
               <Footer />

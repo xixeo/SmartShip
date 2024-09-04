@@ -13,8 +13,7 @@ import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
 
 function createData(name, calories, fat, carbs, protein, price) {
-  return {
-    name,
+  return { name,
     calories,
     fat,
     carbs,
@@ -39,9 +38,24 @@ function Row(props) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
 
+// EnhancedTableHead.propTypes = {
+//   numSelected: PropTypes.number.isRequired,
+//   onSelectAllClick: PropTypes.func.isRequired,
+//   rowCount: PropTypes.number.isRequired,
+//   allRowsSelected: PropTypes.bool.isRequired,
+// };
+
   return (
     <React.Fragment>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' }, '&:hover': { backgroundColor: '#f5f5f5' } }}>
+      <TableCell padding="checkbox" style={{ width: '5%' }}>
+          {/* <Checkbox
+            color="default"
+            indeterminate={numSelected > 0 && numSelected < rowCount}
+            checked={allRowsSelected}
+            onChange={onSelectAllClick}
+          /> */}
+        </TableCell>
         <TableCell>
           <IconButton
             aria-label="expand row"
