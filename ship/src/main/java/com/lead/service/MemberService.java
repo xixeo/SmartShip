@@ -33,7 +33,6 @@ public class MemberService {
                 return "사용할 수 없는 아이디입니다.";
             }
         } else {
-        	 // Log the role before saving
             System.out.println("Setting role: " + member.getRole());
             
             member.setRole(Role.ROLE_USER); // Use Role.ROLE_USER

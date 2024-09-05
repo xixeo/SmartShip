@@ -1,9 +1,7 @@
 package com.lead.repository;
 
-import java.util.List;
-
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.lead.entity.Items;
 
@@ -20,10 +18,6 @@ import com.lead.entity.Items;
 //}
 
 
-public interface ItemsRepo extends JpaRepository<Items, Integer> {
-	
-	// 한번만 조회했는데도 5번씩 타길래 삽입.
-	@EntityGraph(attributePaths = {"category3", "category3.category2", "category3.category2.category1", "supplier"})
-	List<Items> findByItemNameContaining(String itemName);
-
+public interface ItemsRepo extends JpaRepository<Items, Long>, JpaSpecificationExecutor<Items> {
+    // 필요한 메서드가 있으면 여기에 추가
 }
