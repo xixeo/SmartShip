@@ -7,7 +7,10 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import CloseIcon from '@mui/icons-material/Close';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
-import { ko } from 'date-fns/locale'
+import 'react-day-picker/dist/style.css'
+import { KeyOff } from '@mui/icons-material';
+import { ko } from 'date-fns/locale';
+import { format } from 'date-fns';
 
 function createData(category1_name, category2_name, item_name, part1, part2, price, unit, quantity, supplier_name, pre_leadtime_id) {
   return { category1_name, category2_name, item_name, part1, part2, price, unit, quantity, supplier_name, pre_leadtime_id };
@@ -145,18 +148,9 @@ Row.propTypes = {
   }).isRequired,
 };
 
-function CustomCaption({ date }) {
-  const month = date;
-  const year = month.getFullYear();
-  const monthName = month.toLocaleString('ko-KR', { month: 'long' });
-  return <div>{`${year}년 ${monthName}`}</div>;
-}
-
 function OrderTEST() {
   const [selected, setSelected] = useState(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
-
-  // rows 변수 추가
   const rows = initialRows;
 
   return (
@@ -232,25 +226,16 @@ function OrderTEST() {
                   <CloseIcon/>
                 </IconButton>
               </Box>
-              <DayPicker
-                mode="single"
+              {/* <DayPicker
                 selected={selected}
                 onSelect={setSelected}
-                components={{
-                  Caption: CustomCaption, // 커스텀 캡션 적용
-                }}
-                locale={{
-                  formatCaption: (date) => date.toLocaleDateString('ko-KR', {
-                    year: 'numeric',
-                    month: 'long',
-                  }),
-                  weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-                  firstDayOfWeek: 0,
-                }}
+                locale={ko}
+                captionLayout="dropdown"
+                formatters={{ formatCaption }}
                 footer={
-                  selected ? `[ ${selected.toLocaleDateString()} 창고 출고 예정 ]` : ""
+                  selected ? `[ ${selected.toLocaleDateString('ko-KR')} 창고 출고 예정 ]` : ""
                 }
-              />
+              /> */}
             </Box>
           )}
         </div>

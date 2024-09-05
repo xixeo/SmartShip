@@ -7,7 +7,8 @@ import Schedule from './01/Schedule';
 import ListTable from './02/ListTable';
 import Order from './03/Order';
 import OrderTEST from './03/OrderTEST'; 
-import SignUpIn from './Compo/SignUpIn';
+import SignUp from './Sign/SignUp';
+import SignIn from './Sign/SignIn';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -23,9 +24,13 @@ function App() {
   return (
     <BrowserRouter>
       <div className="flex flex-col h-screen">
-        {/* {!isAuthenticated ? (
-          <SignUpIn setIsAuthenticated={setIsAuthenticated} />  // 로그인 전
-        ) : ( */}
+        {!isAuthenticated ? (
+          <Routes>
+            <Route path="/signup" element={<SignUp setIsAuthenticated={setIsAuthenticated} />} />
+            <Route path="/signin" element={<SignIn setIsAuthenticated={setIsAuthenticated} />} />
+            <Route path="*" element={<Navigate to="/signin" />} />
+          </Routes>
+        ) : (
           <div className="flex flex-1">
             <Navi />
             <div className="flex flex-col flex-1">
@@ -41,7 +46,7 @@ function App() {
               <Footer />
             </div>
           </div>
-        {/* )} */}
+        )}
       </div>
     </BrowserRouter>
   );
