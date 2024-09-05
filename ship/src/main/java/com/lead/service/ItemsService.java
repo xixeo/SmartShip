@@ -12,15 +12,25 @@ import com.lead.dto.ItemsDTO;
 import com.lead.entity.Items;
 import com.lead.repository.ItemsRepo;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 @Service
 public class ItemsService {
 
     @Autowired
     private ItemsRepo itemsRepo;
+    
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Transactional(readOnly = true)
     public List<ItemsDTO> findItems(String category1Name, String category2Name, String category3Name, String itemName, String supplierName) {
 
+    	  // 영속성 컨텍스트 강제 초기화 (flush() 및 clear() 호출)
+        entityManager.flush();
+        entityManager.clear();
+        
         Specification<Items> spec = (root, query, builder) -> {
             // 동적 조건 조합
             return builder.and(

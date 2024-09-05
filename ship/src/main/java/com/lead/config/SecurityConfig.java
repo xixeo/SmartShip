@@ -32,6 +32,8 @@ public class SecurityConfig {
 
 	 @Bean
 	    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		 
+		 
 	        
 	        JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter(authenticationConfiguration.getAuthenticationManager(), memberRepo);
 	        jwtAuthenticationFilter.setFilterProcessesUrl("/login"); // 로그인 경로 설정
