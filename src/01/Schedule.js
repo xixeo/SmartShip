@@ -15,7 +15,7 @@ const eventcolors = ['#F8FF95', '#B2A4FF', '#FCA3CC', '#9BE3DE', '#A9ECA2', '#FF
 const ChangeData = (events) => {
   let eventcolorsindex = 0;
   return events.map(event => {
-
+    
     const eventColor = eventcolors[eventcolorsindex % eventcolors.length];
     eventcolorsindex += 1;
     
@@ -23,7 +23,7 @@ const ChangeData = (events) => {
     const startdate = (event.start).split("T")[0];
     console.log('enddate',enddate);
     console.log('startdate',startdate);
-
+    
     return {
       ...event,
       start: startdate,
@@ -34,66 +34,69 @@ const ChangeData = (events) => {
   });
 };
 export default function Schedule() {
-  const [scheduledatas, setScheduledatas] = useState([]);
-  const [detaildatas, setDetaildatas] = useState([]);
-  const [filteredData, setFilteredData] = useState([]); //검색용 데이터
-  const [searchEvent, setSearchEvent] = useState('');
-  const calendarRef = useRef(null);
-  const [open, setOpen] = useState(false);
-  const [modalData, setModalData] = useState(null) //모달에 넣을 데이터
-
   useEffect(() => {
-    //  =====================
-    // | 전체 스케줄 목록 api |
-    //  =====================
-    const fetchScheduleData = async () => {
-      // 목업 이벤트 데이터 생성 (랜덤 색상 적용) > 실제로 받아올땐 받아온 데이터에 랜덤색상함수를 더해줘야한다.(fetch에 쓰게되면 api로 바꿔서 들고오면됨)
-      const schedules = [
-        {
-          orderId: 1,
-          listName: '혜인발주',
-          alias: '유승호',
-          bestOrderDate: '2024-08-03T15:00:00.000+00:00',
-          releaseDate: '2024-08-10T15:00:00.000+00:00'
-        },
-        {
-          orderId: 2,
-          listName: '20240912 AWS발주',
-          alias: '유승호',
-          bestOrderDate: '2024-09-03T15:00:00.000+00:00',
-          releaseDate: '2024-09-10T15:00:00.000+00:00'
-        },
-        {
-          orderId: 3,
-          alias: '유승호',
-          listName: 'Event 3',
-          bestOrderDate: '2024-09-16T15:00:00.000+00:00',
-          releaseDate: '2024-09-18T15:00:00.000+00:00'
-        },
-        {
-          orderId: 4,
-          alias: '유승호',
-          listName: 'Event 4',
-          bestOrderDate: '2024-09-17T15:00:00.000+00:00',
-          releaseDate: '2024-10-16T15:00:00.000+00:00'
-        },
-      ];
-      try {
-        // const response = await fetch('/schedule');
-        // if (!response.ok) {
-          //   throw new Error('schdule response was not ok');
-          // }
-          // const schedules = await response.json();
-          const events = schedules.map(schedule => 
-            ({
-              orderId: schedule.orderId,
-              alias: schedule.alias,
-              title: schedule.listName,
-              start: schedule.bestOrderDate,
-              end: schedule.releaseDate,
-            })
-          ); 
-          console.log('events',events);
+    fetchScheduleData(); //전체 스케줄 api 호출
+  }, []);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+  }, []);
+  //  =====================
+  // | 전체 스케줄 목록 api |
+  //  =====================
+  const fetchScheduleData = async () => {
+    // 목업 이벤트 데이터 생성 (랜덤 색상 적용) > 실제로 받아올땐 받아온 데이터에 랜덤색상함수를 더해줘야한다.(fetch에 쓰게되면 api로 바꿔서 들고오면됨)
+    // const schedules = [
+    //   {
+    //     orderId: 1,
+    //     listName: '혜인발주',
+    //     alias: '유승호',
+    //     bestOrderDate: '2024-08-03T15:00:00.000+00:00',
+    //     releaseDate: '2024-08-10T15:00:00.000+00:00'
+    //   },
+    //   {
+    //     orderId: 2,
+    //     listName: '20240912 AWS발주',
+    //     alias: '유승호',
+    //     bestOrderDate: '2024-09-03T15:00:00.000+00:00',
+    //     releaseDate: '2024-09-10T15:00:00.000+00:00'
+    //   },
+    //   {
+    //     orderId: 3,
+    //     alias: '유승호',
+    //     listName: 'Event 3',
+    //     bestOrderDate: '2024-09-16T15:00:00.000+00:00',
+    //     releaseDate: '2024-09-18T15:00:00.000+00:00'
+    //   },
+    //   {
+    //     orderId: 4,
+    //     alias: '유승호',
+    //     listName: 'Event 4',
+    //     bestOrderDate: '2024-09-17T15:00:00.000+00:00',
+    //     releaseDate: '2024-10-16T15:00:00.000+00:00'
+    //   },
+    // ];
+    try {
+      const response = await fetch('http://10.125.121.175:8080/schedule',
+        // {
+        // headers: {
+        //   'Authorization': `Bearer ${token}`,
+        // }
+        // }
+      );
+      if (!response.ok) {
+        throw new Error('schdule response was not ok');
+      }
+      const schedules = await response.json();
+      const events = schedules.map(schedule => 
+        ({
+          orderId: schedule.orderId,
+          alias: schedule.alias,
+          title: schedule.listName,
+          start: schedule.bestOrderDate,
+            end: schedule.releaseDate,
+          })
+        ); 
+        console.log('events',events);
         //데이터에 색상추가 & 날짜시간 분리
         const changeDatas = ChangeData(events);
         setScheduledatas(changeDatas);
@@ -106,257 +109,268 @@ export default function Schedule() {
     // |  스케줄 detail api   |
     //  =====================
     const fetchScheduleDetail = async (orderId) => {
-      const details = [
+      // const details = [
+        //   {
+          //     orderDetailId: 1,
+          //     listName: "20240912 AWS발주",
+          //     supplierName: "패션하우스 A",
+          //     category1Name: "패션",
+          //     category2Name: "여성의류",
+          //     category3Name: "바지",
+          //     itemName: "청바지",
+          //     quantity: 320,
+          //     price: 45000.00,
+          //     unit: "KRW",
+          //     alias: "유승호"
+          //   },
+          //   {
+            //     orderDetailId: 2,
+            //     listName: "20240912 AWS발주",
+            //     supplierName: "패션하우스 A",
+            //     category1Name: "패션",
+            //     category2Name: "남성의류",
+            //     category3Name: "바지",
+            //     itemName: "청바지",
+            //     quantity: 220,
+            //     price: 45000.00,
+            //     unit: "KRW",
+            //     alias: "유승호"
+    //   },
+    //   {
+    //     orderDetailId: 3,
+    //     listName: "20240912 AWS발주",
+    //     supplierName: "패션하우스 B",
+    //     category1Name: "패션",
+    //     category2Name: "여성의류",
+    //     category3Name: "바지",
+    //     itemName: "청바지",
+    //     quantity: 320,
+    //     price: 45000.00,
+    //     unit: "KRW",
+    //     alias: "유승호"
+    //   },
+    //   {
+      //     orderDetailId: 3,
+      //     listName: "20240912 AWS발주",
+      //     supplierName: "패션하우스 B",
+      //     category1Name: "패션",
+      //     category2Name: "여성의류",
+      //     category3Name: "바지",
+      //     itemName: "청바지",
+      //     quantity: 320,
+      //     price: 45000.00,
+    //     unit: "KRW",
+    //     alias: "유승호"
+    //   },
+    //   {
+      //     orderDetailId: 3,
+      //     listName: "20240912 AWS발주",
+      //     supplierName: "패션하우스 B",
+      //     category1Name: "패션",
+      //     category2Name: "여성의류",
+      //     category3Name: "바지",
+      //     itemName: "청바지",
+      //     quantity: 320,
+      //     price: 45000.00,
+      //     unit: "KRW",
+      //     alias: "유승호"
+      //   },
+      //   {
+        //     orderDetailId: 3,
+        //     listName: "20240912 AWS발주",
+        //     supplierName: "패션하우스 B",
+        //     category1Name: "패션",
+        //     category2Name: "여성의류",
+        //     category3Name: "바지",
+        //     itemName: "청바지",
+        //     quantity: 320,
+        //     price: 45000.00,
+        //     unit: "KRW",
+        //     alias: "유승호"
+        //   },
+        //   {
+          //     orderDetailId: 3,
+          //     listName: "20240912 AWS발주",
+          //     supplierName: "패션하우스 B",
+          //     category1Name: "패션",
+          //     category2Name: "여성의류",
+          //     category3Name: "바지",
+          //     itemName: "청바지",
+          //     quantity: 320,
+    //     price: 45000.00,
+    //     unit: "KRW",
+    //     alias: "유승호"
+    //   },
+    //   {
+      //     orderDetailId: 3,
+      //     listName: "20240912 AWS발주",
+      //     supplierName: "패션하우스 B",
+      //     category1Name: "패션",
+      //     category2Name: "여성의류",
+      //     category3Name: "바지",
+      //     itemName: "청바지",
+      //     quantity: 320,
+      //     price: 45000.00,
+      //     unit: "KRW",
+      //     alias: "유승호"
+      //   },
+      //   {
+        //     orderDetailId: 3,
+        //     listName: "20240912 AWS발주",
+        //     supplierName: "패션하우스 B",
+        //     category1Name: "패션",
+        //     category2Name: "여성의류",
+        //     category3Name: "바지",
+        //     itemName: "청바지",
+        //     quantity: 320,
+        //     price: 45000.00,
+        //     unit: "KRW",
+        //     alias: "유승호"
+        //   },
+        //   {
+    //     orderDetailId: 3,
+    //     listName: "20240912 AWS발주",
+    //     supplierName: "패션하우스 B",
+    //     category1Name: "패션",
+    //     category2Name: "여성의류",
+    //     category3Name: "바지",
+    //     itemName: "청바지",
+    //     quantity: 320,
+    //     price: 45000.00,
+    //     unit: "KRW",
+    //     alias: "유승호"
+    //   },
+    //   {
+      //     orderDetailId: 3,
+      //     listName: "20240912 AWS발주",
+      //     supplierName: "패션하우스 B",
+      //     category1Name: "패션",
+      //     category2Name: "여성의류",
+      //     category3Name: "바지",
+      //     itemName: "청바지",
+      //     quantity: 320,
+      //     price: 45000.00,
+      //     unit: "KRW",
+      //     alias: "유승호"
+      //   },
+      //   {
+        //     orderDetailId: 3,
+        //     listName: "20240912 AWS발주",
+        //     supplierName: "패션하우스 B",
+        //     category1Name: "패션",
+        //     category2Name: "여성의류",
+    //     category3Name: "바지",
+    //     itemName: "청바지",
+    //     quantity: 320,
+    //     price: 45000.00,
+    //     unit: "KRW",
+    //     alias: "유승호"
+    //   },
+    //   {
+      //     orderDetailId: 3,
+      //     listName: "20240912 AWS발주",
+      //     supplierName: "패션하우스 B",
+      //     category1Name: "패션",
+      //     category2Name: "여성의류",
+      //     category3Name: "바지",
+      //     itemName: "청바지",
+      //     quantity: 320,
+      //     price: 45000.00,
+      //     unit: "KRW",
+      //     alias: "유승호"
+      //   },
+      //   {
+        //     orderDetailId: 3,
+        //     listName: "20240912 AWS발주",
+        //     supplierName: "패션하우스 B",
+        //     category1Name: "패션",
+        //     category2Name: "여성의류",
+        //     category3Name: "바지",
+        //     itemName: "청바지",
+        //     quantity: 320,
+        //     price: 45000.00,
+        //     unit: "KRW",
+        //     alias: "유승호"
+        //   },
+        //   {
+          //     orderDetailId: 3,
+          //     listName: "20240912 AWS발주",
+          //     supplierName: "패션하우스 B",
+          //     category1Name: "패션",
+          //     category2Name: "여성의류",
+          //     category3Name: "바지",
+          //     itemName: "청바지",
+          //     quantity: 320,
+          //     price: 45000.00,
+          //     unit: "KRW",
+          //     alias: "유승호"
+          //   },
+          //   {
+            //     orderDetailId: 3,
+            //     listName: "20240912 AWS발주",
+            //     supplierName: "패션하우스 B",
+            //     category1Name: "패션",
+    //     category2Name: "여성의류",
+    //     category3Name: "바지",
+    //     itemName: "청바지",
+    //     quantity: 320,
+    //     price: 45000.00,
+    //     unit: "KRW",
+    //     alias: "유승호"
+    //   },
+    //   {
+      //     orderDetailId: 3,
+      //     listName: "20240912 AWS발주",
+    //     supplierName: "패션하우스 B",
+    //     category1Name: "패션",
+    //     category2Name: "여성의류",
+    //     category3Name: "바지",
+    //     itemName: "청바지",
+    //     quantity: 320,
+    //     price: 45000.00,
+    //     unit: "KRW",
+    //     alias: "유승호"
+    //   },
+    // ];
+    try {
+      const response = await fetch(`http://10.125.121.175:8080/schedule?orderId=${orderId}`,
         {
-          orderDetailId: 1,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 A",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 2,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 A",
-          category1Name: "패션",
-          category2Name: "남성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 220,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 3,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 B",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 3,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 B",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 3,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 B",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 3,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 B",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 3,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 B",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 3,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 B",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 3,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 B",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 3,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 B",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 3,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 B",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 3,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 B",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 3,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 B",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 3,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 B",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 3,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 B",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 3,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 B",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-        {
-          orderDetailId: 3,
-          listName: "20240912 AWS발주",
-          supplierName: "패션하우스 B",
-          category1Name: "패션",
-          category2Name: "여성의류",
-          category3Name: "바지",
-          itemName: "청바지",
-          quantity: 320,
-          price: 45000.00,
-          unit: "KRW",
-          alias: "유승호"
-        },
-      ];
-      try {
-        // const response = await fetch('/schedule?orderId={orderId}');
-        // if (!response.ok) {
-        //   throw new Error('schdule detail response was not ok');
-        // }
-        // const details = await response.json();
-        const detailevents = details.map(detail => ({
-          detailId: detail.orderDetailId,
-          title: detail.listName,
-          spname: detail.supplierName,
-          c1name: detail.category1Name,
-          c2name: detail.category2Name,
-          c3name: detail.category3Name,
-          itemname: detail.itemName,
-          quantity: detail.quantity,
-          price: detail.price,
-          unit: detail.unit,
-          alias: detail.alias
-        }))
-
-        setDetaildatas(detailevents);
-      } catch (error) {
-        console.error('Failed to fetch scheduleData:', error);
+          // headers: {
+          //   'Authorization': `Bearer ${token}`,
+          // }
+        }
+      );
+      if (!response.ok) {
+        throw new Error('schdule detail response was not ok');
       }
-    };
-    fetchScheduleData(); //전체 스케줄 api 호출
-    fetchScheduleDetail(); // 스케줄 detail 호출
-  }, []);
+      const details = await response.json();
+      const detailevents = details.map(detail => ({
+        detailId: detail.orderDetailId,
+        title: detail.listName,
+        spname: detail.supplierName,
+        c1name: detail.category1Name,
+        c2name: detail.category2Name,
+        c3name: detail.category3Name,
+        itemname: detail.itemName,
+        quantity: detail.quantity,
+        price: detail.price,
+        unit: detail.unit,
+        alias: detail.alias
+      }))
+
+      setDetaildatas(detailevents);
+    } catch (error) {
+      console.error('Failed to fetch scheduleData:', error);
+    }
+  };
+  const [scheduledatas, setScheduledatas] = useState([]);
+  const [detaildatas, setDetaildatas] = useState([]);
+  const [filteredData, setFilteredData] = useState([]); //검색용 데이터
+  const [searchEvent, setSearchEvent] = useState('');
+  const calendarRef = useRef(null);
+  const [open, setOpen] = useState(false);
+  const [modalData, setModalData] = useState(null) //모달에 넣을 데이터
+
 
   const searchlistName = () => {
     const filterData = scheduledatas.filter(event => event.listName.toLowerCase().includes(searchEvent.toLowerCase()));
@@ -385,10 +399,9 @@ export default function Schedule() {
     console.log('e.event',e.event);
     const eventid = e.event.extendedProps.orderId;
     console.log('eventid',eventid);
-    // const eventAlias = (events.find(event => event.id === eventid)).alias;
     
     // 이벤트 아이디를 백으로 넘겨줘서 데이터 받아오기
-    // await fetchScheduleDetail(eventid);
+    await fetchScheduleDetail(eventid);
 
     // 받아온 데이터를 들고오기
     const eventDetail = detaildatas;
@@ -396,7 +409,7 @@ export default function Schedule() {
 
     // Modal 콘텐츠 생성 함수
     const generateModalContent = (eventDetails) => {
-      // 공급자별로 카테고리와 아이템을 정리합니다.
+      // 공급자별로 카테고리와 아이템을 정리
       const suppliers = eventDetails.reduce((acc, detail) => {
         const {
           spname,
@@ -475,9 +488,12 @@ export default function Schedule() {
 
   return (
     <div className="w-full">
-      <div className='w-full flex justify-end'>
-        <input className='m-5' placeholder='견적서 제목' value={searchEvent} onChange={(e) => setSearchEvent(e.target.value)} onKeyDown={handleKeyDown} />
-        <button className='bg-indigo-500 m-3 p-2' onClick={searchlistName}>검색</button>
+      <div  className='w-full flex justify-between'>
+          <h2 className='text-xl font-semibold text-white mb-4 '>일정 관리</h2>
+        <div className=''>
+          <input className='m-5 border-' placeholder='견적서 제목' value={searchEvent} onChange={(e) => setSearchEvent(e.target.value)} onKeyDown={handleKeyDown} />
+          <button className='bg-indigo-500 m-3 p-2 rounded-md' onClick={searchlistName}>검색</button>
+        </div>
       </div>
       <FullCalendar
         // defaultView="dayGridMonth"
