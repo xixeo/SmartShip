@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Button, Paper, TextField, InputAdornment, Select, MenuItem, Box} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Pagination from '@mui/material/Pagination';
-import RegisterModal from "./RegisterModal";
 import LeadTimeModal from './LeadTimeModal';
 import GradientButton from '../Compo/GradientButton'
 import { useNavigate } from 'react-router-dom';
@@ -14,19 +13,19 @@ import { IconButton } from '@mui/material';
 
 // 1) db연결전
 // 데이터 생성 함수
-function createData(category1Name, category2Name, itemName, part1, part2, price, unit, supplierName, leadtime) {
-  return { category1Name, category2Name, itemName, part1, part2, price, unit, supplierName, leadtime };
+function createData(category1Name, category2Name, category3Name, itemName, price, unit, supplierName, leadtime) {
+  return { category1Name, category2Name, category3Name, itemName, price, unit, supplierName, leadtime };
 }
 // 초기 데이터
 const initialRows = [
-  createData('식품', '과일', '수박', '012526', '', '180', 'EUR', '쿠팡', 1),
-  createData('음료', '탄산음료', '콜라', '015789', '321456', '120', 'USD', '이마트', 2),
-  createData('음료', '탄산음료', '사이다', '015782', '321457', '120', 'KRW', '이마트', 2),
-  createData('음료', '커피', '', '015783', '321458', '170', 'KRW', '롯데슈퍼', 3),
-  createData('간식', '과자', '포테이토칩', '019876', '654321', '1500', 'JPY', '롯데마트', 4),
-  createData('유제품', '우유', '서울우유', '021345', '987654', '200', 'KRW', '홈플러스', 5),
-  createData('건강식품', '비타민', '비타민C', '023456', '789012', '250', 'EUR', '네이버쇼핑', 6),
-  createData('과일', '사과', '후지사과', '025678', '345678', '220', 'USD', '마켓컬리', 7),
+  createData('식품', '과일', '수박/참외', '수박', '18', 'EUR', '쿠팡', 1),
+  createData('음료', '탄산음료', '콜라', '코카콜라', '12', 'USD', '이마트', 2),
+  createData('음료', '탄산음료', '사이다', '칠성사이다', '1200', 'KRW', '이마트', 2),
+  createData('음료', '커피', '커피', '아메리카노', '1700', 'KRW', '롯데슈퍼', 3),
+  createData('간식', '과자', '포테이토칩', '스윙칩',  '150', 'JPY', '롯데마트', 4),
+  createData('유제품', '우유', '서울우유', '저지방 서울우유', '2000', 'KRW', '홈플러스', 5),
+  createData('건강식품', '비타민', '비타민', '비타민C', '25', 'EUR', '네이버쇼핑', 6),
+  createData('과일', '사과', '후지사과', '유기농 후지사과', '2', 'USD', '마켓컬리', 7),
 ];
 
 // // 2) db연결후
@@ -51,11 +50,11 @@ const initialRows = [
 const headCells = [
   { id: 'category1Name', label: 'Category 1', width: '13%' },
   { id: 'category2Name', label: 'Category 2', width: '13%' },
+  { id: 'category3Name', label: 'Category 3', width: '13%' },
   { id: 'itemName', label: '물품명', width: '14%' },
-  { id: 'part1', label: 'Part No. 1', width: '13%' },
-  { id: 'part2', label: 'Part No. 2', width: '13%' },
   { id: 'price', label: '가격', width: '10%' },
-  { id: 'supplierName', label: '발주처', width: '10%' },
+  { id: 'quantity', label: '수량', width: '10%' },
+  { id: 'supplierName', label: '판매자', width: '10%' },
   { id: 'leadtime', label: '리드타임', width: '9%' },
 ];
 
@@ -135,10 +134,12 @@ function ListTable() {
   const [searchQuery, setSearchQuery] = useState(''); // 검색 쿼리
   const [category1Name, setCategoryName] = useState(''); // Category 1 필터
   const [category2Name, setCategory2Name] = useState(''); // Category 2 필터
+  const [category3Name, setCategory3Name] = useState(''); // Category 3 필터
   const [modalOpen, setModalOpen] = useState(false); // 모달 표시 상태
   const [leadTimeModalOpen, setLeadTimeModalOpen] = useState(false); // LeadTimeModal 표시 상태
   const [selectedLeadTimeData, setSelectedLeadTimeData] = useState([]); // 선택된 리드타임 데이터
   const [displayedRows, setDisplayedRows] = useState(initialRows); // 현재 화면에 표시되는 데이터
+  const [showSelected, setShowSelected] = useState(false); // 선택된 항목만 보기 여부
 
 // 1) db연결전
   // Category 1의 고유 값 리스트
@@ -147,6 +148,10 @@ function ListTable() {
   const category2Options = useMemo(() => {
     return [...new Set(initialRows.filter((row) => row.category1Name === category1Name).map((row) => row.category2Name))];
   }, [category1Name]);
+  // Category 3의 고유 값 리스트 (선택된 Category 2에 따라 필터링됨)
+  const category3Options = useMemo(() => {
+    return [...new Set(initialRows.filter((row) => row.category2Name === category2Name).map((row) => row.category3Name))];
+  }, [category2Name]);
 
 // // 2) db연결후
 //   const category1Options = useMemo(() => {
@@ -171,15 +176,16 @@ function ListTable() {
     return displayedRows.filter((row) => {
       const matchesCategory1 = category1Name ? row.category1Name === category1Name : true;
       const matchesCategory2 = category2Name ? row.category2Name === category2Name : true;
-  
-      return matchesCategory1 && matchesCategory2;
+      const matchesCategory3 = category3Name ? row.category3Name === category3Name : true;
+
+      return matchesCategory1 && matchesCategory2 && matchesCategory3;
     });
-  }, [displayedRows, category1Name, category2Name]); // `displayedRows`를 의존성 배열에 추가 // 1) db연결전 -> 2) db연결후 rows 추가
+  }, [displayedRows, category1Name, category2Name, category3Name]); // `displayedRows`를 의존성 배열에 추가 // 1) db연결전 -> 2) db연결후 rows 추가
 
   // 검색, 카테고리, 페이지 크기 변경 시 페이지를 1로 초기화
   useEffect(() => {
     setPage(1);
-  }, [searchQuery, category1Name, category2Name, rowsPerPage]);
+  }, [searchQuery, category1Name, category2Name, category3Name, rowsPerPage]);
 
  // 전체 선택 핸들러
 const handleSelectAllClick = (event) => {
@@ -229,8 +235,18 @@ const handleSelectAllClick = (event) => {
     setCategory2Name(event.target.value);
   };
 
+  // Category 3 변경 핸들러
+  const handleCategory3Change = (event) => {
+    setCategory3Name(event.target.value);
+  };
+
   // 항목이 선택되었는지 여부 확인
   const isSelected = (itemName) => selected.has(itemName);
+
+  // 선택된 항목 보기 버튼 클릭 시
+  const handleShowSelected = () => {
+    setShowSelected(!isSelected);
+  };
 
   // 빈 행 계산
   const emptyRows = useMemo(
@@ -305,7 +321,7 @@ const handleSelectAllClick = (event) => {
             value={category2Name}
             onChange={handleCategory2Change}
             displayEmpty
-            className="bg-transparent rounded-md"
+            className="select-category bg-transparent rounded-md"
             disabled={!category1Name} // 'Category 1'이 선택되지 않았을 때만 비활성화
             sx={{
               height: 40, 
@@ -346,11 +362,57 @@ const handleSelectAllClick = (event) => {
             ))}
           </Select>
 
+          {/* Category 3 선택 필터 */}
+          <Select
+            value={category3Name}
+            onChange={handleCategory3Change}
+            displayEmpty
+            className="bg-transparent rounded-md"
+            disabled={!category2Name} // 'Category 2'이 선택되지 않았을 때만 비활성화
+            sx={{
+              height: 40, 
+              minWidth: 120,
+              backgroundColor: 'transparent',
+              '& .MuiSelect-select': {
+                color: 'white', 
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'white', 
+              },
+              '& .MuiSvgIcon-root': {
+                color: 'white', 
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'white', 
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'white', 
+              },
+              '&.Mui-disabled': {
+                '& .MuiSelect-select': {
+                  color: 'white', 
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'white', 
+                },
+              },
+            }}
+          >
+            <MenuItem value="">
+              <em>Category 3</em>
+            </MenuItem>
+            {category3Options.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+
           {/* 검색 필드 */}
           <TextField
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="검색"
+            placeholder="물품명 검색"
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -398,12 +460,17 @@ const handleSelectAllClick = (event) => {
               },
             }}
           />
+          {/* 선택 품목 보기 버튼 */}
+          <Button variant="contained" onClick={handleShowSelected}>
+            {showSelected ? "모든 품목 보기" : "선택 품목 보기"}
+          </Button>
           <Button
               onClick={() => {
                 // 검색 버튼 클릭 시 필터링된 데이터 설정
                 const filteredData = initialRows.filter((row) => { // db연결 후에는 initialRows 대신 rows 사용
                   return row.category1Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         row.category2Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        row.category3Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         row.itemName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         row.part1.includes(searchQuery) ||
                         row.part2.includes(searchQuery) ||
@@ -427,12 +494,6 @@ const handleSelectAllClick = (event) => {
             </Button>
 
           </div>
-        {/* 새상품 등록 버튼 */}
-        <GradientButton
-          onClick={openModal} // 버튼 클릭 시 모달 열기
-        >
-          새상품 등록
-        </GradientButton>
       </div>
 
       <div className="bg-white rounded-lg shadow-md ">
@@ -471,6 +532,7 @@ const handleSelectAllClick = (event) => {
                       {formatCellValue(row.category1Name)}
                     </TableCell>
                     <TableCell align="center">{formatCellValue(row.category2Name)}</TableCell>
+                    <TableCell align="center">{formatCellValue(row.category3Name)}</TableCell>
                     <TableCell align="center">{formatCellValue(row.itemName)}</TableCell>
                     <TableCell align="center">{formatCellValue(row.part1)}</TableCell>
                     <TableCell align="center">{formatCellValue(row.part2)}</TableCell>
@@ -560,8 +622,6 @@ const handleSelectAllClick = (event) => {
         </GradientButton>
       </div>
     </div>
-     {/* 새상품 등록 모달 */}
-     <RegisterModal open={modalOpen} setOpen={setModalOpen} />
 
      {/* 리드타임 모달 */}
      <LeadTimeModal
