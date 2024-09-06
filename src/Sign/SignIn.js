@@ -15,14 +15,13 @@ function SignIn({ setIsAuthenticated }) {
         const url = '/login';
 
         try {
-            // console.log('Sending username:', username);
-            // console.log('Sending password:', pw);
             const response = await fetch(url, {
-                method: "POST",
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     username: username,
-                    pw: pw
+                    pw: pw,
+
                 }),
             });
 
@@ -30,38 +29,35 @@ function SignIn({ setIsAuthenticated }) {
             console.log('Response status:', response.status);
             console.log('Response headers:', [...response.headers.entries()]);
 
+            const jwt = require('jsonwebtoken');
+            const token = response.headers.get("authorization");
+            // 토큰에서 정보 추출
+            const decoded = jwt.decode(token);
+            console.log(decoded);  // Payload 내용이 출력됨
+
+            if (token) {
+                console.log(token)
+                localStorage.setItem("token", token);
+                // localStorage.setItem("alias", alias);
+
+                console.log('Token and alias received and stored successfully.');
+                console.log(`Username: ${username}`);
+                // console.log(`alias: ${alias}`);
+
+                // 로그인 성공 시 지정된 URL로 리디렉션
+                setIsAuthenticated(true);
+                navigate('/');
+            } else {
+                console.log('Token not received from the server');
+            }
             if (!response.ok) {
                 const errorText = await response.text();
                 console.log('Error text:', errorText);
                 alert("로그인에 실패했습니다.");
                 throw new Error(errorText || "로그인에 실패하였습니다.");
             }
-            console.log(await response.text()); // JSON 데이터가 텍스트로 어떻게 생겼는지 확인
-
-            // if (contentType && contentType.includes('application/json')) {
-            // const responseData = await response.json();
-            // console.log(responseData);
-            // const token = responseData;
-
-            // if (token) {
-            //     console.log(token)
-            //     localStorage.setItem("token", token);
-            //     // localStorage.setItem("alias", alias);
-
-            //     console.log('Token and alias received and stored successfully.');
-            //     console.log(`Username: ${username}`);
-
-            //     // 로그인 성공 시 지정된 URL로 리디렉션
-            //     setIsAuthenticated(true);
-            //     navigate('/');
-            // } else {
-            //     console.log('Token not received from the server');
-            // }
-            // } else {
-            //     throw new Error('서버 응답이 JSON 형식이 아닙니다.');
-            // }
         } catch (error) {
-            alert(error.message);
+
         }
     };
     return (
