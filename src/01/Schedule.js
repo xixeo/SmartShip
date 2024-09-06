@@ -76,7 +76,7 @@ export default function Schedule() {
     //   },
     // ];
     try {
-      const response = await fetch('http://10.125.121.175:8080/schedule',
+      const response = await fetch('/schedule',
         // {
         // headers: {
         //   'Authorization': `Bearer ${token}`,
@@ -333,7 +333,7 @@ export default function Schedule() {
     //   },
     // ];
     try {
-      const response = await fetch(`http://10.125.121.175:8080/schedule?orderId=${orderId}`,
+      const response = await fetch(`/schedule?orderId=${orderId}`,
         {
           // headers: {
           //   'Authorization': `Bearer ${token}`,
@@ -503,7 +503,7 @@ export default function Schedule() {
         ref={calendarRef} // FullCalendar ref 설정 검색시 이동
         eventClick={handleeventclick}
       />
-      <Modal open={open} setOpen={setOpen} title={<h2>발주 상세 내역</h2>}>
+      <Modal open={open} setOpen={setOpen} title={<div><h2>발주 상세 내역</h2></div>}>
         {modalData}
       </Modal>
     </div>
