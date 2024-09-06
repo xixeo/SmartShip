@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import './App.css';
+import './App.scss';
 import Navi from './Compo/Navi';
 import Footer from './Compo/Footer';
 import Schedule from './01/Schedule';
