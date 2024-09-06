@@ -25,5 +25,5 @@ public class ItemsDTO {
     private String part2;
     private BigDecimal price;
     private String unit;
-    private String supplierName;
+    private String alias;
 }

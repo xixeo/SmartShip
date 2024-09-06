@@ -30,18 +30,21 @@ public class Items {
     private Category3 category3;
 
     @ManyToOne
-    @JoinColumn(name = "supplier_id", nullable = false)
-    private Suppliers supplier;
+    @JoinColumn(name = "username", nullable = false)
+    private Member member;
 
     @Column(name = "item_name", nullable = false)
     private String itemName;
     
     @Column(nullable = false)
     private String part1;
+    
     @Column(nullable = false)
     private String part2;
+    
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
+    
     @Column(nullable = false)
     private String unit;
 }

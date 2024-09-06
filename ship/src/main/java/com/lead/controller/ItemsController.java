@@ -23,12 +23,13 @@ public class ItemsController {
         @RequestParam(required = false) String category2Name,
         @RequestParam(required = false) String category3Name,
         @RequestParam(required = false) String itemName,
-        @RequestParam(required = false) String supplierName) {
+        @RequestParam(required = false) String alias) {
         
         // 서비스로부터 필터링된 데이터 조회
-        List<ItemsDTO> items = itemsService.findItems(category1Name, category2Name, category3Name, itemName, supplierName);
-
+        List<ItemsDTO> items = itemsService.findItems(category1Name, category2Name, category3Name, itemName, alias);
+        
         return ResponseEntity.ok()
+        		
             .cacheControl(CacheControl.noCache())  // 캐시 방지
             .body(items);
     }

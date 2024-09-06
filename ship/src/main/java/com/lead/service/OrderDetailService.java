@@ -36,7 +36,7 @@ public class OrderDetailService {
                 orderDetail.getQuantity(),
                 item.getPrice(),
                 item.getUnit(),
-                item.getSupplier().getSupplierName(),
+                item.getMember().getUsername(),
                 alias
             );
         }).collect(Collectors.toList());

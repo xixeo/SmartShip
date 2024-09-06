@@ -1,6 +1,6 @@
 package com.lead.entity;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -31,10 +31,10 @@ public class Orders {
     private String listName;
 
     @Column(name = "release_date", nullable = false)
-    private Date releaseDate;
+    private LocalDate releaseDate;
     
     @Column(name = "best_order_date", nullable = false)
-    private Date bestOrderDate;
+    private LocalDate bestOrderDate;
 
     @ManyToOne
     @JoinColumn(name = "username", nullable = false)

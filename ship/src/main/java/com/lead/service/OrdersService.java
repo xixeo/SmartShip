@@ -51,7 +51,7 @@ public class OrdersService {
                     orderDetail.getQuantity(),
                     orderDetail.getItem().getPrice(),
                     orderDetail.getItem().getUnit(),
-                    orderDetail.getItem().getSupplier().getSupplierName(),
+                    orderDetail.getItem().getMember().getUsername(),
                     orderDetail.getOrder().getMember().getAlias()
                 );
             }).collect(Collectors.toList());

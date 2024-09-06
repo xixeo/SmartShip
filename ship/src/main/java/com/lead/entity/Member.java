@@ -36,4 +36,7 @@ public class Member {
 
     @OneToMany(mappedBy = "member")
     private Set<Orders> orders;
+    
+    @OneToMany(mappedBy = "member")
+    private Set<Items> items;
 }

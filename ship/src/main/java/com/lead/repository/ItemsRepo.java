@@ -17,7 +17,5 @@ import com.lead.entity.Items;
 //    List<ItemsDTO> findAllItemsDetails();
 //}
 
-
-public interface ItemsRepo extends JpaRepository<Items, Long>, JpaSpecificationExecutor<Items> {
-    // 필요한 메서드가 있으면 여기에 추가
+public interface ItemsRepo extends JpaRepository<Items, Integer>, JpaSpecificationExecutor<Items> {
 }

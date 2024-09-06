@@ -23,6 +23,7 @@ public class MemberController {
 	
 	@PostMapping("/members/unsub")
 	public String unsubMembers(@AuthenticationPrincipal User user) {
+		System.out.println("===========================회원탈퇴 한다");
 		return memService.unsubMembers(user);
 	}
 }
