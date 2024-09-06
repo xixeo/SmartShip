@@ -41,7 +41,7 @@ export default function Ordertest2() {
 
   return (
     <div className='w-10/12 orderTest2'>
-      <Card >
+      <div className='bg-slate-700 text-white rounded-xl '>
         <CardHeader
           action={
             <IconButton
@@ -56,31 +56,31 @@ export default function Ordertest2() {
           title="2024-08-29 AWS 발주"
         />
         <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <CardContent>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell align="right">test</TableCell>
-                  <TableCell align="right">test1</TableCell>
-                  <TableCell align="right">test2</TableCell>
-                  <TableCell align="right">test3</TableCell>
-                  <TableCell align="right">test4</TableCell>
+          <div className='text-white'>
+            <Table sx={{ margin: 4, minWidth: 650, maxWidth: 900, border: 'white'}} aria-label="simple table">
+              <TableHead> 
+                <TableRow >
+                  <TableCell align="right" sx={{color: 'white'}}>test</TableCell>
+                  <TableCell align="right"sx={{color: 'white'}}>test1</TableCell>
+                  <TableCell align="right"sx={{color: 'white'}}>test2</TableCell>
+                  <TableCell align="right"sx={{color: 'white'}}>test3</TableCell>
+                  <TableCell align="right"sx={{color: 'white'}}>test4</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 <TableRow key={'test'}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                  <TableCell align="right">test</TableCell>
-                  <TableCell align="right">test</TableCell>
-                  <TableCell align="right">test</TableCell>
-                  <TableCell align="right">89746231</TableCell>
-                  <TableCell align="right">89746231</TableCell>
+                  <TableCell align="right" sx={{color: 'white'}}>test</TableCell>
+                  <TableCell align="right" sx={{color: 'white'}}>test</TableCell>
+                  <TableCell align="right" sx={{color: 'white'}}>test</TableCell>
+                  <TableCell align="right" sx={{color: 'white'}}>89746231</TableCell>
+                  <TableCell align="right" sx={{color: 'white'}}>89746231</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
-          </CardContent>
+          </div>
         </Collapse>
-      </Card>
+      </div>
     </div>
   );
 }
