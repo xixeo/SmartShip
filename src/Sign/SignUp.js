@@ -115,5 +115,5 @@ function SignUp({ setIsAuthenticated }) {
     </div>
   );
 }
-
+  
 export default SignUp;
