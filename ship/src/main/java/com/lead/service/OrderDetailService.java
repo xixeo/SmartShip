@@ -25,19 +25,13 @@ public class OrderDetailService {
     private List<OrderDetailDTO> convertOrderDetailToDTO(List<OrderDetail> orderDetails) {
         return orderDetails.stream().map(orderDetail -> {
             var item = orderDetail.getItem();
-            var alias = orderDetail.getOrder().getMember().getAlias();
             return new OrderDetailDTO(
             	orderDetail.getOrderDetailId(),
-            	orderDetail.getOrder().getListName(),
                 item.getItemName(),
-                item.getCategory3().getCategory2().getCategory1().getCategoryName(),
-                item.getCategory3().getCategory2().getCategory2Name(),
-                item.getCategory3().getCategory3Name(),
                 orderDetail.getQuantity(),
                 item.getPrice(),
                 item.getUnit(),
-                item.getMember().getUsername(),
-                alias
+                item.getMember().getUsername()
             );
         }).collect(Collectors.toList());
     }

@@ -25,8 +25,7 @@ public class ItemsService {
 	private EntityManager entityManager;
 
 	@Transactional(readOnly = true)
-	public List<ItemsDTO> findItems(String category1Name, String category2Name, String category3Name, String itemName,
-			String alias) {
+	public List<ItemsDTO> findItems(String category1Name, String category2Name, String category3Name, String itemName) {
 
 		// 영속성 컨텍스트 강제 초기화 (flush() 및 clear() 호출)
 		entityManager.flush();
@@ -48,10 +47,6 @@ public class ItemsService {
 							: builder.conjunction(),
 
 					itemName != null && !itemName.isEmpty() ? builder.like(root.get("itemName"), "%" + itemName + "%")
-							: builder.conjunction(),
-
-					alias != null && !alias.isEmpty()
-							? builder.equal(root.join("member").get("alias"), alias)
 							: builder.conjunction());
 		};
 

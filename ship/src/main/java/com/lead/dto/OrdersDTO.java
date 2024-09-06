@@ -11,9 +11,11 @@ import lombok.Data;
 public class OrdersDTO {
 
 	private Integer orderId;
-	private String listName;
+	private String username;
+	private String alias;
 	private LocalDate releaseDate;
 	private LocalDate bestOrderDate;
-	private String alias;
+	private LocalDate orderDate;
+	private String memo;
 	private List<OrderDetailDTO> orderDetails;
 }

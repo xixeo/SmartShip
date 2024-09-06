@@ -13,7 +13,7 @@ public interface OrderDetailRepo extends JpaRepository<OrderDetail, Integer> {
 	
 	 @EntityGraph(attributePaths = {
 		        "item", 
-		        "item.supplier", 
+		        "item.member.alias", 
 		        "item.category3", 
 		        "item.category3.category2", 
 		        "item.category3.category2.category1"

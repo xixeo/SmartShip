@@ -22,14 +22,17 @@ public class ScheduleController {
 
 	@GetMapping("/scheduleAll")
 	public List<OrdersDTO> getOrders() {
+		System.out.println("===========================전체 스케줄 검색한다");
 		return ordersService.getOrdersWithDetails();
 	}
 
 	@GetMapping("/schedule")
 	public Object getSchedule(@RequestParam(required = false) Integer orderId) {
 		if (orderId != null) {
+			System.out.println("===========================Orders 조회 한다");
 			return orderDetailService.getOrderDetailsByOrderId(orderId);
 		} else {
+			System.out.println("===========================OrderDetail 조회 한다");
 			return ordersService.getOrders();
 		}
 	}

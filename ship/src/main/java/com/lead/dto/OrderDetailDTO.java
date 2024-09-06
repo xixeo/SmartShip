@@ -11,14 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor 
 public class OrderDetailDTO {
 	private Integer orderDetailId;
-	private String listName;
     private String itemName;
-    private String category1Name;
-    private String category2Name;
-    private String category3Name;
     private Integer quantity;
     private BigDecimal price;
     private String unit;
-    private String supplierName;
-    private String alias;
+    private String username;
 }

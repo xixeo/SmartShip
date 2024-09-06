@@ -27,14 +27,17 @@ public class Orders {
     @Column(name = "order_id", nullable = false)
     private Integer orderId;
 
-    @Column(name = "list_name", nullable = false)
-    private String listName;
-
-    @Column(name = "release_date", nullable = false)
+    @Column(name = "release_date", nullable = true)
     private LocalDate releaseDate;
     
-    @Column(name = "best_order_date", nullable = false)
+    @Column(name = "best_order_date", nullable = true)
     private LocalDate bestOrderDate;
+    
+    @Column(name = "order_date", nullable = false)
+    private LocalDate orderDate;
+    
+    @Column(name = "memo", nullable = true)
+    private String memo;
 
     @ManyToOne
     @JoinColumn(name = "username", nullable = false)
