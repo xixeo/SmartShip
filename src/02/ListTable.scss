@@ -1,0 +1,131 @@
+.list-table-root {
+  /* 체크박스 기본 스타일 */
+  .MuiCheckbox-root {
+    color: #fff;
+    border-color: #fff;
+
+    .MuiIconButton-root {
+      border-color: #fff;
+    }
+
+    &.Mui-checked {
+      .MuiIconButton-root {
+        border-color: #fff;
+      }
+    }
+  }
+
+  /* 체크박스 체크 아이콘 스타일 */
+  .MuiCheckbox-root .MuiSvgIcon-root {
+    color: #fff;
+  }
+
+  /* 테이블 배경 색상 */
+  .MuiTable-root {
+    background-color: #68666E;
+
+    .MuiTableRow-root.Mui-selected {
+      background-color: #525158;
+    }
+  }
+
+  /* 테이블 헤더 스타일 */
+  .MuiTableHead-root {
+    background-color: #47464F;
+
+    .MuiTableCell-head {
+      color: #fff;
+      font-weight: bold;
+    }
+  }
+
+  .MuiTableRow-root.Mui-selected:hover {
+    background-color: #525158;
+  }
+
+  .MuiTableCell-root {
+    &:hover {
+      background-color: transparent;
+    }
+  }
+
+  /* 선택 필터 스타일 */
+  .select-custom {
+    height: 40px;
+    min-width: 120px;
+    background-color: transparent;
+
+    .MuiSelect-select {
+      color: white;
+    }
+
+    .MuiOutlinedInput-notchedOutline {
+      border-color: #9D9B9B !important;
+    }
+
+    .MuiSvgIcon-root {
+      color: #9D9B9B;
+    }
+
+    &:hover .MuiOutlinedInput-notchedOutline {
+      border-color: #9D9B9B !important;
+    }
+
+    &.Mui-focused .MuiOutlinedInput-notchedOutline {
+      border-color: #9D9B9B !important;
+    }
+  }
+
+  /* 커스텀 텍스트필드 스타일 */
+  .custom-textfield {
+    height: 40px;
+    flex-grow: 1;
+    max-width: 300px;
+    background-color: transparent;
+
+    .MuiInputBase-input {
+      color: white;
+      height: 100%;
+    }
+
+    .MuiOutlinedInput-root {
+      height: 40px;
+
+      & fieldset {
+        border-color: white;
+      }
+
+      &:hover fieldset {
+        border-color: white;
+      }
+
+      &.Mui-focused fieldset {
+        border-color: white;
+      }
+    }
+  }
+
+  .MuiButton-root.greenbutton {
+    background-color: transparent;
+    border: 1px solid #3DD19D;
+    color: #3DD19D;
+
+    &:hover {
+      background-color: #3DD19D;
+      color: #fff;
+      border: 1px solid transparent;
+    }
+  }
+
+  .MuiButton-root.bluebutton {
+    background-color: transparent;
+    border: 1px solid #43C5FE;
+    color: #43C5FE;
+
+    &:hover {
+      background-color: #43C5FE;
+      color: #fff;
+      border: 1px solid transparent;
+    }
+  }
+}
