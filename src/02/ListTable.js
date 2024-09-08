@@ -1,9 +1,8 @@
- import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Button, Paper, TextField, InputAdornment, Select, MenuItem, Box} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Pagination from '@mui/material/Pagination';
 import LeadTimeModal from './LeadTimeModal';
-import GradientButton from '../Compo/GradientButton'
 import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton } from '@mui/material';
@@ -229,14 +228,14 @@ const handleSelectAllClick = (event) => {
   // 리드타임 버튼 클릭 핸들러
   const handleLeadTimeClick = (leadtime) => {
     // 리드타임 데이터를 가공하여 모달에 전달
-    const leadTimeData = Array.from({ length: parseInt(leadtime, 10) }, (_, i) => Math.random() * 10 + 5); // 예시 데이터
+    const leadTimeData = Array.from({ length: parseInt(leadtime, 10) }, (_, i) => Math.random() * 10 + 5); // 예시 데이터 그냥 넣어둠
     setSelectedLeadTimeData(leadTimeData);
     setLeadTimeModalOpen(true); // 모달 열기
   };
 
   return (
     <div className="list-table-root flex flex-col p-6">
-      <div className="text-xl font-semibold text-white mb-4">선용품 리스트</div>
+      <div className="text-xl font-semibold text-white mb-4">물품 리스트</div>
       <div className="flex items-center justify-between gap-4 mb-4">
         <div className="flex items-center gap-4">
 
@@ -434,17 +433,18 @@ const handleSelectAllClick = (event) => {
           >
             {[5, 10, 15].map((option) => (
               <MenuItem key={option} value={option}>
-                페이지당 항목수 : {option}
+              {option}
               </MenuItem>
             ))}
           </Select>
       </div>
       <div className="flex gap-4">
-        {/* 발주하기 버튼 */}
-        <GradientButton
+        {/* 장바구니 담기 버튼 */}
+        <Button
+          className='bluebutton2'
           onClick={() => navigate('/order')}>
-          발주하기
-        </GradientButton>
+          장바구니 담기
+        </Button>
       </div>
     </div>
 
