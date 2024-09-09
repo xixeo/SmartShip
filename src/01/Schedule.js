@@ -19,8 +19,10 @@ const ChangeData = (events) => {
     const eventColor = eventcolors[eventcolorsindex % eventcolors.length];
     eventcolorsindex += 1;
     
-    const enddate = (event.end).split("T")[0];
-    const startdate = (event.start).split("T")[0];
+    // const enddate = (event.end).split("T")[0];
+    // const startdate = (event.start).split("T")[0];
+    const enddate = event.end;
+    const startdate = event.start;
     console.log('enddate',enddate);
     console.log('startdate',startdate);
     

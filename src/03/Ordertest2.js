@@ -1,86 +1,114 @@
 import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardContent from '@mui/material/CardContent';
-import Collapse from '@mui/material/Collapse';
-import IconButton from '@mui/material/IconButton';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Table, TableBody, TableHead, TableRow, TableCell } from '@mui/material';
+import { MobileDatePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'; // Dayjs 어댑터
+import dayjs from 'dayjs'; // dayjs 가져오기
+import 'dayjs/locale/ko'; // dayjs 한국어 로케일 가져오기
+import { TextField, IconButton } from '@mui/material';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; // 달력 아이콘
+import './style.css';
 
-const ExpandMore = styled((props) => {
-  const { expand, ...other } = props;
-  return <IconButton {...other} />;
-})(({ theme }) => ({
-  marginLeft: 'auto',
-  transition: theme.transitions.create('transform', {
-    duration: theme.transitions.duration.shortest,
-  }),
-  variants: [
-    {
-      props: ({ expand }) => !expand,
-      style: {
-        transform: 'rotate(0deg)',
-      },
-    },
-    {
-      props: ({ expand }) => !!expand,
-      style: {
-        transform: 'rotate(180deg)',
-      },
-    },
-  ],
-}));
+export default function BasicDatePicker() {
+  const [value, setValue] = React.useState(dayjs()); // 초기값을 dayjs로 설정
 
-export default function Ordertest2() {
-  const [expanded, setExpanded] = React.useState(false);
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
+  const handleChange = (newValue) => {
+    setValue(newValue); // 날짜 변경 시 값 업데이트
   };
 
   return (
-    <div className='w-10/12 orderTest2'>
-      <div className='bg-slate-700 text-white rounded-xl '>
-        <CardHeader
-          action={
-            <IconButton
-              onClick={handleExpandClick}
-              aria-expanded={expanded}
-              aria-label="show more"
-              className={`transition-transform ${expanded ? 'rotate-180' : ''}`}
-            >
-              <ExpandMoreIcon />
-            </IconButton>
-          }
-          title="2024-08-29 AWS 발주"
-        />
-        <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <div className='text-white'>
-            <Table sx={{ margin: 4, minWidth: 650, maxWidth: 900, border: 'white'}} aria-label="simple table">
-              <TableHead> 
-                <TableRow >
-                  <TableCell align="right" sx={{color: 'white'}}>test</TableCell>
-                  <TableCell align="right"sx={{color: 'white'}}>test1</TableCell>
-                  <TableCell align="right"sx={{color: 'white'}}>test2</TableCell>
-                  <TableCell align="right"sx={{color: 'white'}}>test3</TableCell>
-                  <TableCell align="right"sx={{color: 'white'}}>test4</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableRow key={'test'}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                  <TableCell align="right" sx={{color: 'white'}}>test</TableCell>
-                  <TableCell align="right" sx={{color: 'white'}}>test</TableCell>
-                  <TableCell align="right" sx={{color: 'white'}}>test</TableCell>
-                  <TableCell align="right" sx={{color: 'white'}}>89746231</TableCell>
-                  <TableCell align="right" sx={{color: 'white'}}>89746231</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
-        </Collapse>
-      </div>
-    </div>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko"> {/* 한국어 로케일 설정 */}
+      <MobileDatePicker
+        label="날짜 선택"
+        value={value}
+        onChange={handleChange}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {params.InputProps.endAdornment}
+                  <IconButton
+                    sx={{ color: 'white' }}
+                    onClick={() => params.inputProps.onClick()} // 아이콘 클릭 시 날짜 피커 열기
+                  >
+                    <CalendarTodayIcon />
+                  </IconButton>
+                </>
+              ),
+            }}
+            sx={{
+              input: { color: 'white' }, // 텍스트 색상을 하얀색으로 변경
+              label: { color: 'white' }, // 라벨 색상을 하얀색으로 변경
+              '.MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: 'white' }, // 테두리 색상 하얀색
+                '&:hover fieldset': { borderColor: 'white' }, // 호버 시 테두리 색상
+                '&.Mui-focused fieldset': { borderColor: 'white' }, // 포커스 시 테두리 색상
+              },
+            }}
+          />
+        )}
+      />
+    </LocalizationProvider>
   );
 }
+
+
+
+
+
+// import * as React from 'react';
+// import { DesktopDatePicker } from '@mui/x-date-pickers';
+// import { LocalizationProvider } from '@mui/x-date-pickers';
+// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'; // Dayjs 어댑터
+// import dayjs from 'dayjs'; // dayjs 가져오기
+// import 'dayjs/locale/ko'; // dayjs 한국어 로케일 가져오기
+// import { TextField } from '@mui/material';
+// import './style.css';
+
+// export default function BasicDatePicker() {
+//   const [value, setValue] = React.useState(dayjs()); // 초기값을 dayjs로 설정
+//   const [tempValue, setTempValue] = React.useState(dayjs()); // 임시값 저장
+
+//   const handleChange = (newValue) => {
+//     setTempValue(newValue); // 날짜가 변경될 때 임시로 저장
+//   };
+
+//   const handleAccept = (newValue) => {
+//     setValue(newValue); // accept 버튼을 눌렀을 때 실제로 날짜를 저장
+//   };
+
+//   return (
+//     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko"> {/* 한국어 로케일 설정 */}
+//       <DesktopDatePicker
+//         label="날짜 선택"
+//         value={tempValue} // 임시값을 표시
+//         onChange={handleChange} // 날짜 변경 시 임시값 업데이트
+//         onAccept={handleAccept} // accept 버튼을 누를 때만 최종 값 업데이트
+//         slots={{
+//           textField: (params) => (
+//             <TextField
+//               {...params}
+//               sx={{
+//                 input: { color: 'white' }, // 텍스트 색상을 하얀색으로 변경
+//                 label: { color: 'white' }, // 라벨 색상을 하얀색으로 변경
+//                 '.MuiOutlinedInput-root': {
+//                   '& fieldset': { borderColor: 'white' }, // 테두리 색상 하얀색
+//                   '&:hover fieldset': { borderColor: 'white' }, // 호버 시 테두리 색상
+//                   '&.Mui-focused fieldset': { borderColor: 'white' }, // 포커스 시 테두리 색상
+//                 },
+//                 '.css-1a7z5rc-MuiButtonBase-root-MuiIconButton-root': { color: 'white' },
+//               }}
+//             />
+//           ),
+//         }}
+//         slotProps={{
+//           actionBar: {
+//             actions: ['clear', 'accept'], // clear와 accept 버튼만 표시
+//           },
+//         }}
+//       />
+//     </LocalizationProvider>
+//   );
+// }

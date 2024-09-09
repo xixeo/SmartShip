@@ -1,273 +1,243 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Paper, Select, MenuItem, InputAdornment, TextField, Button, Box, IconButton, Typography, Collapse } from '@mui/material';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import CloseIcon from '@mui/icons-material/Close';
-import { DayPicker } from 'react-day-picker';
-import 'react-day-picker/style.css';
-import 'react-day-picker/dist/style.css'
-import { KeyOff } from '@mui/icons-material';
-import { ko } from 'date-fns/locale';
-import { format } from 'date-fns';
+import * as React from 'react';
+import { styled } from '@mui/material/styles';
+import Collapse from '@mui/material/Collapse';
+import IconButton from '@mui/material/IconButton';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Table, TableBody, TableHead, TableRow, TableCell } from '@mui/material';
+import Box from '@mui/material/Box';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Button from '@mui/material/Button';
+import { MobileDatePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import './style.css';
 
-function createData(category1_name, category2_name, item_name, part1, part2, price, unit, quantity, supplier_name, pre_leadtime_id) {
-  return { category1_name, category2_name, item_name, part1, part2, price, unit, quantity, supplier_name, pre_leadtime_id };
-}
+const ExpandMore = styled((props) => {
+  const { expand, ...other } = props;
+  return <IconButton {...other} />;
+})(({ theme }) => ({
+  marginLeft: 'auto',
+  transition: theme.transitions.create('transform', {
+    duration: theme.transitions.duration.shortest,
+  }),
+  transform: (props) => (props.expand ? 'rotate(180deg)' : 'rotate(0deg)'),
+}));
 
-// 초기 데이터
-const initialRows = [
-  createData('식품', '과일', '수박', '012526', '', '180', 'EUR', 100, '쿠팡', 1),
-  createData('음료', '탄산음료', '콜라', '015789', '321456', '120', 'USD', 200, '이마트', 2),
-  createData('음료', '탄산음료', '사이다', '015782', '321457', '120', 'KRW', 250, '이마트', 3),
-  createData('음료', '커피', '', '015783', '321458', '170', 'KRW', 100, '롯데슈퍼', 3),
-  createData('간식', '과자', '포테이토칩', '019876', '654321', '1500', 'JPY', 300, '롯데마트', 4),
-  createData('유제품', '우유', '서울우유', '021345', '987654', '200', 'KRW', 50, '홈플러스', 5),
-  createData('건강식품', '비타민', '비타민C', '023456', '789012', '250', 'EUR', 70, '네이버쇼핑', 6),
-  createData('과일', '사과', '후지사과', '025678', '345678', '220', 'USD', 100, '마켓컬리', 7),
-];
-
-// 테이블 헤더 정의
-const headCells = [
-  { id: 'category1_name', label: 'Category 1', width: '13%' },
-  { id: 'category2_name', label: 'Category 2', width: '13%' },
-  { id: 'item_name', label: '물품명', width: '14%' },
-  { id: 'price', label: '단가', width: '10%' },
-  { id: 'quantity', label: '수량', width: '10%' },
-  { id: 'price*quantity', label: '금액', width: '10%' },
-  { id: 'optimalOrderDate', label: '최적 발주일', width: '10%' },
-  { id: 'pre_leadtime_id', label: '과거 리드타임', width: '9%' },
-];
-
-// null값 처리 & 가격 단위 구분 함수
-const formatCellValue = (value, unit) => {
-  if (value == null || value === '') {
-    return '-';
-  }
-
-  if (unit) {
-    switch (unit) {
-      case 'USD':
-        return `$ ${value}`;
-      case 'KRW':
-        return `₩ ${value}`;
-      case 'EUR':
-        return `€ ${value}`;
-      case 'JPY':
-        return `¥ ${value}`;
-      default:
-        return value; // 기본값
+// Helper function: 그룹을 username별로 나누기
+const groupByUsername = (orderDetails) => {
+  return orderDetails.reduce((groups, detail) => {
+    const { username } = detail;
+    if (!groups[username]) {
+      groups[username] = [];
     }
-  }
-
-  return value;
+    groups[username].push(detail);
+    return groups;
+  }, {});
 };
 
-function Row(props) {
-  const { row } = props;
-  const [open, setOpen] = React.useState(false);
+export default function Ordertest2() {
+  // 서버로부터 받은 데이터 예시
+  const data = [
+    {
+      orderId: 1,
+      username: 'AWS선박',
+      alias: '유승호',
+      releaseDate: '2024-05-04',
+      orderDate: '2024-09-06',
+      memo: '테스트',
+      orderDetails: [
+        {
+          orderDetailId: 1,
+          category1Name: '옷',
+          category2Name: '바지',
+          category3Name: '여성바지',
+          itemName: '청바지',
+          quantity: 10,
+          price: 39900.0,
+          unit: 'KRW',
+          username: '민주샵',
+        },
+        {
+          orderDetailId: 7,
+          category1Name: '옷',
+          category2Name: '바지',
+          category3Name: '남성바지',
+          itemName: '청바지',
+          quantity: 5,
+          price: 39900.0,
+          unit: 'KRW',
+          username: '민주샵',
+        },
+        {
+          orderDetailId: 8,
+          category1Name: '옷',
+          category2Name: '바지',
+          category3Name: '남성바지',
+          itemName: '청바지',
+          quantity: 10,
+          price: 59900.0,
+          unit: 'KRW',
+          username: '수플린',
+        },
+      ],
+    },
+  ];
+
+  const [expanded, setExpanded] = React.useState({});
+  const [checked, setChecked] = React.useState({});
+  const [startDate, setStartDate] = React.useState();
+
+  // 전체 체크 상태 결정
+  const allChecked = Object.values(checked).every(Boolean);
+  const someChecked = Object.values(checked).some(Boolean) && !allChecked;
+
+  // username별로 그룹화된 데이터를 받아옴
+  const groupedData = groupByUsername(data[0].orderDetails);
+
+
+  const handleChangeParent = (event) => {
+    const newChecked = {};
+    Object.keys(groupedData).forEach((username) => {
+      newChecked[username] = event.target.checked;
+    });
+    setChecked(newChecked);
+  };
+
+  const handleChangeChild = (username) => (event) => {
+    setChecked({
+      ...checked,
+      [username]: event.target.checked,
+    });
+  };
+
+  const handleExpandClick = (username) => () => {
+    setExpanded({
+      ...expanded,
+      [username]: !expanded[username],
+    });
+  };
+
+  const handleExpandAll = () => {
+    const newExpanded = {};
+    Object.keys(groupedData).forEach((username) => {
+      newExpanded[username] = true;
+    });
+    setExpanded(newExpanded);
+  };
+
+  const handleCollapseAll = () => {
+    const newExpanded = {};
+    Object.keys(groupedData).forEach((username) => {
+      newExpanded[username] = false;
+    });
+    setExpanded(newExpanded);
+  };
 
   return (
-    <React.Fragment>
-      <TableRow sx={{ '& > *': { borderBottom: 'unset' }, '&:hover': { backgroundColor: '#f5f5f5' } }}>
-        <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell>{row.category1_name}</TableCell>
-        <TableCell>{row.category2_name}</TableCell>
-        <TableCell>{row.item_name}</TableCell>
-        <TableCell align="right">{formatCellValue(row.price, row.unit)}</TableCell>
-        <TableCell align="right">{row.quantity}</TableCell>
-        <TableCell align="right">{formatCellValue(row.price * row.quantity, row.unit)}</TableCell>
-        <TableCell align="right">{row.optimalOrderDate || '-'}</TableCell>
-        <TableCell align="right">{row.pre_leadtime_id}</TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                History
-              </Typography>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Customer</TableCell>
-                    <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right">Total price ($)</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {row.history && row.history.map((historyRow) => (
-                    <TableRow key={historyRow.date}>
-                      <TableCell component="th" scope="row">
-                        {historyRow.date}
-                      </TableCell>
-                      <TableCell>{historyRow.customerId}</TableCell>
-                      <TableCell align="right">{historyRow.amount}</TableCell>
-                      <TableCell align="right">
-                        {Math.round(historyRow.amount * row.price * 100) / 100}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </React.Fragment>
-  );
-}
-
-Row.propTypes = {
-  row: PropTypes.shape({
-    category1_name: PropTypes.string.isRequired,
-    category2_name: PropTypes.string.isRequired,
-    item_name: PropTypes.string.isRequired,
-    price: PropTypes.number.isRequired,
-    quantity: PropTypes.number.isRequired,
-    unit: PropTypes.string,
-    optimalOrderDate: PropTypes.string,
-    pre_leadtime_id: PropTypes.number.isRequired,
-    history: PropTypes.arrayOf(
-      PropTypes.shape({
-        amount: PropTypes.number.isRequired,
-        customerId: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-      })
-    ),
-  }).isRequired,
-};
-
-function OrderTEST() {
-  const [selected, setSelected] = useState(null);
-  const [calendarOpen, setCalendarOpen] = useState(false);
-  const rows = initialRows;
-
-  return (
-    <div className='p-6'>
-      <div className="text-xl font-semibold text-white mb-4">발주 스케줄링</div>
-      <div className="flex items-center justify-between gap-4 mb-4">
-        <div className="flex items-center gap-4 relative">
-          <Typography className="text-white" sx={{ mr: 2 }}>창고 출고 예정일:</Typography>
-          <TextField
-            className='text-white'
-            value={selected ? selected.toLocaleDateString() : ''}
-            onClick={() => setCalendarOpen(!calendarOpen)}
-            InputProps={{
-              endAdornment: (
-                <IconButton position="end" onClick={() => setCalendarOpen(!calendarOpen)}>
-                  <CalendarTodayIcon sx={{ color: 'white' }} />
-                </IconButton>
-              ),
-            }}
-            sx={{
-              height: 40,
-              backgroundColor: 'transparent',
-              '& .MuiInputBase-root': {
-                color: 'white', 
-              },
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'white', 
-              },
-              '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'white', 
-              },
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'white', 
-              },
-              '& .MuiInputBase-input': {
-                color: 'white', 
-              },
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': {
-                  borderColor: 'white',
-                },
-                '&:hover fieldset': {
-                  borderColor: 'white',
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: 'white',
-                },
-              },
-            }}
-            readOnly
-            variant="outlined"
-            size="small"
-          />
-          {calendarOpen && (
-            <Box sx={{ 
-              position: 'absolute', 
-              top: '100%', 
-              left: 300, 
-              transform: 'translateY(4px)', // 아이콘 바로 아래에 띄우기 위해 변환
-              bgcolor: 'white', 
-              borderRadius: 1, 
-              boxShadow: 3,
-              zIndex: 1,
-              p: 1,
-              width: 'fit-content', 
-            }}>
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <IconButton 
-                  size="small" 
-                  onClick={() => setCalendarOpen(false)}
-                  sx={{ color: 'black' }}
-                >
-                  <CloseIcon/>
-                </IconButton>
-              </Box>
-              {/* <DayPicker
-                selected={selected}
-                onSelect={setSelected}
-                locale={ko}
-                captionLayout="dropdown"
-                formatters={{ formatCaption }}
-                footer={
-                  selected ? `[ ${selected.toLocaleDateString('ko-KR')} 창고 출고 예정 ]` : ""
-                }
-              /> */}
-            </Box>
-          )}
-        </div>
+    <div className="flex-col text-white">
+      <div className="w-full flex justify-between">
+        <h2 className="text-xl font-semibold text-white mb-4">장바구니</h2>
       </div>
-      <TableContainer component={Paper}>
-        <Table aria-label="collapsible table">
-          <TableHead
-            sx={{ 
-              backgroundColor: '#f0f0f0', 
-              '& th': { fontWeight: 'bold' } 
-            }}>
-            <TableRow>
-              <TableCell />
-              <TableCell align="center">Category 1</TableCell>
-              <TableCell align="center">Category 2</TableCell>
-              <TableCell align="center">물품명</TableCell>
-              <TableCell align="center">단가</TableCell>
-              <TableCell align="center">수량</TableCell>
-              <TableCell align="center">금액</TableCell>
-              <TableCell align="center">최적 발주일</TableCell>
-              <TableCell align="center">과거 리드타임</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <Row key={row.item_name} row={row} />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <div className="bg-[#2F2E38] m-5 p-5 rounded-lg">
+        {/* 부모 체크박스 ================================================== 처음 로딩때 왜 전체 체크 안되있는데 니 맘대로 색칠해있냐,,?*/}
+        <FormControlLabel
+          label="전체 선택"
+          control={
+            <Checkbox
+              checked={allChecked}
+              indeterminate={someChecked}
+              onChange={handleChangeParent}
+              sx={{ color: 'white' }}
+            />
+          }
+        />
+        <div className='flex justify-end'>
+          <Button
+            variant="contained"
+            onClick={handleExpandAll}
+            style={{ marginRight: '10px' }}
+            sx={{bgcolor: '#43C5FE'}}
+            >
+            전체 열기
+          </Button>
+          <Button variant="contained" onClick={handleCollapseAll} sx={{bgcolor: '#43C5FE'}}>
+            전체 닫기
+          </Button>
+        </div>
+        {Object.keys(groupedData).map((username) => (
+          <div key={username} className="bg-[#2F2E38] text-white rounded-xl m-5 border ">
+            <Box sx={{ display: 'flex', alignItems: 'center', padding: '16px' }}>
+              {/* 왼쪽에 체크박스 */}
+              <FormControlLabel
+                label={username}
+                control={
+                  <Checkbox checked={checked[username] || false} onChange={handleChangeChild(username)} sx={{ color: 'white' }} />
+                }
+                sx={{ color: 'white' }}
+              />
+              {/* 오른쪽에 아이콘 */}
+              <IconButton
+                onClick={handleExpandClick(username)} // 각 카드의 expand 상태 처리
+                aria-expanded={expanded[username] || false}
+                aria-label="show more"
+                className={`transition-transform ${expanded[username] ? 'rotate-180' : ''
+                  }`}
+                sx={{ color: 'white', marginLeft: 'auto' }}
+              >
+                <ExpandMoreIcon />
+              </IconButton>
+            </Box>
+            <Collapse in={expanded[username]} timeout="auto" unmountOnExit>
+              <div className="w-full p-4">
+                <Table aria-label="simple table">
+                  <TableHead>
+                    <TableRow
+                      sx={{
+                        'th, td': {
+                          bgcolor: '#47454F',
+                          color: 'white',
+                          fontWeight: 'bold',
+                          border: 'none',
+                        },
+                      }}
+                    >
+                      <TableCell align="center">Category1 Name</TableCell>
+                      <TableCell align="center">Category2 Name</TableCell>
+                      <TableCell align="center">Category3 Name</TableCell>
+                      <TableCell align="center">Item Name</TableCell>
+                      <TableCell align="center">Quantity</TableCell>
+                      <TableCell align="center">Price</TableCell>
+                      <TableCell align="center">BestOrderDate</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {groupedData[username].map((detail) => (
+                      <TableRow
+                      key={detail.orderDetailId}
+                      sx={{ }}
+                      >
+                        <TableCell align="center" sx={{ bgcolor: '#67666E', fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.category1Name}</TableCell>
+                        <TableCell align="center" sx={{ bgcolor: '#67666E', fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.category2Name}</TableCell>
+                        <TableCell align="center" sx={{ bgcolor: '#67666E', fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.category3Name}</TableCell>
+                        <TableCell align="center" sx={{ bgcolor: '#67666E', fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.itemName}</TableCell>
+                        <TableCell align="center" sx={{ bgcolor: '#67666E', fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.quantity}</TableCell>
+                        <TableCell align="center" sx={{ bgcolor: '#67666E', fontWeight: 'semi-bold', color: 'white', border: 'none' }}> 
+                          {detail.unit === 'KRW' ? `₩ ${detail.price}` :
+                          detail.unit === 'USD' ? `$ ${detail.price}` :
+                          detail.unit === 'JPY' ? `¥ ${detail.price}` :
+                          detail.unit === 'EUR' ? `₤ ${detail.price}` :
+                          detail.price}
+                        </TableCell>
+                        <TableCell align="center" sx={{ bgcolor: '#67666E', fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.bestorderday}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </Collapse>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
-
-export default OrderTEST;
