@@ -10,6 +10,7 @@ import OrderTEST from './03/OrderTEST';
 import Ordertest from './03/Ordertest2'; 
 import SignUp from './Sign/SignUp';
 import SignIn from './Sign/SignIn';
+import ListTableTest from './02/ListTableTEST';
 
 function App() {
   // const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -48,6 +49,7 @@ function App() {
                   <Route path="/ordertest" element={<OrderTEST />} />
                   <Route path="/ordertest2" element={<Ordertest />} />
                   <Route path="*" element={<Navigate to="/" />} />
+                  <Route path="/ListTableTest" element={<ListTableTest />} />                
                 </Routes>
               </main>
               <Footer />
