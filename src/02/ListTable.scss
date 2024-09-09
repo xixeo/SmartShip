@@ -1,4 +1,21 @@
 .list-table-root {
+  .MuiTableRow-root:last-child .MuiTableCell-root {
+    border-bottom: 1px solid #47464F;
+  }
+
+  .MuiTableCell-root:last-child {
+    border-right: none;
+  }
+
+  .MuiPaper-root{
+    background-color: #68666E;
+  }
+  .bg-custom {
+    background-color: #68666E;
+    border-radius: 0.5rem; // rounded-lg에 해당하는 클래스
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); // shadow-md에 해당하는 클래스
+  }
+
   /* 체크박스 기본 스타일 */
   .MuiCheckbox-root {
     color: #fff;
@@ -92,15 +109,15 @@
       height: 40px;
 
       & fieldset {
-        border-color: white;
+        border-color: #9D9B9B !important;
       }
 
       &:hover fieldset {
-        border-color: white;
+        border-color: #9D9B9B !important;
       }
 
       &.Mui-focused fieldset {
-        border-color: white;
+        border-color: #9D9B9B !important;
       }
     }
   }
@@ -139,5 +156,75 @@
       border: 1px solid #43C5FE;
       color: #43C5FE;
     }
+  }
+
+  /* 페이지네이션 부분 */
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    
+    .MuiPagination-root {
+      color: white;
+      
+      .MuiPagination-ul {
+        .MuiButtonBase-root {
+          color: white;
+          border-radius: 50%;
+  
+          &.Mui-selected {
+            background-color: #47464F; 
+            color: white; 
+          }
+  
+          &:hover {
+            background-color: #5f5e6b; 
+          }
+        }
+      }
+  
+      .MuiPaginationItem-root {
+        color: white;
+  
+        &.Mui-selected {
+          background-color: #47464F; 
+          color: white;
+        }
+      }
+  
+      .MuiPaginationItem-ellipsis {
+        color: white;
+      }
+    }
+  }
+
+  .item-cell {
+    color: white;
+  }
+  
+  .price-cell {
+    color: white;
+    text-align: right;
+    padding-right: 3%;
+  }
+
+  .custom-toggle {
+    .MuiFormControlLabel-label {
+      order: -1; // 레이블을 먼저 표시
+      color: #ffffff; // 레이블 글자색 흰색
+    }
+  
+    .MuiSwitch-switchBase {
+      color: #b0b0b0; // 스위치 기본 색상 (회색)
+      &.Mui-checked {
+        color: #b0b0b0; // 스위치 체크 상태 색상 (회색)
+      }
+    }
+  
+    .MuiSwitch-track {
+      background-color: #d0d0d0; // 스위치 트랙 색상 (회색)
+    }
+
+    margin-left: 16px;
   }
 }

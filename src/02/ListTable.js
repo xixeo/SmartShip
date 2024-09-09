@@ -6,22 +6,24 @@ import LeadTimeModal from './LeadTimeModal';
 import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton } from '@mui/material';
+import Switch from '@mui/material/Switch';
 import './ListTable.scss';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 // 데이터 생성 함수
-function createData(category1Name, category2Name, category3Name, itemName, price, unit, quantity, supplierName, leadtime) {
-  return { category1Name, category2Name, category3Name, itemName, price, unit, quantity, supplierName, leadtime };
+function createData(category1Name, category2Name, category3Name, itemName, price, unit, supplierName, leadtime) {
+  return { category1Name, category2Name, category3Name, itemName, price, unit, supplierName, leadtime };
 }
 
 const initialRows = [
-  createData('식품', '과일', '수박/참외', '수박', '18', 'EUR', 10, '쿠팡', 1),
-  createData('음료', '탄산음료', '콜라', '코카콜라', '12', 'USD', 100, '이마트', 2),
-  createData('음료', '탄산음료', '사이다', '칠성사이다', '1200', 'KRW', 4, '이마트', 2),
-  createData('음료', '커피', '커피', '아메리카노', '1700', 'KRW', '', '롯데슈퍼', 3),
-  createData('간식', '과자', '포테이토칩', '스윙칩',  '150', 'JPY', 14, '롯데마트', 4),
-  createData('유제품', '우유', '서울우유', '저지방 서울우유', '2000', 'KRW', 100 , '홈플러스', 5),
-  createData('건강식품', '비타민', '비타민', '비타민C', '25', 'EUR', 3, '네이버쇼핑', 6),
-  createData('과일', '사과', '후지사과', '유기농 후지사과', '2', 'USD', 1, '마켓컬리', 7),
+  createData('식품', '과일', '수박/참외', '수박', 18, 'EUR', '쿠팡', 1), 
+  createData('음료', '탄산음료', '콜라', '코카콜라', 12, 'USD', '이마트', 1),
+  createData('음료', '탄산음료', '사이다', '칠성사이다', 1200, 'KRW', '이마트', 1),
+  createData('음료', '커피', '커피', '아메리카노', 1700, 'KRW', '롯데슈퍼', 1),
+  createData('간식', '과자', '포테이토칩', '스윙칩', 150, 'JPY', '롯데마트', 1),
+  createData('유제품', '우유', '서울우유', '저지방 서울우유', 200, 'KRW', '홈플러스', 1),
+  createData('건강식품', '비타민', '비타민', '비타민C', 25, 'EUR', '네이버쇼핑', 1),
+  createData('과일', '사과', '후지사과', '유기농 후지사과', 2, 'USD', '마켓컬리', 1),
 ];
 
 // 테이블 헤더 정의
@@ -30,10 +32,10 @@ const headCells = [
   { id: 'category2Name', label: 'Category 2', width: '14%' },
   { id: 'category3Name', label: 'Category 3', width: '14%' },
   { id: 'itemName', label: '물품명', width: '14%' },
-  { id: 'price', label: '가격', width: '10%' },
+  { id: 'calculateTotalPrice', label: '가격', width: '10%' },
   { id: 'quantity', label: '수량', width: '10%' },
   { id: 'supplierName', label: '판매자', width: '10%' },
-  { id: 'leadtime', label: '리드타임', width: '9%' },
+  { id: 'leadtime', label: '', width: '9%' },
 ];
 
 // null값 처리 & 가격 단위 구분 함수
@@ -94,7 +96,7 @@ function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, allRowsSel
 // 메인 테이블 컴포넌트
 function ListTable() {
   const navigate = useNavigate();
-  const [rows, setRows] = useState(initialRows); // 서버에서 가져온 데이터
+  const [rows, setRows] = useState(initialRows.map(row => ({ ...row, quantity: 1 })));
   const [selected, setSelected] = useState(new Set()); // 선택된 항목 상태
   const [page, setPage] = useState(1); // 현재 페이지
   const [rowsPerPage, setRowsPerPage] = useState(5); // 페이지당 항목 수
@@ -137,12 +139,17 @@ function ListTable() {
 
       return matchesCategory1 && matchesCategory2 && matchesCategory3 && matchesSearchQuery;
     });
-  }, [displayedRows, category1Name, category2Name, category3Name, searchQuery]); // `displayedRows`를 의존성 배열에 추가 
+  }, [displayedRows, category1Name, category2Name, category3Name, searchQuery, showSelected]); // `displayedRows`를 의존성 배열에 추가 
+
+  // 선택된 항목만 보기 필터링
+  const filteredRowsBySelection = useMemo(() => {
+    return showSelected ? filteredRows.filter(row => selected.has(row.itemName)) : filteredRows;
+  }, [filteredRows, showSelected, selected]);
 
   // 검색, 카테고리, 페이지 크기 변경 시 페이지를 1로 초기화
   useEffect(() => {
     setPage(1);
-  }, [searchQuery, category1Name, category2Name, category3Name, rowsPerPage]);
+  }, [searchQuery, category1Name, category2Name, category3Name, rowsPerPage, showSelected]);
 
  // 전체 선택 핸들러
 const handleSelectAllClick = (event) => {
@@ -159,16 +166,22 @@ const handleSelectAllClick = (event) => {
   }
 };
 
-  // 행 클릭 핸들러
-  const handleClick = (event, itemName) => {
-    const newSelected = new Set(selected);
-    if (newSelected.has(itemName)) {
-      newSelected.delete(itemName);
-    } else {
-      newSelected.add(itemName);
-    }
-    setSelected(newSelected);
-  };
+// 행 클릭 핸들러
+const handleClick = (event, itemName) => {
+  // 클릭된 요소가 수량 변경 또는 리드타임 버튼인 경우 함수 종료
+  if (event.target.classList.contains('quantity-button') || event.target.classList.contains('leadtime-button')) {
+    return;
+  }
+
+  // 체크박스 선택/해제 처리
+  const newSelected = new Set(selected);
+  if (newSelected.has(itemName)) {
+    newSelected.delete(itemName);
+  } else {
+    newSelected.add(itemName);
+  }
+  setSelected(newSelected);
+};
 
   // 페이지 변경 핸들러
   const handleChangePage = (event, newPage) => {
@@ -203,20 +216,36 @@ const handleSelectAllClick = (event) => {
   // 항목이 선택되었는지 여부 확인
   const isSelected = (itemName) => selected.has(itemName);
 
-  // 선택된 항목 보기 버튼 클릭 시
+  // 선택된 항목만 보기 버튼 핸들러
   const handleShowSelected = () => {
-    setShowSelected(!isSelected);
+    setShowSelected((prev) => {
+      if (!prev) setPage(1); // 선택품목보기 버튼 클릭 시 페이지를 1로 초기화
+      return !prev;
+    });
+  };
+
+  // 수량 변경 핸들러
+  const handleQuantityChange = (itemName, value) => {
+    const quantity = Math.max(1, parseInt(value, 10) || 1); // 수량을 숫자로 변환
+    setRows(prevItems =>
+      prevItems.map(row =>
+        row.itemName === itemName ? { ...row, quantity } : row
+      )
+    );
   };
 
   // 빈 행 계산
-  const emptyRows = useMemo(
-    () => (page > 1 ? Math.max(0, (page - 1) * rowsPerPage + rowsPerPage - filteredRows.length) : 0),
-    [page, rowsPerPage, filteredRows.length]
-  );
+  const emptyRows = useMemo(() => {
+    const rowsCount = showSelected ? filteredRowsBySelection.length : filteredRows.length;
+    return page > 1 ? Math.max(0, (page - 1) * rowsPerPage + rowsPerPage - rowsCount) : 0;
+  }, [page, rowsPerPage, filteredRows.length, filteredRowsBySelection.length, showSelected]);
 
   // 총 페이지 수 계산
-  const totalPages = useMemo(() => Math.ceil(filteredRows.length / rowsPerPage), [filteredRows.length, rowsPerPage]);
-
+  const totalPages = useMemo(() => {
+    const rowsCount = showSelected ? filteredRowsBySelection.length : filteredRows.length;
+    return Math.ceil(rowsCount / rowsPerPage);
+  }, [filteredRows.length, filteredRowsBySelection.length, rowsPerPage, showSelected]);
+  
   // 모든 행이 선택되었는지 여부 확인
   const allRowsSelected = useMemo(() => {
     return filteredRows.length > 0 && filteredRows.every(row => selected.has(row.itemName));
@@ -238,7 +267,6 @@ const handleSelectAllClick = (event) => {
       <div className="text-xl font-semibold text-white mb-4">물품 리스트</div>
       <div className="flex items-center justify-between gap-4 mb-4">
         <div className="flex items-center gap-4">
-
           {/* Category 1 선택 필터 */}
           <Select
             value={category1Name}
@@ -292,49 +320,56 @@ const handleSelectAllClick = (event) => {
 
           {/* 검색 필드 */}
           <TextField
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      placeholder="물품명 검색"
-      InputProps={{
-        startAdornment: (
-          <InputAdornment position="start">
-            <SearchIcon sx={{ color: 'white', fontSize: 20 }} />
-          </InputAdornment>
-        ),
-        endAdornment: (
-          <InputAdornment position="end">
-            {searchQuery && (
-              <IconButton
-                onClick={() => {
-                  setSearchQuery(''); // 검색 값 초기화
-                  setDisplayedRows(initialRows); // 검색 값 초기화 시 전체 데이터 다시 설정
-                }}
-                edge="end"
-                sx={{ color: 'white' }}
-              >
-                <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
-              </IconButton>
-            )}
-          </InputAdornment>
-        ),
-      }}
-      className="custom-textfield"
-    />
-          {/* 선택 품목 보기 버튼 */}
-          <Button variant="contained" onClick={handleShowSelected}>
-            {showSelected ? "모든 품목 보기" : "선택 품목 보기"}
-          </Button>
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="물품명 검색"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: 'white', fontSize: 20 }} />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  {searchQuery && (
+                    <IconButton
+                      onClick={() => {
+                        setSearchQuery(''); // 검색 값 초기화
+                        setDisplayedRows(initialRows); // 검색 값 초기화 시 전체 데이터 다시 설정
+                      }}
+                      edge="end"
+                      sx={{ color: 'white' }}
+                    >
+                      <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
+                    </IconButton>
+                  )}
+                </InputAdornment>
+              ),
+            }}
+            className="custom-textfield"
+          />
+
+          <FormControlLabel
+          control={
+            <Switch
+              checked={showSelected}
+              onChange={handleShowSelected}
+              color="default"
+            />
+          }
+          label={showSelected ? '선택 품목 보기' : '전체 품목 보기'}
+          className="custom-toggle"
+          />
+          </div>
           <Button
               onClick={() => {
                 // 검색 버튼 클릭 시 필터링된 데이터 설정
                 const filteredData = initialRows.filter((row) => { 
-                  return row.category1Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  return row.category1Name.toLocaleLowerCase().includes(searchQuery.toLowerCase()) ||
                         row.category2Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         row.category3Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         row.itemName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        row.part1.includes(searchQuery) ||
-                        row.part2.includes(searchQuery) ||
-                        row.price.includes(searchQuery) ||
+                        row.price.toLowerCase().includes(searchQuery.toLocaleLowerCase()) ||
                         row.supplierName.toLowerCase().includes(searchQuery.toLowerCase());
                 });
                 setDisplayedRows(filteredData);
@@ -345,24 +380,26 @@ const handleSelectAllClick = (event) => {
             >
               검색
             </Button>
-
-          </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md ">
-        <TableContainer component={Paper} sx={{ minHeight: '400px' }}>
+      <div className="bg-custom">
+        <TableContainer component={Paper} sx={{ minHeight: '400px',  width: '100%' }}>
           <Table>
             <EnhancedTableHead
               numSelected={selected.size}
               onSelectAllClick={handleSelectAllClick}
-              rowCount={filteredRows.length}
+              rowCount={filteredRowsBySelection.length}
               allRowsSelected={allRowsSelected}
             />
             <TableBody>
               {/* 페이지네이션에 따른 행 데이터 표시 */}
-              {filteredRows.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row, index) => {
+              {filteredRowsBySelection.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row, index) => {
                 const isItemSelected = isSelected(row.itemName);
                 const labelId = `enhanced-table-checkbox-${index}`;
+
+                const price = parseFloat(row.price) || 0;
+                const quantity = parseInt(row.quantity, 10) || 1;
+                const totalPrice = price * quantity;
 
                 return (
                   <TableRow
@@ -381,15 +418,33 @@ const handleSelectAllClick = (event) => {
                         inputProps={{ 'aria-labelledby': labelId }}
                       />
                     </TableCell>
-                    <TableCell component="th" id={labelId} scope="row" padding="none" align="center">
+                    <TableCell component="th" id={labelId} scope="row" padding="none" align="center" className="item-cell">
                       {formatCellValue(row.category1Name)}
                     </TableCell>
-                    <TableCell align="center">{formatCellValue(row.category2Name)}</TableCell>
-                    <TableCell align="center">{formatCellValue(row.category3Name)}</TableCell>
-                    <TableCell align="center">{formatCellValue(row.itemName)}</TableCell>
-                    <TableCell align="center">{formatCellValue(row.price*row.quantity, row.unit)}</TableCell>
-                    <TableCell align="center">{formatCellValue(row.quantity)}</TableCell>
-                    <TableCell align="center">{formatCellValue(row.supplierName)}</TableCell>
+                    <TableCell align="center" className="item-cell">
+                      {formatCellValue(row.category2Name)}
+                    </TableCell>
+                    <TableCell align="center" className="item-cell">
+                      {formatCellValue(row.category3Name)}
+                    </TableCell>
+                    <TableCell align="center" className="item-cell">
+                      {formatCellValue(row.itemName)}
+                    </TableCell>
+                    <TableCell align="center" className='price-cell'>{formatCellValue(totalPrice, row.unit)}</TableCell>
+                    <TableCell align="center" className='item-cell'>
+                    <TextField
+                      className="custom-textfield"
+                      type="number" // 숫자 입력 필드로 설정
+                      inputProps={{ min: 1 }} 
+                      value={row.quantity} 
+                      onChange={(e) => handleQuantityChange(row.itemName, e.target.value)}
+                      size="small" // 필드 크기 조정
+                      color='white'
+                    />
+                    </TableCell>
+                    <TableCell align="center" className="item-cell">
+                      {formatCellValue(row.supplierName)}
+                    </TableCell>
                     <TableCell align="center" style={{ width: '9%' }}>
                     <Button
                       onClick={() => handleLeadTimeClick(row.leadtime)}
@@ -410,8 +465,8 @@ const handleSelectAllClick = (event) => {
             </TableBody>
           </Table>
         </TableContainer>
-
-        <Box display="flex" justifyContent="center" alignItems="center" py={2}>
+      </div>
+      <div className="pagination-container">
           {/* 페이지네이션 컴포넌트 */}
           <Pagination
             count={totalPages}
@@ -419,10 +474,8 @@ const handleSelectAllClick = (event) => {
             onChange={handleChangePage}
             variant="outlined"
             shape="rounded"
-            color="original"
           />
-        </Box>
-      </div>
+        </div>
       <div className='flex justify-between items-center mt-6'>
       <div className="flex gap-4">
           {/* 페이지당 항목 수 선택 */}
