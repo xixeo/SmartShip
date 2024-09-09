@@ -2,10 +2,12 @@ package com.lead.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.lead.dto.OrderDetailDTO;
 import com.lead.dto.OrderItemRequestDTO;
@@ -71,9 +73,9 @@ public class OrdersService {
 
         // Orders 엔티티 생성
         Orders order = new Orders();
-        order.setReleaseDate(LocalDate.parse(orderRequest.getReleaseDate()));
-        order.setBestOrderDate(LocalDate.parse(orderRequest.getBestOrderDate()));
-        order.setOrderDate(LocalDate.now());  // 현재 날짜를 orderDate로 설정
+//        order.setReleaseDate(LocalDate.parse(orderRequest.getReleaseDate()));
+//        order.setBestOrderDate(LocalDate.parse(orderRequest.getBestOrderDate()));
+//        order.setOrderDate(LocalDate.now());  // 현재 날짜를 orderDate로 설정
         order.setMember(member);
         order.setMemo(orderRequest.getMemo());
 
@@ -105,15 +107,19 @@ public class OrdersService {
             savedOrder.getOrderId(),
             savedOrder.getMember().getUsername(),
             savedOrder.getMember().getAlias(),
-            savedOrder.getReleaseDate(),
-            savedOrder.getBestOrderDate(),
-            savedOrder.getOrderDate(),
+//            savedOrder.getReleaseDate(),
+//            savedOrder.getBestOrderDate(),
+//            savedOrder.getOrderDate(),
+            null, // releaseDate update때 생성
+            null, // bestOrderDate update때 생성
+            null, // orderDate update때 생성
             savedOrder.getMemo(),
             null  // 필요시 orderDetails 추가 가능
         );
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////  수정
+	 @Transactional
 	public OrdersDTO updateOrder(Integer orderId, OrderRequestDTO orderRequest) {
 		
 		//OrderId로 기존 주문 조회
@@ -121,30 +127,42 @@ public class OrdersService {
 		
 		//bestOrderDate와 releaseDate가 있는지 확인
 		if(orderRequest.getReleaseDate() == null || orderRequest.getBestOrderDate() == null) {
-			throw new RuntimeException("bestOrderDate와 releaseDate는 필수 값입니다.");
+			throw new RuntimeException("bestOrderDate와 releaseDate를 입력해주세요.");
 		}
 		
 		//기존 orders 정보 업데이트
 		existingOrder.setReleaseDate(LocalDate.parse(orderRequest.getReleaseDate()));
 		existingOrder.setBestOrderDate(LocalDate.parse(orderRequest.getBestOrderDate()));
-		
+		existingOrder.setOrderDate(LocalDate.now());
+
 		// 기존 주문 정보 저장
         Orders updatedOrder = ordersRepository.save(existingOrder);
         
-		//기존 orderDetail 제거 후 새로운 값으로 업데이트
-		orderDetailRepo.deleteAll(existingOrder.getOrderDetails()); //기존 orderDetail 삭제
+     // 기존 OrderDetail 조회
+        List<OrderDetail> existingOrderDetails = orderDetailRepo.findByOrderOrderId(orderId);
 		
 		//새로운 값 저장
 		for(OrderItemRequestDTO itemDetail : orderRequest.getItemDetails()) {
 			Items item = itemsRepo.findById(itemDetail.getItemId()).orElseThrow(() -> new RuntimeException("존재하지 않는 품목입니다."));
 			
-			OrderDetail orderDetail = new OrderDetail();
-			orderDetail.setOrder(updatedOrder);
-			orderDetail.setItem(item);
-			orderDetail.setQuantity(itemDetail.getQuantity());
+			   // 기존 OrderDetail 찾기
+	        Optional<OrderDetail> existingDetail = existingOrderDetails.stream()
+	                .filter(od -> od.getItem().getItemsId().equals(itemDetail.getItemId()))
+	                .findFirst();
 			
-			//새로 저장
-			orderDetailRepo.save(orderDetail);
+	        if (existingDetail.isPresent()) {
+	            // 기존 아이템이 있으면 업데이트
+	            OrderDetail orderDetail = existingDetail.get();
+	            orderDetail.setQuantity(itemDetail.getQuantity());
+	            orderDetailRepo.save(orderDetail);
+	        } else {
+	            // 새로 추가해야 할 아이템이면 생성
+	            OrderDetail newOrderDetail = new OrderDetail();
+	            newOrderDetail.setOrder(updatedOrder);
+	            newOrderDetail.setItem(item);
+	            newOrderDetail.setQuantity(itemDetail.getQuantity());
+	            orderDetailRepo.save(newOrderDetail);
+	        }
 		}
 		
 		//DTO반환
