@@ -27,11 +27,16 @@ public class OrderDetailService {
             var item = orderDetail.getItem();
             return new OrderDetailDTO(
             	orderDetail.getOrderDetailId(),
+            	orderDetail.getItem().getCategory3().getCategory2().getCategory1().getCategoryName(),
+            	orderDetail.getItem().getCategory3().getCategory2().getCategory2Name(),
+            	orderDetail.getItem().getCategory3().getCategory3Name(),     
+            	orderDetail.getItem().getItemsId(),
                 item.getItemName(),
                 orderDetail.getQuantity(),
                 item.getPrice(),
                 item.getUnit(),
-                item.getMember().getUsername()
+                item.getMember().getUsername(),
+                null
             );
         }).collect(Collectors.toList());
     }
