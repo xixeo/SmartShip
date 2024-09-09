@@ -1,5 +1,7 @@
 package com.lead.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lead.dto.ItemRecommendDTO;
 import com.lead.dto.ItemsDTO;
 import com.lead.entity.Items;
 import com.lead.repository.ItemsRepo;
@@ -56,10 +59,33 @@ public class ItemsService {
 	}
 
 	private ItemsDTO convertToDto(Items item) {
-		return ItemsDTO.builder().itemId(item.getItemsId()).itemName(item.getItemName())
+		return ItemsDTO.builder()
+				.itemId(item.getItemsId())
+				.itemName(item.getItemName())
 				.category1Name(item.getCategory3().getCategory2().getCategory1().getCategoryName())
 				.category2Name(item.getCategory3().getCategory2().getCategory2Name())
-				.category3Name(item.getCategory3().getCategory3Name()).part1(item.getPart1()).part2(item.getPart2())
-				.price(item.getPrice()).unit(item.getUnit()).alias(item.getMember().getAlias()).build();
+				.category3Name(item.getCategory3().getCategory3Name())
+				.part1(item.getPart1())
+				.part2(item.getPart2())
+				.price(item.getPrice())
+				.unit(item.getUnit())
+				.alias(item.getMember().getAlias())
+				.build();
 	}
+	
+	public List<ItemRecommendDTO> getRecommendedItems(Integer selectedItemId, LocalDate releaseDate) {
+        List<Object[]> results = itemsRepo.findAlternativeItems(selectedItemId, releaseDate.toString());
+
+        return results.stream().map(result -> {
+            ItemRecommendDTO dto = new ItemRecommendDTO();
+            dto.setItemsId((Integer) result[0]); // itemsId
+            dto.setItemName((String) result[1]); // itemName
+            dto.setPrice((BigDecimal) result[2]); // price
+            dto.setLeadtime((Integer) result[3]); // leadtime
+            // recommendedOrderDate는 여기서 계산하거나 추가적인 로직이 필요함
+            // 예를 들어, LocalDate recommendedDate = releaseDate.minusDays(leadtime);
+            // dto.setRecommendedOrderDate(recommendedDate);
+            return dto;
+        }).collect(Collectors.toList());
+    }
 }
