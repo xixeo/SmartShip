@@ -1,5 +1,6 @@
 package com.lead.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class Cart {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "cart_id", nullable = false)
     private Integer cartId;
 
     @ManyToOne
@@ -37,7 +39,10 @@ public class Cart {
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems;
-
+    
+    @Column(name = "release_date", nullable = true) 
+    private LocalDate releaseDate;
+    
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

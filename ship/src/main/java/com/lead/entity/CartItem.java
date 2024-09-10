@@ -1,6 +1,5 @@
 package com.lead.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -27,6 +26,7 @@ public class CartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "cart_item_id", nullable = false)
     private Integer cartItemId;
 
     @ManyToOne

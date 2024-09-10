@@ -9,5 +9,5 @@ import com.lead.entity.Leadtime;
 
 @Repository
 public interface LeadtimeRepo extends JpaRepository<Leadtime, Integer> {
-	Optional<Leadtime> findByItems_ItemsId(Integer itemId);
+    Optional<Leadtime> findByItems_ItemsId(Integer itemsId);
 }

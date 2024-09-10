@@ -25,7 +25,6 @@ public class CartDTO {
 	private String alias;
 	private LocalDate releaseDate;
 	private LocalDate bestOrderDate;
-//	private String memo;
 	private LocalDateTime createdAt;
 	private List<CartItemDTO> cartItems;
 }
