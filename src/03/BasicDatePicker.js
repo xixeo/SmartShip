@@ -7,13 +7,16 @@ import 'dayjs/locale/ko'; // dayjs 한국어 로케일 가져오기
 import { Popper, TextField } from '@mui/material';
 import './style.css'
 
-export default function BasicDatePicker() {
+export default function BasicDatePicker({ onDateAccept }) {
   const [value, setValue] = React.useState(() => {
     const today = dayjs();
     return today.add(1, 'month'); // 현재 날짜에서 한 달 뒤로 설정
   });
 
   const handleAccept = (newValue) => {
+    if (onDateAccept) {
+      onDateAccept(newValue); // 상위 컴포넌트에 선택된 날짜를 전달
+    }
     setValue(newValue); // accept 버튼을 눌렀을 때 실제로 날짜를 저장
   };
 
