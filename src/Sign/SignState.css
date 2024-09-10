@@ -1,16 +1,40 @@
+.sign-state-container {
+  position: relative; 
+  padding: 8px 16px; 
+  background: transparent; 
+  margin: 0; 
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; 
+  color: white; 
+}
+
 .logout-button-container {
-    right: 0;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  
-  .logout-button-container.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  
-  .logout-button-container.hide {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
+  display: flex; 
+  position: absolute; 
+  top: 100%; 
+  opacity: 0; 
+  transform: translateY(-10px); 
+  visibility: hidden; 
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease; 
+}
+
+.logout-button-container.show {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.logout-button {
+  padding: 8px 16px;
+  background-color: #55535C;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}

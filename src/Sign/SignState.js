@@ -1,3 +1,5 @@
+//style.css 막아둬야 SignState.css 우선적용됨
+
 import React, { useState } from 'react';
 import { ReactComponent as UserIcon } from './User.svg';
 import { useNavigate } from 'react-router-dom';
@@ -23,9 +25,9 @@ const SignState = () => {
   };
 
   return (
-    <div className="fixed top-5 right-0 p-4 z-50">
-      <div className="flex-col items-center">
-        <div className='flex items-center space-x-2 text-white'>
+    <div className="sign-state-container">
+      <div className="user-info">
+        <div className='flex items-center space-x-2 pt-4 text-white'>
           <UserIcon width="32" height="32" />
           <div className="flex items-center space-x-2">
             <h1 className="font-semibold text-white">
@@ -48,8 +50,7 @@ const SignState = () => {
         <div className={`logout-button-container ${isLogoutVisible ? 'show' : 'hide'}`}>
           <button
             onClick={handleLogout}
-            className="px-4 py-2 mt-2 mr-6 text-white rounded flex items-center fixed right-0"
-            style={{ backgroundColor: '#55535C' }}
+            className="logout-button mr-2"
           >
             <SvgIcon className="text-white mr-2" width="17" height="17" />
             로그아웃
