@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Button, Paper, TextField, InputAdornment, Select, MenuItem, Box} from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Button, Paper, TextField, InputAdornment, Select, MenuItem, Box } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Pagination from '@mui/material/Pagination';
 import LeadTimeModal from './LeadTimeModal';
@@ -16,7 +16,7 @@ function createData(category1Name, category2Name, category3Name, itemName, price
 }
 
 const initialRows = [
-  createData('식품', '과일', '수박/참외', '수박', 18, 'EUR', '쿠팡', 1), 
+  createData('식품', '과일', '수박/참외', '수박', 18, 'EUR', '쿠팡', 1),
   createData('음료', '탄산음료', '콜라', '코카콜라', 12, 'USD', '이마트', 1),
   createData('음료', '탄산음료', '사이다', '칠성사이다', 1200, 'KRW', '이마트', 1),
   createData('음료', '커피', '커피', '아메리카노', 1700, 'KRW', '롯데슈퍼', 1),
@@ -41,24 +41,12 @@ const headCells = [
 // null값 처리 & 가격 단위 구분 함수
 const formatCellValue = (value, unit) => {
   if (value == null || value === '') {
-    return '-';
-  }
-
+    return '-'; }
   if (unit) {
     switch (unit) {
-      case 'USD':
-        return `$ ${value}`;
-      case 'KRW':
-        return `₩ ${value}`;
-      case 'EUR':
-        return `€ ${value}`;
-      case 'JPY':
-        return `¥ ${value}`;
-      default:
-        return value; // 기본값
-    }
-  }
-
+      case 'USD': return `$ ${value}`; case 'KRW': return `₩ ${value}`; case 'EUR': return `€ ${value}`; case 'JPY': return `¥ ${value}`;
+      default: return value; // 기본값
+    }}
   return value;
 };
 
@@ -66,7 +54,8 @@ const formatCellValue = (value, unit) => {
 function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, allRowsSelected }) {
   return (
     <TableHead
-      sx={{ backgroundColor: '#47464F', '& th': { fontWeight: 'bold', color: '#fff' }
+      sx={{
+        backgroundColor: '#47464F', '& th': { fontWeight: 'bold', color: '#fff' }
       }}>
       <TableRow>
         <TableCell padding="checkbox" style={{ width: '5%' }}>
@@ -130,16 +119,11 @@ function ListTable() {
       const matchesCategory1 = category1Name ? row.category1Name === category1Name : true;
       const matchesCategory2 = category2Name ? row.category2Name === category2Name : true;
       const matchesCategory3 = category3Name ? row.category3Name === category3Name : true;
-      const matchesSearchQuery = searchQuery ? 
-        row.itemName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        row.category1Name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        row.category2Name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        row.category3Name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        row.supplierName.toLowerCase().includes(searchQuery.toLowerCase()) : true;
-
+      const matchesSearchQuery = searchQuery ?
+        row.itemName.toLowerCase().includes(searchQuery.toLowerCase()) : true;
       return matchesCategory1 && matchesCategory2 && matchesCategory3 && matchesSearchQuery;
     });
-  }, [displayedRows, category1Name, category2Name, category3Name, searchQuery, showSelected]); // `displayedRows`를 의존성 배열에 추가 
+  }, [rows, category1Name, category2Name, category3Name, searchQuery, showSelected]); 
 
   // 선택된 항목만 보기 필터링
   const filteredRowsBySelection = useMemo(() => {
@@ -151,37 +135,37 @@ function ListTable() {
     setPage(1);
   }, [searchQuery, category1Name, category2Name, category3Name, rowsPerPage, showSelected]);
 
- // 전체 선택 핸들러
-const handleSelectAllClick = (event) => {
-  if (event.target.checked) {
-    const newSelected = new Set(filteredRows.map((row) => row.itemName));
-    setSelected((prevSelected) => new Set([...prevSelected, ...newSelected]));
-  } else {
-    setSelected((prevSelected) => {
-      const newSelected = new Set(
-        [...prevSelected].filter(item => !filteredRows.some(row => row.itemName === item))
-      );
-      return newSelected;
-    });
-  }
-};
+  // 전체 선택 핸들러
+  const handleSelectAllClick = (event) => {
+    if (event.target.checked) {
+      const newSelected = new Set(filteredRows.map((row) => row.itemName));
+      setSelected((prevSelected) => new Set([...prevSelected, ...newSelected]));
+    } else {
+      setSelected((prevSelected) => {
+        const newSelected = new Set(
+          [...prevSelected].filter(item => !filteredRows.some(row => row.itemName === item))
+        );
+        return newSelected;
+      });
+    }
+  };
 
-// 행 클릭 핸들러
-const handleClick = (event, itemName) => {
-  // 클릭된 요소가 수량 변경 또는 리드타임 버튼인 경우 함수 종료
-  if (event.target.classList.contains('quantity-button') || event.target.classList.contains('leadtime-button')) {
-    return;
-  }
+  // 행 클릭 핸들러
+  const handleClick = (event, itemName) => {
+    // 클릭된 요소가 수량 변경 또는 리드타임 버튼인 경우 함수 종료
+    if (event.target.classList.contains('quantity-button') || event.target.classList.contains('leadtime-button')) {
+      return;
+    }
 
-  // 체크박스 선택/해제 처리
-  const newSelected = new Set(selected);
-  if (newSelected.has(itemName)) {
-    newSelected.delete(itemName);
-  } else {
-    newSelected.add(itemName);
-  }
-  setSelected(newSelected);
-};
+    // 체크박스 선택/해제 처리
+    const newSelected = new Set(selected);
+    if (newSelected.has(itemName)) {
+      newSelected.delete(itemName);
+    } else {
+      newSelected.add(itemName);
+    }
+    setSelected(newSelected);
+  };
 
   // 페이지 변경 핸들러
   const handleChangePage = (event, newPage) => {
@@ -206,7 +190,6 @@ const handleClick = (event, itemName) => {
     setCategory2Name(event.target.value);
     setCategory3Name(''); // 카테고리 3 리셋
   };
-
 
   // Category 3 변경 핸들러
   const handleCategory3Change = (event) => {
@@ -245,7 +228,7 @@ const handleClick = (event, itemName) => {
     const rowsCount = showSelected ? filteredRowsBySelection.length : filteredRows.length;
     return Math.ceil(rowsCount / rowsPerPage);
   }, [filteredRows.length, filteredRowsBySelection.length, rowsPerPage, showSelected]);
-  
+
   // 모든 행이 선택되었는지 여부 확인
   const allRowsSelected = useMemo(() => {
     return filteredRows.length > 0 && filteredRows.every(row => selected.has(row.itemName));
@@ -262,6 +245,20 @@ const handleClick = (event, itemName) => {
     setLeadTimeModalOpen(true); // 모달 열기
   };
 
+   // 검색어 변경 핸들러
+   const handleSearchQueryChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // 검색 버튼 클릭 핸들러
+  const handleSearchButtonClick = () => {
+    const filteredData = initialRows.filter((row) => {
+      return row.itemName.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+    setDisplayedRows(filteredData);
+    setPage(1); // 검색 시 페이지를 1로 초기화
+  };
+
   return (
     <div className="list-table-root flex flex-col p-6">
       <div className="text-xl font-semibold text-white mb-4">물품 리스트</div>
@@ -273,7 +270,7 @@ const handleClick = (event, itemName) => {
             onChange={handleCategory1Change}
             displayEmpty
             className="select-custom"
-            >
+          >
             <MenuItem value="">
               <em>Category 1</em>
             </MenuItem>
@@ -321,7 +318,7 @@ const handleClick = (event, itemName) => {
           {/* 검색 필드 */}
           <TextField
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchQueryChange}
             placeholder="물품명 검색"
             InputProps={{
               startAdornment: (
@@ -350,40 +347,28 @@ const handleClick = (event, itemName) => {
           />
 
           <FormControlLabel
-          control={
-            <Switch
-              checked={showSelected}
-              onChange={handleShowSelected}
-              color="default"
-            />
-          }
-          label={showSelected ? '선택 품목 보기' : '전체 품목 보기'}
-          className="custom-toggle"
+            control={
+              <Switch
+                checked={showSelected}
+                onChange={handleShowSelected}
+                color="default"
+              />
+            }
+            label={showSelected ? '선택 품목 보기' : '전체 품목 보기'}
+            className="custom-toggle"
           />
-          </div>
-          <Button
-              onClick={() => {
-                // 검색 버튼 클릭 시 필터링된 데이터 설정
-                const filteredData = initialRows.filter((row) => { 
-                  return row.category1Name.toLocaleLowerCase().includes(searchQuery.toLowerCase()) ||
-                        row.category2Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        row.category3Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        row.itemName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        row.price.toLowerCase().includes(searchQuery.toLocaleLowerCase()) ||
-                        row.supplierName.toLowerCase().includes(searchQuery.toLowerCase());
-                });
-                setDisplayedRows(filteredData);
-                setPage(1); // 검색 시 페이지를 1로 초기화
-              }}
-              variant="contained"
-              className="bluebutton"
-            >
-              검색
-            </Button>
+        </div>
+        <Button
+          onClick={handleSearchButtonClick}
+          variant="contained"
+          className="bluebutton"
+        >
+          검색
+        </Button>
       </div>
 
       <div className="bg-custom">
-        <TableContainer component={Paper} sx={{ minHeight: '400px',  width: '100%' }}>
+        <TableContainer component={Paper} sx={{ minHeight: '400px', width: '100%' }}>
           <Table>
             <EnhancedTableHead
               numSelected={selected.size}
@@ -396,7 +381,6 @@ const handleClick = (event, itemName) => {
               {filteredRowsBySelection.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row, index) => {
                 const isItemSelected = isSelected(row.itemName);
                 const labelId = `enhanced-table-checkbox-${index}`;
-
                 const price = parseFloat(row.price) || 0;
                 const quantity = parseInt(row.quantity, 10) || 1;
                 const totalPrice = price * quantity;
@@ -432,27 +416,26 @@ const handleClick = (event, itemName) => {
                     </TableCell>
                     <TableCell align="center" className='price-cell'>{formatCellValue(totalPrice, row.unit)}</TableCell>
                     <TableCell align="center" className='item-cell'>
-                    <TextField
-                      className="custom-textfield"
-                      type="number" // 숫자 입력 필드로 설정
-                      inputProps={{ min: 1 }} 
-                      value={row.quantity} 
-                      onChange={(e) => handleQuantityChange(row.itemName, e.target.value)}
-                      size="small" // 필드 크기 조정
-                      color='white'
-                    />
+                      <TextField
+                        className="custom-textfield"
+                        type="number"
+                        slotProps={{ input: { min: 1 } }} 
+                        value={row.quantity}
+                        onChange={(e) => handleQuantityChange(row.itemName, e.target.value)}
+                        size="small"
+                      />
                     </TableCell>
                     <TableCell align="center" className="item-cell">
                       {formatCellValue(row.supplierName)}
                     </TableCell>
                     <TableCell align="center" style={{ width: '9%' }}>
-                    <Button
-                      onClick={() => handleLeadTimeClick(row.leadtime)}
-                      variant="contained"
-                      className="greenbutton"
-                    >
-                      리드타임
-                    </Button>
+                      <Button
+                        onClick={() => handleLeadTimeClick(row.leadtime)}
+                        variant="contained"
+                        className="greenbutton"
+                      >
+                        리드타임
+                      </Button>
                     </TableCell>
                   </TableRow>
                 );
@@ -467,17 +450,17 @@ const handleClick = (event, itemName) => {
         </TableContainer>
       </div>
       <div className="pagination-container">
-          {/* 페이지네이션 컴포넌트 */}
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={handleChangePage}
-            variant="outlined"
-            shape="rounded"
-          />
-        </div>
+        {/* 페이지네이션 컴포넌트 */}
+        <Pagination
+          count={totalPages}
+          page={page}
+          onChange={handleChangePage}
+          variant="outlined"
+          shape="rounded"
+        />
+      </div>
       <div className='flex justify-between items-center mt-6'>
-      <div className="flex gap-4">
+        <div className="flex gap-4">
           {/* 페이지당 항목 수 선택 */}
           <Select
             value={rowsPerPage}
@@ -486,27 +469,27 @@ const handleClick = (event, itemName) => {
           >
             {[5, 10, 15].map((option) => (
               <MenuItem key={option} value={option}>
-              {option}
+                {option}
               </MenuItem>
             ))}
           </Select>
+        </div>
+        <div className="flex gap-4">
+          {/* 장바구니 담기 버튼 */}
+          <Button
+            className='bluebutton2'
+            onClick={() => navigate('/order')}>
+            장바구니 담기
+          </Button>
+        </div>
       </div>
-      <div className="flex gap-4">
-        {/* 장바구니 담기 버튼 */}
-        <Button
-          className='bluebutton2'
-          onClick={() => navigate('/order')}>
-          장바구니 담기
-        </Button>
-      </div>
-    </div>
 
-     {/* 리드타임 모달 */}
-     <LeadTimeModal
-          open={leadTimeModalOpen}
-          setOpen={setLeadTimeModalOpen}
-          leadTimeData={selectedLeadTimeData} // 선택된 리드타임 데이터 전달
-     />
+      {/* 리드타임 모달 */}
+      <LeadTimeModal
+        open={leadTimeModalOpen}
+        setOpen={setLeadTimeModalOpen}
+        leadTimeData={selectedLeadTimeData} // 선택된 리드타임 데이터 전달
+      />
     </div>
   );
 }

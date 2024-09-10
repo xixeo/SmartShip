@@ -1,10 +1,14 @@
 .list-table-root {
+
   .MuiTableRow-root:last-child .MuiTableCell-root {
     border-bottom: 1px solid #47464F;
   }
 
   .MuiTableCell-root:last-child {
-    border-right: none;
+    border-bottom: 1px solid #47464F;
+  }
+  .MuiTableCell-root {
+    border-bottom: 1px solid #47464F;
   }
 
   .MuiPaper-root{
@@ -227,4 +231,5 @@
 
     margin-left: 16px;
   }
+
 }
