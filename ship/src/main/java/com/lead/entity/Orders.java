@@ -36,8 +36,8 @@ public class Orders {
     @Column(name = "order_date", nullable = true)
     private LocalDate orderDate;
     
-    @Column(name = "memo", nullable = true)
-    private String memo;
+//    @Column(name = "memo", nullable = true)
+//    private String memo;
 
     @ManyToOne
     @JoinColumn(name = "username", nullable = false)

@@ -16,6 +16,6 @@ public class OrdersDTO {
 	private LocalDate releaseDate;
 	private LocalDate bestOrderDate;
 	private LocalDate orderDate;
-	private String memo;
+//	private String memo;
 	private List<OrderDetailDTO> orderDetails;
 }

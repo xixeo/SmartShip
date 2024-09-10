@@ -224,9 +224,13 @@ public class CartService {
           }
       }
 
-      return new OrdersDTO(savedOrder.getOrderId(), savedOrder.getMember().getUsername(),
-              savedOrder.getMember().getAlias(), savedOrder.getReleaseDate(), savedOrder.getBestOrderDate(),
-              savedOrder.getOrderDate(), null, null);
+      return new OrdersDTO(
+    		  savedOrder.getOrderId(), 
+    		  savedOrder.getMember().getUsername(),
+              savedOrder.getMember().getAlias(), 
+              savedOrder.getReleaseDate(), 
+              savedOrder.getBestOrderDate(),
+              savedOrder.getOrderDate(), null);
   }
 
 }
