@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ReactComponent as UserIcon } from './User.svg';
 import { useNavigate } from 'react-router-dom';
 import SvgIcon from './SvgIcon';
+import './SignState.css';
 
 const SignState = () => {
   const [isLogoutVisible, setIsLogoutVisible] = useState(false);
@@ -44,7 +45,7 @@ const SignState = () => {
             </svg>
           </button>
         </div>
-        {isLogoutVisible && (
+        <div className={`logout-button-container ${isLogoutVisible ? 'show' : 'hide'}`}>
           <button
             onClick={handleLogout}
             className="px-4 py-2 mt-2 mr-6 text-white rounded flex items-center fixed right-0"
@@ -53,7 +54,7 @@ const SignState = () => {
             <SvgIcon className="text-white mr-2" width="17" height="17" />
             로그아웃
           </button>
-        )}
+        </div>
       </div>
     </div>
   );

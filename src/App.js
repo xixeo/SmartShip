@@ -12,6 +12,7 @@ import SignUp from './Sign/SignUp';
 import SignIn from './Sign/SignIn';
 import ListTableTest from './02/ListTableTEST';
 import SignState from './Sign/SignState';
+import Board from './DashBoard/Board';
 
 function App() {
   // const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -53,6 +54,7 @@ function App() {
                   <Route path="*" element={<Navigate to="/" />} />
                   <Route path="/ListTableTest" element={<ListTableTest />} />  
                   <Route path="/signstate" element={<SignState />} />  
+                  <Route path="/Board" element={<Board />} />  
                 </Routes>
               </main>
               <Footer />
