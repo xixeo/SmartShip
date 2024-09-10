@@ -37,6 +37,7 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
                 const decodedToken = jwtDecode(cleanedToken);
                 const alias = decodedToken.alias;
                 localStorage.setItem("token", cleanedToken);
+                localStorage.setItem('username', username);
                 localStorage.setItem('alias', alias);
 
                 setIsAuthenticated(true);
