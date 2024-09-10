@@ -7,7 +7,7 @@ import Schedule from './01/Schedule';
 import ListTable from './02/ListTable';
 import Order from './03/Order';
 import OrderTEST from './03/OrderTEST'; 
-import Ordertest from './03/Ordertest2'; 
+import Datepicker from './03/BasicDatePicker'; 
 import SignUp from './Sign/SignUp';
 import SignIn from './Sign/SignIn';
 import ListTableTest from './02/ListTableTEST';
@@ -47,7 +47,7 @@ function App() {
                   <Route path="/listtable" element={<ListTable />} />
                   <Route path="/order" element={<Order />}  />
                   <Route path="/ordertest" element={<OrderTEST />} />
-                  <Route path="/ordertest2" element={<Ordertest />} />
+                  <Route path="/ordertest2" element={<Datepicker />} />
                   <Route path="*" element={<Navigate to="/" />} />
                   <Route path="/ListTableTest" element={<ListTableTest />} />                
                 </Routes>
