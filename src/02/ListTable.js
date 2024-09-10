@@ -45,7 +45,7 @@ const formatCellValue = (value, unit) => {
   if (unit) {
     switch (unit) {
       case 'USD': return `$ ${value}`; case 'KRW': return `₩ ${value}`; case 'EUR': return `€ ${value}`; case 'JPY': return `¥ ${value}`;
-      default: return value; // 기본값
+      default: return value;
     }}
   return value;
 };
@@ -112,7 +112,6 @@ function ListTable() {
     return [...new Set(initialRows.filter((row) => row.category2Name === category2Name).map((row) => row.category3Name))];
   }, [category2Name]);
 
-
   // 필터링된 행 데이터
   const filteredRows = useMemo(() => {
     return displayedRows.filter((row) => {
@@ -123,7 +122,7 @@ function ListTable() {
         row.itemName.toLowerCase().includes(searchQuery.toLowerCase()) : true;
       return matchesCategory1 && matchesCategory2 && matchesCategory3 && matchesSearchQuery;
     });
-  }, [rows, category1Name, category2Name, category3Name, searchQuery, showSelected]); 
+  }, [displayedRows, category1Name, category2Name, category3Name, searchQuery, showSelected]); // `displayedRows`를 의존성 배열에 추가 
 
   // 선택된 항목만 보기 필터링
   const filteredRowsBySelection = useMemo(() => {
@@ -152,11 +151,7 @@ function ListTable() {
 
   // 행 클릭 핸들러
   const handleClick = (event, itemName) => {
-    // 클릭된 요소가 수량 변경 또는 리드타임 버튼인 경우 함수 종료
-    if (event.target.classList.contains('quantity-button') || event.target.classList.contains('leadtime-button')) {
-      return;
-    }
-
+    
     // 체크박스 선택/해제 처리
     const newSelected = new Set(selected);
     if (newSelected.has(itemName)) {
@@ -208,14 +203,16 @@ function ListTable() {
   };
 
   // 수량 변경 핸들러
-  const handleQuantityChange = (itemName, value) => {
-    const quantity = Math.max(1, parseInt(value, 10) || 1); // 수량을 숫자로 변환
-    setRows(prevItems =>
-      prevItems.map(row =>
+  const handleQuantityChange = (itemName, newQuantity) => {
+    const quantity = Math.max(1, parseInt(newQuantity, 10) || 1);
+    console.log(`----- (수량 변경 핸들러) ${itemName}: ${quantity}`);
+    setRows((prevRows) => {
+      return prevRows.map(row => 
         row.itemName === itemName ? { ...row, quantity } : row
-      )
-    );
+      );
+    });
   };
+  
 
   // 빈 행 계산
   const emptyRows = useMemo(() => {
@@ -314,7 +311,7 @@ function ListTable() {
               </MenuItem>
             ))}
           </Select>
-
+          
           {/* 검색 필드 */}
           <TextField
             value={searchQuery}
@@ -388,9 +385,6 @@ function ListTable() {
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => handleClick(event, row.itemName)}
-                    role="checkbox"
-                    aria-checked={isItemSelected}
                     tabIndex={-1}
                     key={row.itemName}
                     selected={isItemSelected}
@@ -399,6 +393,7 @@ function ListTable() {
                       <Checkbox
                         color="default"
                         checked={isItemSelected}
+                        onChange={(event) => handleClick(event, row.itemName)}
                         inputProps={{ 'aria-labelledby': labelId }}
                       />
                     </TableCell>
@@ -414,16 +409,23 @@ function ListTable() {
                     <TableCell align="center" className="item-cell">
                       {formatCellValue(row.itemName)}
                     </TableCell>
-                    <TableCell align="center" className='price-cell'>{formatCellValue(totalPrice, row.unit)}</TableCell>
-                    <TableCell align="center" className='item-cell'>
-                      <TextField
-                        className="custom-textfield"
-                        type="number"
-                        slotProps={{ input: { min: 1 } }} 
-                        value={row.quantity}
-                        onChange={(e) => handleQuantityChange(row.itemName, e.target.value)}
-                        size="small"
-                      />
+                    <TableCell align="center" className='price-cell'>
+                      {console.log(`Total price for ${row.itemName}*${row.quantity}: ${totalPrice}`)}
+                      {formatCellValue(totalPrice, row.unit)}
+                    </TableCell>
+                    <TableCell align="center" className="item-cell">
+                    <TextField
+                      className="custom-textfield"
+                      type="number"
+                      slotProps={{ input: { min: 1 } }}
+                      value={row.quantity} 
+                      onChange={(e) => {
+                        const newQuantity = e.target.value;
+                        console.log(`----- (입력필드) ${row.itemName}의 입력값 : ${newQuantity}`);
+                        handleQuantityChange(row.itemName, newQuantity);
+                      }}
+                      size="small"
+                    />
                     </TableCell>
                     <TableCell align="center" className="item-cell">
                       {formatCellValue(row.supplierName)}
@@ -442,7 +444,6 @@ function ListTable() {
               })}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 53 * emptyRows }}>
-                  <TableCell colSpan={headCells.length} />
                 </TableRow>
               )}
             </TableBody>
