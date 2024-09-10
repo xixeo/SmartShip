@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
@@ -47,15 +47,15 @@ const Addbestdate = (basket, selectedDate) => {
 
 export default function OrderTest() {
   const [expanded, setExpanded] = useState({});
-  const [checked, setChecked] = useState({});
+  const [checkedParent, setCheckedParent] = useState({}); // 부모 체크박스 상태
+  const [checkedChildren, setCheckedChildren] = useState({}); // 자식 체크박스 상태
   const [listdatas, setListdatas] = useState([]);
   const [selectedDate, setSelectedDate] = useState(() => {
     const savedDate = localStorage.getItem('selectedDate');
-    return savedDate ? dayjs(savedDate) : dayjs().add(1, 'month'); // 로컬 스토리지에 저장된 날짜가 없으면 기본값 설정
+    return savedDate ? dayjs(savedDate) : dayjs().add(1, 'month');
   });
 
   const fetchorderlist = async (selectedDate) => {
-    // 목업데이터
     const basket = [
       {
         orderId: 1,
@@ -103,74 +103,47 @@ export default function OrderTest() {
       },
     ];
     try {
-      // const response = await fetch(`/order/${selectedDate}`,
-      // {
-      // headers: {
-      //   'Authorization': `Bearer ${token}`,
-      // }
-      // }
-      // );
-      // if(!response.ok) {
-      //   throw new Error('orderbasket response was not ok');
-      // };
-      // const orderbasket = await response.json();
-      // const basket = orderbasket.map(list => 
-      //   ({
-      //   orderId: list.orderId,
-      //   memo: list.memo,
-      //   orderDetails: list.orderDetails
-      //   })
-      // );
-      console.log('basket', basket);
       const lists = Addbestdate(basket, selectedDate);
-      console.log('selectedDate', selectedDate);
-      console.log('lists', lists);
       setListdatas(lists);
     } catch (error) {
       console.error('Failed to fetch orderbasket:', error);
     }
   };
 
-
   useEffect(() => {
-    fetchorderlist(selectedDate.format('YYYY-MM-DD')); // 현재 선택된 날짜를 인자로 전달 // 초기 데이터 로딩
+    fetchorderlist(selectedDate.format('YYYY-MM-DD'));
   }, [selectedDate]);
 
   useEffect(() => {
-    localStorage.setItem('selectedDate', selectedDate.format('YYYY-MM-DD')); // 날짜를 로컬 스토리지에 저장
+    localStorage.setItem('selectedDate', selectedDate.format('YYYY-MM-DD'));
   }, [selectedDate]);
+
+  // username별로 그룹화된 데이터를 받아옴
+  const orderDetails = listdatas[0]?.orderDetails || [];
+  const groupedData = groupByUsername(orderDetails);
 
   // 전체 체크 상태 결정
-  const allChecked = Object.values(checked).every(Boolean);
-  const someChecked = Object.values(checked).some(Boolean) && !allChecked;
+  const handleParentChange = (event) => {
+    const newCheckedParent = event.target.checked;
+    const newCheckedChildren = { ...checkedChildren };
 
-  // 데이터가 로드되었는지 확인
-  const orderDetails = listdatas[0]?.orderDetails || [];
-  // username별로 그룹화된 데이터를 받아옴
-  const groupedData = groupByUsername(orderDetails);
-  // const groupedData = groupByUsername(listdatas[0].orderDetails);
-
-  // 날짜 선택시
-  const handleDateAccept = (newValue) => {
-    // 새로운 날짜를 받아서 상태를 업데이트
-    const formattedDate = newValue.format('YYYY-MM-DD');
-    setSelectedDate(formattedDate);
-    console.log('Selected Date:', formattedDate); // 선택된 날짜 확인
-  };
-
-  const handleChangeParent = (event) => {
-    const newChecked = {};
     Object.keys(groupedData).forEach((username) => {
-      newChecked[username] = event.target.checked;
+      newCheckedChildren[username] = newCheckedParent; // 모든 자식 체크박스 상태 변경
     });
-    setChecked(newChecked);
+
+    setCheckedParent({ all: newCheckedParent });
+    setCheckedChildren(newCheckedChildren);
   };
 
-  const handleChangeChild = (username) => (event) => {
-    setChecked({
-      ...checked,
-      [username]: event.target.checked,
-    });
+  const handleChildChange = (username, groupedData) => (event) => {
+    const newCheckedChildren = { ...checkedChildren, [username]: event.target.checked };
+    console.log('check',checkedChildren,username,event.target.checked)
+    console.log('new',newCheckedChildren, groupedData);
+    // 자식 체크박스들이 모두 선택되었는지 확인하여 부모 체크박스 상태 업데이트
+    const allChecked = Object.values(newCheckedChildren).every(Boolean);
+    console.log('allcheck',allChecked);
+    setCheckedParent({ all: allChecked });
+    setCheckedChildren(newCheckedChildren);
   };
 
   const handleExpandClick = (username) => () => {
@@ -196,6 +169,17 @@ export default function OrderTest() {
     setExpanded(newExpanded);
   };
 
+  const formatPrice = (price, quantity, unit) => {
+    const totalPrice = price * quantity;
+    switch (unit) {
+      case 'KRW': return `₩ ${totalPrice.toLocaleString()}`;
+      case 'USD': return `$ ${totalPrice.toLocaleString()}`;
+      case 'JPY': return `¥ ${totalPrice.toLocaleString()}`;
+      case 'EUR': return `€ ${totalPrice.toLocaleString()}`;
+      default: return totalPrice.toLocaleString();
+    }
+  };
+
   return (
     <div className="flex-col text-white">
       <div className="w-full flex justify-between">
@@ -216,14 +200,13 @@ export default function OrderTest() {
           </Button>
         </div>
         <div className='flex justify-between m-2 p-2'>
-          {/* 부모 체크박스 ================================================== 처음 로딩때 왜 전체 체크 안되있는데 니 맘대로 색칠해있냐,,?*/}
+          {/* 부모 체크박스 */}
           <FormControlLabel
             label="전체 선택"
             control={
               <Checkbox
-                checked={allChecked}
-                indeterminate={someChecked}
-                onChange={handleChangeParent}
+                checked={checkedParent.all || false}
+                onChange={handleParentChange}
                 sx={{ color: 'white' }}
               />
             }
@@ -236,16 +219,19 @@ export default function OrderTest() {
               <FormControlLabel
                 label={username}
                 control={
-                  <Checkbox checked={checked[username] || false} onChange={handleChangeChild(username)} sx={{ color: 'white' }} />
+                  <Checkbox
+                    checked={checkedChildren[username] || false}
+                    onChange={handleChildChange(username, groupedData[username])}
+                    sx={{ color: 'white' }}
+                  />
                 }
                 sx={{ color: 'white' }}
               />
               <IconButton
-                onClick={handleExpandClick(username)} // 각 카드의 expand 상태 처리
+                onClick={handleExpandClick(username)}
                 aria-expanded={expanded[username] || false}
                 aria-label="show more"
-                className={`transition-transform ${expanded[username] ? 'rotate-180' : ''
-                  }`}
+                className={`transition-transform ${expanded[username] ? 'rotate-180' : ''}`}
                 sx={{ color: 'white', marginLeft: 'auto' }}
               >
                 <ExpandMoreIcon />
@@ -265,6 +251,7 @@ export default function OrderTest() {
                         },
                       }}
                     >
+                      <TableCell align="center"></TableCell>
                       <TableCell align="center">Category1 Name</TableCell>
                       <TableCell align="center">Category2 Name</TableCell>
                       <TableCell align="center">Category3 Name</TableCell>
@@ -277,20 +264,21 @@ export default function OrderTest() {
                   <TableBody>
                     {groupedData[username].map((detail) => (
                       <TableRow
-                        key={detail.orderDetailId}
-                        sx={{}}
+                      key={detail.orderDetailId}
+                      sx={{}}
                       >
+                        <TableCell padding='checkbox' sx={{ bgcolor: '#67666E', fontWeight: 'semi-bold', color: 'white', border: 'none' }}>
+                          <Checkbox 
+                          checked={checkedChildren[username]?true:false}
+                          onChange={handleChildChange(orderDetailId)}
+                          sx={{color:'white'}} /></TableCell>
                         <TableCell align="center" sx={{ bgcolor: '#67666E', fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.category1Name}</TableCell>
                         <TableCell align="center" sx={{ bgcolor: '#67666E', fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.category2Name}</TableCell>
                         <TableCell align="center" sx={{ bgcolor: '#67666E', fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.category3Name}</TableCell>
                         <TableCell align="center" sx={{ bgcolor: '#67666E', fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.itemName}</TableCell>
                         <TableCell align="center" sx={{ bgcolor: '#67666E', fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.quantity}</TableCell>
                         <TableCell align="center" sx={{ bgcolor: '#67666E', fontWeight: 'semi-bold', color: 'white', border: 'none' }}>
-                          {detail.unit === 'KRW' ? `₩ ${(detail.price * detail.quantity).toLocaleString()}` :
-                            detail.unit === 'USD' ? `$ ${(detail.price * detail.quantity).toLocaleString()}` :
-                              detail.unit === 'JPY' ? `¥ ${(detail.price * detail.quantity).toLocaleString()}` :
-                                detail.unit === 'EUR' ? `€ ${(detail.price * detail.quantity).toLocaleString()}` :
-                                  (detail.price * detail.quantity).toLocaleString()}
+                          {formatPrice(detail.price, detail.quantity, detail.unit)}
                         </TableCell>
                         <TableCell align="center" sx={{ bgcolor: '#67666E', fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.bestOrderDate}</TableCell>
                       </TableRow>
@@ -299,7 +287,7 @@ export default function OrderTest() {
                 </Table>
               </div>
               <div className='p-2'>
-                <h2> 주문 금액 : {groupedData[username].reduce((total, detail) => {
+                <h2> 주문 금액 :  {groupedData[username].reduce((total, detail) => {
                                   return total + (detail.unit === 'KRW' ? detail.price * detail.quantity :
                                                   detail.unit === 'USD' ? detail.price * detail.quantity :
                                                   detail.unit === 'JPY' ? detail.price * detail.quantity :
@@ -310,8 +298,12 @@ export default function OrderTest() {
             </Collapse>
           </div>
         ))}
-        <div>
-          <h2>총 합계:</h2>
+        <div className='flex justify-between m-2 p-2'>
+          <h2>총 합계: 화폐 어떻게 할지 정해야해,,,</h2>
+          <div>
+          <button className='rounded-lg bg-[#43C5FE] m-1 p-2 text-white font-bold'>구매신청</button>
+          <button className='rounded-lg bg-[#43C5FE] m-1 p-2 text-white font-bold'>삭제하기</button>
+          </div>
         </div>
       </div>
     </div>
