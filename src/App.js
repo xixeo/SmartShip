@@ -6,11 +6,12 @@ import Footer from './Compo/Footer';
 import Schedule from './01/Schedule';
 import ListTable from './02/ListTable';
 import Order from './03/Order';
-import OrderTEST from './03/OrderTEST'; 
-import Datepicker from './03/BasicDatePicker'; 
+// import OrderTEST from './03/OrderTEST'; 
+// import Ordertest from './03/Ordertest2'; 
 import SignUp from './Sign/SignUp';
 import SignIn from './Sign/SignIn';
 import ListTableTest from './02/ListTableTEST';
+import SignState from './Sign/SignState';
 
 function App() {
   // const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -39,17 +40,19 @@ function App() {
         ) : ( */}
           <div className="flex flex-1">
             <Navi />
+            <SignState/>
             <div className="flex flex-col flex-1">
-              <main className="flex-1 p-4 bg-gradient-to-b from-black to-[#1a1b41]">
+              <main className="flex-1 p-4 pt-10 bg-gradient-to-b from-black to-[#1a1b41]">
                 <Routes>
                   <Route path="/" element={<MainApp />} />
                   <Route path="/schedule" element={<Schedule />} />
                   <Route path="/listtable" element={<ListTable />} />
                   <Route path="/order" element={<Order />}  />
-                  <Route path="/ordertest" element={<OrderTEST />} />
-                  <Route path="/ordertest2" element={<Datepicker />} />
+                  {/* <Route path="/ordertest" element={<OrderTEST />} />
+                  <Route path="/ordertest2" element={<Ordertest />} /> */}
                   <Route path="*" element={<Navigate to="/" />} />
-                  <Route path="/ListTableTest" element={<ListTableTest />} />                
+                  <Route path="/ListTableTest" element={<ListTableTest />} />  
+                  <Route path="/signstate" element={<SignState />} />  
                 </Routes>
               </main>
               <Footer />
