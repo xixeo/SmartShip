@@ -111,7 +111,9 @@ public class OrdersService {
 		}
 
 		// 최종 결과 반환 (DTO 변환)
-		return new OrdersDTO(savedOrder.getOrderId(), savedOrder.getMember().getUsername(),
+		return new OrdersDTO(
+				savedOrder.getOrderId(), 
+				savedOrder.getMember().getUsername(),
 				savedOrder.getMember().getAlias(),
 //            savedOrder.getReleaseDate(),
 //            savedOrder.getBestOrderDate(),
@@ -133,7 +135,7 @@ public class OrdersService {
 
 		// bestOrderDate와 releaseDate가 있는지 확인
 		if (orderRequest.getReleaseDate() == null || orderRequest.getBestOrderDate() == null) {
-			throw new RuntimeException("bestOrderDate와 releaseDate를 입력해주세요.");
+			throw new RuntimeException("창고 출고예정일을 입력해주세요.");
 		}
 
 		// 기존 orders 정보 업데이트
@@ -143,9 +145,21 @@ public class OrdersService {
 
 		// 기존 주문 정보 저장
 		Orders updatedOrder = ordersRepository.save(existingOrder);
-
+		
 		// 기존 OrderDetail 조회
-		List<OrderDetail> existingOrderDetails = orderDetailRepo.findByOrderOrderId(orderId);
+				List<OrderDetail> existingOrderDetails = orderDetailRepo.findByOrderOrderId(orderId);
+		
+		// 새로운 itemDetails에 없는 기존 OrderDetail 삭제
+	    List<Integer> newItemIds = orderRequest.getItemDetails().stream()
+	            .map(OrderItemRequestDTO::getItemId)
+	            .collect(Collectors.toList());
+
+	    for (OrderDetail existingDetail : existingOrderDetails) {
+	        if (!newItemIds.contains(existingDetail.getItem().getItemsId())) {
+	            // 새로운 목록에 없는 기존 아이템 삭제
+	            orderDetailRepo.delete(existingDetail);
+	        }
+	    }
 
 		// 새로운 값 저장
 		for (OrderItemRequestDTO itemDetail : orderRequest.getItemDetails()) {
@@ -172,52 +186,16 @@ public class OrdersService {
 		}
 
 		// DTO반환
-		return new OrdersDTO(updatedOrder.getOrderId(), updatedOrder.getMember().getUsername(),
-				updatedOrder.getMember().getAlias(), updatedOrder.getReleaseDate(), updatedOrder.getBestOrderDate(),
-				updatedOrder.getOrderDate(), updatedOrder.getMemo(), null);
+		return new OrdersDTO(
+				updatedOrder.getOrderId(), 
+				updatedOrder.getMember().getUsername(),
+				updatedOrder.getMember().getAlias(), 
+				updatedOrder.getReleaseDate(), 
+				updatedOrder.getBestOrderDate(),
+				updatedOrder.getOrderDate(), 
+				updatedOrder.getMemo(), null);
 	}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////  조회
-
-	// 주문 조회
-//	public OrdersDTO getOrderById(Integer orderId) {
-//	    Orders order = ordersRepository.findById(orderId).orElseThrow(() -> new RuntimeException("해당 주문을 찾을 수 없습니다."));
-//
-//	    List<OrderDetail> orderDetails = orderDetailRepo.findByOrderOrderId(orderId);
-//	    List<OrderDetailDTO> orderDetailDTOs = orderDetails.stream()
-//	            .map(orderDetail -> {
-//	                // 아이템에 대한 리드타임 정보 조회
-//	                Leadtime leadtime = leadtimeRepo.findByItems_ItemsId(orderDetail.getItem().getItemsId())
-//	                        .orElseThrow(() -> new RuntimeException("리드타임 정보가 없습니다."));
-//
-//	                // 추천 주문일 계산
-//	                LocalDate recommendedOrderDate = order.getReleaseDate().minusDays(leadtime.getLeadtime());
-//
-//	                return new OrderDetailDTO(
-//	                        orderDetail.getOrderDetailId(),
-//	                        orderDetail.getItem().getCategory3().getCategory2().getCategory1().getCategoryName(),
-//	                        orderDetail.getItem().getCategory3().getCategory2().getCategory2Name(),
-//	                        orderDetail.getItem().getCategory3().getCategory3Name(),
-//	                        orderDetail.getItem().getItemName(), 
-//	                        orderDetail.getQuantity(),
-//	                        orderDetail.getItem().getPrice(), 
-//	                        orderDetail.getItem().getUnit(),
-//	                        orderDetail.getItem().getMember().getUsername(),
-//	                        recommendedOrderDate
-//	                );
-//	            })
-//	            .collect(Collectors.toList());
-//
-//	    return new OrdersDTO(
-//	            order.getOrderId(), 
-//	            order.getMember().getUsername(), 
-//	            order.getMember().getAlias(),
-//	            order.getReleaseDate(), 
-//	            order.getBestOrderDate(), 
-//	            order.getOrderDate(), 
-//	            order.getMemo(),
-//	            orderDetailDTOs
-//	    );
-//	}
 	
 	 @Transactional
 	    public OrdersDTO getOrderByIdAndReleaseDate(Integer orderId, LocalDate releaseDate) {
