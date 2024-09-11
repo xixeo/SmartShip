@@ -1,44 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.scss';
+import SignUp from './Sign/SignUp';
+import SignIn from './Sign/SignIn';
+import SignState from './Sign/SignState';
 import Navi from './Compo/Navi';
 import Footer from './Compo/Footer';
+import Board from './DashBoard/Board';
 import Schedule from './01/Schedule';
 import ListTable from './02/ListTable';
+import ListTableTest from './02/ListTableTEST';
+import ListTableDB from './02/ListTableDB';
 import Order from './03/Order';
 import OrderTEST from './03/OrderTEST'; 
 import BasicDatePicker from './03/BasicDatePicker'; 
-import SignUp from './Sign/SignUp';
-import SignIn from './Sign/SignIn';
-import ListTableTest from './02/ListTableTEST';
-import SignState from './Sign/SignState';
-import Board from './DashBoard/Board';
 
 function App() {
-  // const [isAuthenticated, setIsAuthenticated] = useState(false);
+   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [redirectPath, setRedirectPath] = useState('/');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      // setIsAuthenticated(true);
+       setIsAuthenticated(true);
     }
   }, []);
 
-  // const PrivateRoute = ({ element }) => {
-  //   return isAuthenticated ? element : <Navigate to="/signin" />;
-  // };
+  const PrivateRoute = ({ element }) => {
+    return isAuthenticated ? element : <Navigate to="/signin" />;
+  };
 
   return (
     <BrowserRouter>
       <div className="flex flex-col h-screen">
-        {/* {!isAuthenticated ? (
+        {!isAuthenticated ? (
           <Routes>
             <Route path="/signup" element={<SignUp setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/signin" element={<SignIn setIsAuthenticated={setIsAuthenticated} setRedirectPath={setRedirectPath} />} />
             <Route path="*" element={<Navigate to="/signin" />} />
           </Routes>
-        ) : ( */}
+        ) : (
           <div className="flex flex-1">
             <Navi />
             <div className="flex flex-col flex-1 bg-gradient-to-b from-black to-[#1a1b41]">
@@ -48,11 +49,12 @@ function App() {
                   <Route path="/" element={<MainApp />} />
                   <Route path="/schedule" element={<Schedule />} />
                   <Route path="/listtable" element={<ListTable />} />
+                  <Route path="/ListTableTest" element={<ListTableTest />} />  
+                  <Route path="/listtabledb" element={<ListTableDB />} />
                   <Route path="/order" element={<Order />}  />
-                  <Route path="/ordertest" element={<OrderTEST />} />
+                  {/* <Route path="/ordertest" element={<OrderTEST />} /> */}
                   <Route path="/ordertest2" element={<BasicDatePicker />} />
                   <Route path="*" element={<Navigate to="/" />} />
-                  <Route path="/ListTableTest" element={<ListTableTest />} />  
                   <Route path="/signstate" element={<SignState />} />  
                   <Route path="/Board" element={<Board />} />  
                 </Routes>
@@ -60,7 +62,7 @@ function App() {
               <Footer />
             </div>
           </div>
-        {/* )} */}
+         )} 
       </div>
     </BrowserRouter>
   );
@@ -72,7 +74,7 @@ function MainApp() {
   return (
     <div className="w-full h-full flex items-center justify-center">
       <h1 className="text-3xl font-bold text-white">
-        {/* Welcome, {alias ? alias : 'User'} ! */}
+        Welcome, {alias ? alias : 'User'} !
       </h1>
     </div>
   );

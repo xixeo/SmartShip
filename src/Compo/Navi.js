@@ -26,7 +26,7 @@ const Navi = () => {
           {!isCollapsed && <span>일정 관리</span>}
           {!isCollapsed && <FaChevronRight className="right-arrow" />} 
         </li>
-        <li className="menu-item" onClick={() => navigate('/listtable')}>
+        <li className="menu-item" onClick={() => navigate('/listtabledb')}>
           <FaBox className="icon" />
           {!isCollapsed && <span>선용품 리스트</span>}
           {!isCollapsed && <FaChevronRight className="right-arrow" />}
