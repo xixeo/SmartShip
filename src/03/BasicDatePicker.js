@@ -5,7 +5,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko'; // dayjs 한국어 로케일 가져오기
 import { Popper, TextField } from '@mui/material';
-import './style.css'
+import './BasicDatePicker.css'
 
 export default function BasicDatePicker({ onDateAccept }) {
   const [value, setValue] = React.useState(() => {
