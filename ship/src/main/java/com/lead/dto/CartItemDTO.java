@@ -30,4 +30,5 @@ public class CartItemDTO {
     private String unit;
     private String username;
     private LocalDate recommendedOrderDate;
+    private Integer leadtime;
 }

@@ -6,8 +6,10 @@ import java.util.Date;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -40,6 +42,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         try {
             Member member = mapper.readValue(req.getInputStream(), Member.class);
             Authentication authToken = new UsernamePasswordAuthenticationToken(member.getUsername(), member.getPw());
+            System.out.println(member.getUsername() + "이 로그인 시도 했다.");
             return authenticationManager.authenticate(authToken);
         } catch (Exception e) {
             log.info(e.getMessage());
@@ -60,13 +63,32 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         String token = JWT.create()
                 .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 1000))
-                .withClaim("username", username)
+                .withClaim("username", username) // username 토큰으로 전달
                 .withClaim("alias", member.getAlias()) // alias 추가
+                .withClaim("role", member.getRole().toString()) // role 추가
                 .sign(Algorithm.HMAC256("com.lead.jwt"));
 
         res.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
         res.setStatus(HttpStatus.OK.value());
     }
+    
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+                                              AuthenticationException failed) throws IOException, ServletException {
+        // 예외 메시지 확인
+        String message;
+        if (failed instanceof DisabledException) {
+            message = "탈퇴한 아이디입니다."; // 비활성화된 계정일 때 메시지 설정
+        } else {
+            message = "로그인 실패: " + failed.getMessage();
+        }
+
+        // 응답에 메시지 반환
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("{\"error\": \"" + message + "\"}");
+    }
+
 }
 
 //@Slf4j

@@ -2,13 +2,14 @@ package com.lead.service;
 
 import java.util.Optional;
 
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.lead.entity.Member;
 import com.lead.entity.Role;
 import com.lead.repository.MemberRepo;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -19,7 +20,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder; 
 
     public Member getMemberById(String id) {
-        return memberRepo.findById(id).orElseThrow(() -> new RuntimeException("Member not found"));
+        return memberRepo.findById(id).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
     }
 
     public String joinMembers(Member member) {
@@ -43,11 +44,17 @@ public class MemberService {
         }
     }
 
-    public String unsubMembers(User user) {
-        String username = user.getUsername(); 
-        Member member = memberRepo.findById(username).orElseThrow(() -> new RuntimeException("Member not found"));
-        member.setEnabled(false);
-        memberRepo.save(member);
-        return username + "님, 정상적으로 탈퇴되었습니다";
+    @Transactional
+    public String unsubMember(String username) {
+        Member member = memberRepo.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        // enabled 값을 0으로 변경하여 회원 탈퇴 처리
+        member.setEnabled(false); // TINYINT(1)에서 0은 false, 1은 true로 해석됨
+        memberRepo.save(member); // 변경사항 저장
+
+        // 회원 탈퇴 완료 메시지 반환
+        return username + " 회원탈퇴가 정상적으로 처리되었습니다.";
     }
+
 }

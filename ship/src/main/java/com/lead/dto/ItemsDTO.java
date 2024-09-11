@@ -28,8 +28,7 @@ public class ItemsDTO {
     private BigDecimal price;
     private String unit;
     private Integer purchaseCount;
-    private Integer stockQuantity;
+    private String supplierName; 
     private String alias;
-    private String username; 
     private Integer leadtime;
 }

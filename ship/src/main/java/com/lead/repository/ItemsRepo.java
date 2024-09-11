@@ -36,11 +36,6 @@ public interface ItemsRepo extends JpaRepository<Items, Integer>, JpaSpecificati
     List<Object[]> findAlternativeItems(@Param("selectItemId") Integer selectItemId,
                                         @Param("releaseDate") String releaseDate);
     
- // 특정 아이템의 재고 업데이트
-    @Modifying
-    @Query("UPDATE Items i SET i.stockQuantity = :stockQuantity WHERE i.itemsId = :itemsId")
-    void updateStockQuantity(@Param("itemsId") Integer itemsId, @Param("stockQuantity") int stockQuantity);
-
     // 특정 아이템의 구매 횟수 증가
     @Modifying
     @Query("UPDATE Items i SET i.purchaseCount = i.purchaseCount + 1 WHERE i.itemsId = :itemsId")

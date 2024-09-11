@@ -53,9 +53,6 @@ public class Items {
     @Column(name = "purchase_count", nullable = false)
     private int purchaseCount; 
 
-    @Column(name = "stock_quantity", nullable = false)
-    private int stockQuantity;
-    
     @OneToMany(mappedBy = "items")
     private Set<Leadtime> leadtimes;
     
