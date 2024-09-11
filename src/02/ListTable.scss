@@ -99,6 +99,33 @@
     }
   }
 
+  .select-supplier {
+    height: 40px;
+    min-width: 120px;
+    background-color: transparent;
+    font-size: 14px;
+
+    .MuiSelect-select {
+      color: white;
+    }
+
+    .MuiOutlinedInput-notchedOutline {
+      border-color: #9D9B9B !important;
+    }
+
+    .MuiSvgIcon-root {
+      color: #9D9B9B;
+    }
+
+    &:hover .MuiOutlinedInput-notchedOutline {
+      border-color: #9D9B9B !important;
+    }
+
+    &.Mui-focused .MuiOutlinedInput-notchedOutline {
+      border-color: #9D9B9B !important;
+    }
+  }
+
   /* 커스텀 텍스트필드 스타일 */
   .custom-textfield {
     height: 40px;
@@ -109,6 +136,35 @@
     .MuiInputBase-input {
       color: white;
       height: 100%;
+    }
+
+    .MuiOutlinedInput-root {
+      height: 40px;
+
+      & fieldset {
+        border-color: #9D9B9B !important;
+      }
+
+      &:hover fieldset {
+        border-color: #9D9B9B !important;
+      }
+
+      &.Mui-focused fieldset {
+        border-color: #9D9B9B !important;
+      }
+    }
+  }
+
+  .custom-quantity {
+    height: 40px;
+    flex-grow: 1;
+    max-width: 300px;
+    background-color: transparent;
+
+    .MuiInputBase-input {
+      color: white;
+      height: 100%;
+      font-size: 14px;
     }
 
     .MuiOutlinedInput-root {
@@ -210,27 +266,37 @@
   
   .price-cell {
     color: white;
-    text-align: right;
+    text-align: right; /* 기본적으로 우측 정렬 */
     padding-right: 3%;
+  
+    /* 가격이 '-'일 때 중앙 정렬 */
+    &.price-cell-no-price {
+      text-align: center; /* '-'일 때 중앙 정렬 */
+      padding-right: 0%;
+    }
   }
 
   .custom-toggle {
     .MuiFormControlLabel-label {
-      order: -1; // 레이블을 먼저 표시
-      color: #ffffff; // 레이블 글자색 흰색
+      order: -1;
+      color: #ffffff;
     }
   
     .MuiSwitch-switchBase {
-      color: #b0b0b0; // 스위치 기본 색상 (회색)
+      color: #b0b0b0; 
       &.Mui-checked {
-        color: #b0b0b0; // 스위치 체크 상태 색상 (회색)
+        color: #b0b0b0; 
       }
     }
   
     .MuiSwitch-track {
-      background-color: #d0d0d0; // 스위치 트랙 색상 (회색)
+      background-color: #d0d0d0; 
     }
 
     margin-left: 16px;
+  }
+
+  .select-supplier, .custom-quantity {
+    width: 100%; /* 부모 요소에 맞게 너비를 조절 */
   }
 }
