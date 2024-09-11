@@ -438,7 +438,7 @@ export default function OrderTest() {
               />
             }
           />
-          <button className='rounded-lg border-[#43C5FE] border m-1 p-2 text-white font-bold hover:bg-[#43C5FE]' >삭제</button>
+          <Button sx={{borderColor: '#43C5FE' }} className='rounded-lg border-[#43C5FE] border m-1 p-2 text-white font-bold hover:bg-[#43C5FE]' >삭제</Button>
         </div>
         {Object.keys(groupedData).map((username) => (
           <div key={username} className="bg-[#2F2E38] text-white rounded-xl m-5 border border-[#69686F]">
