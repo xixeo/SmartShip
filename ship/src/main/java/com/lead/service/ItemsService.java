@@ -30,12 +30,11 @@ public class ItemsService {
 	@Transactional(readOnly = true)
 	public List<ItemsDTO> findItems(String category1Name, String category2Name, String category3Name, String itemName) {
 
-		// 영속성 컨텍스트 강제 초기화 (flush() 및 clear() 호출)
+		// 영속성 컨텍스트 강제 초기화 (flush() 및 clear() 호출) -- 조회가 여러번 타서 넣음
 		entityManager.flush();
 		entityManager.clear();
 
 		Specification<Items> spec = (root, query, builder) -> {
-			// 동적 조건 조합
 			return builder.and(
 					category1Name != null && !category1Name.isEmpty() ? builder.equal(
 							root.join("category3").join("category2").join("category1").get("categoryName"),
@@ -82,10 +81,19 @@ public class ItemsService {
             dto.setItemName((String) result[1]); // itemName
             dto.setPrice((BigDecimal) result[2]); // price
             dto.setLeadtime((Integer) result[3]); // leadtime
-            // recommendedOrderDate는 여기서 계산하거나 추가적인 로직이 필요함
-            // 예를 들어, LocalDate recommendedDate = releaseDate.minusDays(leadtime);
-            // dto.setRecommendedOrderDate(recommendedDate);
             return dto;
         }).collect(Collectors.toList());
+    }
+	
+	////// 물품 재고수량 업데이트
+	@Transactional
+    public void updateStock(Integer itemsId, int stockQuantity) {
+        itemsRepo.updateStockQuantity(itemsId, stockQuantity);
+    }
+
+	//////판매 횟수 증가
+    @Transactional
+    public void incrementPurchaseCount(Integer itemsId) {
+        itemsRepo.incrementPurchaseCount(itemsId);
     }
 }

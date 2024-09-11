@@ -27,7 +27,9 @@ public class ItemsDTO {
     private String part2;
     private BigDecimal price;
     private String unit;
+    private Integer purchaseCount;
+    private Integer stockQuantity;
     private String alias;
-    private String username;  // 사용자의 이름
-    private Integer leadtime; // 리드타임
+    private String username; 
+    private Integer leadtime;
 }

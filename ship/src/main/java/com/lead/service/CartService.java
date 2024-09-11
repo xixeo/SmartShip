@@ -44,9 +44,6 @@ public class CartService {
 	private CartItemRepo cartItemRepo;
 
 	@Autowired
-	private CartItemService cartItemService;
-
-	@Autowired
 	private OrdersRepo ordersRepo;
 
 	@Autowired
@@ -218,6 +215,13 @@ public class CartService {
               orderDetail.setItem(cartItem.getItem());
               orderDetail.setQuantity(itemDetail.getQuantity()); 
               orderDetailRepo.save(orderDetail);
+              
+              // 재고 감소 및 구매 횟수 증가
+              Items item = cartItem.getItem();
+              item.setStockQuantity(item.getStockQuantity() - itemDetail.getQuantity()); // 재고 감소
+              item.setPurchaseCount(item.getPurchaseCount() + 1); // 구매 횟수 증가
+              itemsRepo.save(item); // 변경된 재고 및 구매 횟수 저장
+
 
               // 장바구니에서 삭제
               cartItemRepo.delete(cartItem);

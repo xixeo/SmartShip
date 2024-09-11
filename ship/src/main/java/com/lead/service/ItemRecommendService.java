@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.lead.dto.ItemRecommendDTO;
 import com.lead.repository.ItemsRepo;
 
+
 @Service
 public class ItemRecommendService {
 
@@ -28,10 +29,9 @@ public class ItemRecommendService {
             BigDecimal price = (BigDecimal) result[2];
             Integer leadtime = (Integer) result[3];
 
-            // Calculate recommendedOrderDate
+            // 기간내에 가능한지 계산
             LocalDate recommendedOrderDate = releaseDate.minusDays(leadtime);
 
-            // Create DTO
             ItemRecommendDTO dto = new ItemRecommendDTO(itemsId, itemName, price, leadtime, recommendedOrderDate);
             recommendedItems.add(dto);
         }
