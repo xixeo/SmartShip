@@ -8,16 +8,15 @@ import Navi from './Compo/Navi';
 import Footer from './Compo/Footer';
 import Board from './DashBoard/Board';
 import Schedule from './01/Schedule';
-import ListTable from './02/ListTable';
-import ListTableTest from './02/ListTableTEST';
 import ListTableDB from './02/ListTableDB';
+import ListTableSupplier from './02/ListTableSupplier';
 import Order from './03/Order';
 import OrderTEST from './03/OrderTEST'; 
 import BasicDatePicker from './03/BasicDatePicker'; 
 
 function App() {
    const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [redirectPath, setRedirectPath] = useState('/');
+   const [redirectPath, setRedirectPath] = useState('/');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -37,7 +36,6 @@ function App() {
           <Routes>
             <Route path="/signup" element={<SignUp setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/signin" element={<SignIn setIsAuthenticated={setIsAuthenticated} setRedirectPath={setRedirectPath} />} />
-            <Route path="*" element={<Navigate to="/signin" />} />
           </Routes>
         ) : (
           <div className="flex flex-1">
@@ -48,13 +46,11 @@ function App() {
                 <Routes>
                   <Route path="/" element={<MainApp />} />
                   <Route path="/schedule" element={<Schedule />} />
-                  <Route path="/listtable" element={<ListTable />} />
-                  <Route path="/ListTableTest" element={<ListTableTest />} />  
                   <Route path="/listtabledb" element={<ListTableDB />} />
+                  <Route path="/listtablesupplier" element={<ListTableSupplier />} />  
                   <Route path="/order" element={<Order />}  />
                   <Route path="/ordertest" element={<OrderTEST />} />
                   <Route path="/ordertest2" element={<BasicDatePicker />} />
-                  <Route path="*" element={<Navigate to="/" />} />
                   <Route path="/signstate" element={<SignState />} />  
                   <Route path="/Board" element={<Board />} />  
                 </Routes>
