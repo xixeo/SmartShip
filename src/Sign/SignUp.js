@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from '../Img/logo.png'; 
+import logo from '../Img/logo.png';
 
 function SignUp({ setIsAuthenticated }) {
   const [username, setUsername] = useState('');
   const [pw, setPw] = useState('');
   const [alias, setAlias] = useState('');
+  const [role, setRole] = useState('ROLE_USER'); // 기본 역할을 'user'로 설정
   const [signupError, setSignupError] = useState('');
   const navigate = useNavigate();
 
@@ -15,7 +16,7 @@ function SignUp({ setIsAuthenticated }) {
 
     try {
       const url = '/signup';
-      const body = { username, pw, alias };
+      const body = { username, pw, alias, role };
 
       const response = await fetch(url, {
         method: 'POST',
@@ -58,7 +59,7 @@ function SignUp({ setIsAuthenticated }) {
         <form onSubmit={handleSubmit} className="bg-white w-full max-w-sm p-8 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold mb-6 text-center font-poppins">SIGN UP</h2>
           
-          <div className="mb-4">
+          <div className="mb-5">
             <label className="block text-gray-700 text-sm font-bold mb-2">아이디</label>
             <input
               type="text"
@@ -69,7 +70,7 @@ function SignUp({ setIsAuthenticated }) {
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-5">
             <label className="block text-gray-700 text-sm font-bold mb-2">비밀번호</label>
             <input
               type="password"
@@ -80,7 +81,7 @@ function SignUp({ setIsAuthenticated }) {
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-5">
             <label className="block text-gray-700 text-sm font-bold mb-2">닉네임</label>
             <input
               type="text"
@@ -89,6 +90,44 @@ function SignUp({ setIsAuthenticated }) {
               required
               className="w-full px-3 py-2 border rounded-lg"
             />
+          </div>
+
+          <div className="mb-5">
+            <span className="block text-gray-700 text-sm font-bold mb-2">회원 권한 선택</span>
+            <div className="flex justify-center items-center">
+              <input
+                type="radio"
+                id="roleUser"
+                name="role"
+                value="ROLE_USER"
+                checked={role === 'ROLE_USER'}
+                onChange={(e) => setRole(e.target.value)}
+                className="mr-2"
+              />
+              <label htmlFor="roleUser" className="mr-4">선박</label>
+
+              <input
+                type="radio"
+                id="roleManager"
+                name="role"
+                value="ROLE_MANAGER"
+                checked={role === 'ROLE_MANAGER'}
+                onChange={(e) => setRole(e.target.value)}
+                className="mr-2"
+              />
+              <label htmlFor="roleManager" className="mr-4">해운선사</label>
+
+              <input
+                type="radio"
+                id="roleSupplier"
+                name="role"
+                value="ROLE_SUPPLIER"
+                checked={role === 'ROLE_SUPPLIER'}
+                onChange={(e) => setRole(e.target.value)}
+                className="mr-2"
+              />
+              <label htmlFor="roleSupplier">판매자</label>
+            </div>
           </div>
 
           {signupError && <p className="text-red-500 pb-2" style={{ whiteSpace: 'pre-wrap' }}>{signupError}</p>}
@@ -115,5 +154,5 @@ function SignUp({ setIsAuthenticated }) {
     </div>
   );
 }
-  
+
 export default SignUp;

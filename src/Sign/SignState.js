@@ -1,5 +1,3 @@
-//style.css 막아둬야 SignState.css 우선적용됨
-
 import React, { useState } from 'react';
 import { ReactComponent as UserIcon } from './User.svg';
 import { useNavigate } from 'react-router-dom';
@@ -15,11 +13,13 @@ const SignState = () => {
 
   const username = localStorage.getItem('username');
   const alias = localStorage.getItem('alias');
+  const role = localStorage.getItem('role');
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem('username');
     localStorage.removeItem('alias');
+    localStorage.removeItem('role');
     localStorage.removeItem('token');
     navigate('/signin');
   };

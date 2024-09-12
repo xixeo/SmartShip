@@ -35,10 +35,15 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
             if (token) {
                 const cleanedToken = token.replace('Bearer ', '');
                 const decodedToken = jwtDecode(cleanedToken);
+
+                // 필요한 정보를 로컬 스토리지에 저장
                 const alias = decodedToken.alias;
+                const role = decodedToken.role;
+
                 localStorage.setItem("token", cleanedToken);
                 localStorage.setItem('username', username);
                 localStorage.setItem('alias', alias);
+                localStorage.setItem('role', role);
 
                 setIsAuthenticated(true);
 
