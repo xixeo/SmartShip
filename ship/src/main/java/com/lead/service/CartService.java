@@ -68,13 +68,17 @@ public class CartService {
 		  // CartItem 조회 및 Leadtime을 기반으로 bestOrderDate 계산
         List<CartItem> cartItems = cartItemRepo.findByCartCartId(cart.getCartId());
         List<CartItemDTO> cartItemDTOs = cartItems.stream().map(cartItem -> {
-            Items item = cartItem.getItem();
+           
+        	Items item = cartItem.getItem();
 
          // Leadtime 정보 조회
             Leadtime leadtime = leadtimeRepo.findByItems_ItemsId(item.getItemsId())
                     .orElseThrow(() -> new RuntimeException("리드타임 정보가 없습니다."));
             
             LocalDate bestOrderDate = releaseDate.minusDays(leadtime.getLeadtime());
+            
+            // 판매 가능 여부: enabled가 true이고 forSale이 true여야 판매 가능
+            boolean isSell = item.isEnabled() && item.isForSale(); // 판매 여부 판단
             
             return new CartItemDTO(cartItem.getCartItemId(), 
                                    item.getCategory3().getCategory2().getCategory1().getCategoryName(), 
@@ -87,7 +91,8 @@ public class CartService {
                                    item.getUnit(), 
                                    item.getMember().getUsername(), 
                                    bestOrderDate,
-                                   leadtime.getLeadtime()
+                                   leadtime.getLeadtime(),
+                                   isSell
                                    );
         }).collect(Collectors.toList());
 

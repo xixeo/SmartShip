@@ -14,7 +14,7 @@ import com.lead.entity.Items;
 @Repository
 public interface ItemsRepo extends JpaRepository<Items, Integer>, JpaSpecificationExecutor<Items> {
 
-	@Query(value = """
+		@Query(value = """
             SELECT
                 i.items_id,
                 i.item_name,
@@ -28,6 +28,7 @@ public interface ItemsRepo extends JpaRepository<Items, Integer>, JpaSpecificati
                 i.category3_id = (SELECT category3_id FROM Items WHERE items_id = :selectItemId)
                 AND (i.price BETWEEN (SELECT price * 0.9 FROM Items WHERE items_id = :selectItemId) AND (SELECT price * 1.1 FROM Items WHERE items_id = :selectItemId))
                 AND i.items_id <> :selectItemId
+                AND i.enabled = true -- enabled 필터 추가
                 AND l.leadtime <= (SELECT DATEDIFF(:releaseDate, CURRENT_DATE))
             ORDER BY
                 ABS(i.price - (SELECT price FROM Items WHERE items_id = :selectItemId)) ASC
@@ -36,6 +37,10 @@ public interface ItemsRepo extends JpaRepository<Items, Integer>, JpaSpecificati
     List<Object[]> findAlternativeItems(@Param("selectItemId") Integer selectItemId,
                                         @Param("releaseDate") String releaseDate);
     
+    
+//    @Query("SELECT i FROM Items i WHERE i.itemsId = :itemId AND i.member.username = :username")
+//    Optional<Items> findItemByIdAndUsername(@Param("itemId") Integer itemId, @Param("username") String username);
+   
     // 특정 아이템의 구매 횟수 증가
     @Modifying
     @Query("UPDATE Items i SET i.purchaseCount = i.purchaseCount + 1 WHERE i.itemsId = :itemsId")

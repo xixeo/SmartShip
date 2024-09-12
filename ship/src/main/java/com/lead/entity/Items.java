@@ -52,6 +52,12 @@ public class Items {
     
     @Column(name = "purchase_count", nullable = false)
     private int purchaseCount; 
+    
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled;
+    
+    @Column(name = "for_sale", nullable = false)
+    private boolean forSale; 
 
     @OneToMany(mappedBy = "items")
     private Set<Leadtime> leadtimes;

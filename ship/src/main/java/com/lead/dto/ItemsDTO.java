@@ -2,6 +2,8 @@ package com.lead.dto;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,4 +33,7 @@ public class ItemsDTO {
     private String supplierName; 
     private String alias;
     private Integer leadtime;
+    @JsonIgnore
+    private boolean enabled;
+    private boolean forSale;
 }
