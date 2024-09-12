@@ -357,9 +357,9 @@ export default function OrderTest() {
   const getcheckedItemIds = () => {
     return Object.keys(groupedData).flatMap((username) => {
       return groupedData[username]
-        .filter((item) => checkedGrandchildren[`${username}-${item.ItemsId}`] || false)
+        .filter((item) => checkedGrandchildren[`${username}-${item.cartItemId}`] || false)
         .map((item) => ({
-          itemsId : item.ItemsId,
+          itemsId : item.itemsId,
         }));
     });
   }
@@ -368,9 +368,9 @@ export default function OrderTest() {
   const getCheckedItemsWithQuantity = () => {
     return Object.keys(groupedData).flatMap((username) => {
       return groupedData[username]
-        .filter((item) => checkedGrandchildren[`${username}-${item.ItemsId}`] || false)
+        .filter((item) => checkedGrandchildren[`${username}-${item.cartItemId}`] || false)
         .map((item) => ({
-          itemsId: item.ItemsId,
+          itemsId: item.itemsId,
           quantity: item.quantity,
         }));
     });
@@ -471,9 +471,10 @@ export default function OrderTest() {
   const handleDelete = async () => {
     // 손자 체크박스에서 체크된 아이템 필터링
     const checkedItemIds = getcheckedItemIds();
+    console.log('checkeditemsids', checkedItemIds);
     const itemsId = checkedItemIds.map(item => item.itemsId);
     console.log('array', Array.isArray(checkedItemIds));
-    console.log('checkeditemsids', itemsId);
+    console.log('itemsid', itemsId);
 
     try {
       const response = await fetch(`delItem`,
@@ -650,7 +651,7 @@ export default function OrderTest() {
                             {formatPrice(detail.price, detail.quantity, detail.unit)}
                           </TableCell>
                           <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.bestOrderDate}</TableCell>
-                          <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}></TableCell>
+                          <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.itemsId}</TableCell>
                         </TableRow>
                       );
                     })}
