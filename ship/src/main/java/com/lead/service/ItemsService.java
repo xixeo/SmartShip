@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lead.dto.ItemRecommendDTO;
 import com.lead.dto.ItemsDTO;
+import com.lead.entity.Category3;
 import com.lead.entity.Items;
 import com.lead.entity.Leadtime;
 import com.lead.repository.Category3Repo;
@@ -157,7 +158,10 @@ public class ItemsService {
      // 수정할 아이템 찾기
         Items item = itemsRepo.findById(itemId)
                 .orElseThrow(() -> new RuntimeException("Item not found"));
-
+        
+        // category3Name을 통해 Category3 엔티티 찾기
+        Category3 category3 = category3Repo.findByCategory3Name(updatedItemDto.getCategory3Name())
+                .orElseThrow(() -> new RuntimeException("Category3 not found"));
 
 		// 현재 사용자(공급자)가 이 물품의 소유자인지 확인
 		if (!item.getMember().getUsername().equals(username)) {
@@ -165,11 +169,13 @@ public class ItemsService {
 		}
 
         // 아이템 정보 업데이트
+		 item.setCategory3(category3);
         item.setItemName(updatedItemDto.getItemName());
         item.setPart1(updatedItemDto.getPart1());
         item.setPart2(updatedItemDto.getPart2());
         item.setPrice(updatedItemDto.getPrice());
         item.setUnit(updatedItemDto.getUnit());
+        item.setForSale(updatedItemDto.isForSale());
 
         itemsRepo.save(item);
 
@@ -179,12 +185,14 @@ public class ItemsService {
     // Entity를 DTO로 변환하는 메소드
     private ItemsDTO convertToDto(Items item) {
         return ItemsDTO.builder()
+        		.category3Name(item.getCategory3().getCategory3Name())
                 .itemId(item.getItemsId())
                 .itemName(item.getItemName())
                 .part1(item.getPart1())
                 .part2(item.getPart2())
                 .price(item.getPrice())
                 .unit(item.getUnit())
+                .forSale(item.isForSale()) 
                 .build();
     }
 
