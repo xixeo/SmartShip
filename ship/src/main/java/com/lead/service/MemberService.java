@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.lead.entity.Member;
-import com.lead.entity.Role;
 import com.lead.repository.MemberRepo;
 
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,8 @@ public class MemberService {
         } else {
             System.out.println("Setting role: " + member.getRole());
             
-            member.setRole(Role.ROLE_USER); // Use Role.ROLE_USER
+//            member.setRole(Role.ROLE_USER); // Use Role.ROLE_USER
+            member.setRole(member.getRole()); // Use Role.ROLE_USER
             member.setEnabled(true);
             member.setPw(passwordEncoder.encode(member.getPw()));
             memberRepo.save(member);

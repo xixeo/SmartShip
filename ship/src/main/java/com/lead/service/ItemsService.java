@@ -14,8 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lead.dto.ItemRecommendDTO;
 import com.lead.dto.ItemsDTO;
+import com.lead.entity.Category3;
 import com.lead.entity.Items;
 import com.lead.entity.Leadtime;
+import com.lead.repository.Category3Repo;
 import com.lead.repository.ItemsRepo;
 import com.lead.repository.LeadtimeRepo;
 
@@ -35,8 +37,13 @@ public class ItemsService {
 	private EntityManager entityManager;
 	
 	@Autowired
-	    private LeadtimeRepo leadtimeRepo;
+    private LeadtimeRepo leadtimeRepo;
+	
+	@Autowired
+    private Category3Repo category3Repo;
 
+	
+	
 	/////////////////////////////////////////////////////////////////////////////////// 전체 상품 조회
 	/////////////////////////////////////////////////////////////////////////////////// ROLE.SUPPLIER 입장 / ROLE.USER 입장
 	@Transactional(readOnly = true)
@@ -119,7 +126,57 @@ public class ItemsService {
 	        .leadtime(leadtime.getLeadtime())
 	        .build();
 	}
+	
+	/////////////////////////////////////////////////////////////////////////////////// 상품
+	/////////////////////////////////////////////////////////////////////////////////// 등록
 
+	
+	
+	/////////////////////////////////////////////////////////////////////////////////// 상품
+	/////////////////////////////////////////////////////////////////////////////////// 수정
+	  @Transactional
+	    public void updateItem(Integer itemId, ItemsDTO itemsDTO, String username) {
+	        // itemId로 물품 조회
+	        Items item = itemsRepo.findById(itemId)
+	                .orElseThrow(() -> new RuntimeException("해당 물품을 찾을 수 없습니다."));
+
+	        // 현재 사용자(공급자)가 이 물품의 소유자인지 확인
+	        if (!item.getMember().getUsername().equals(username)) {
+	            throw new RuntimeException("해당 물품을 수정할 권한이 없습니다.");
+	        }
+
+	        // 필수 필드 체크
+        	if (itemsDTO.getCategory3Name() == null) {
+	            throw new RuntimeException("카테고리 정보가 필요합니다.");
+	        }
+	        if (itemsDTO.getItemName() == null || itemsDTO.getItemName().isEmpty()) {
+	            throw new RuntimeException("상품 이름이 필요합니다.");
+	        }
+	        if (itemsDTO.getPrice() == null) {
+	            throw new RuntimeException("가격 정보가 필요합니다.");
+	        }
+	        if (itemsDTO.getUnit() == null || itemsDTO.getUnit().isEmpty()) {
+	            throw new RuntimeException("단위 정보가 필요합니다.");
+	        }
+	        // category3Name으로 카테고리 조회
+	        Category3 category3 = category3Repo.findByCategory3Name(itemsDTO.getCategory3Name())
+	                .orElseThrow(() -> new RuntimeException("해당 카테고리를 찾을 수 없습니다."));
+
+	        // 물품 정보 수정
+	        item.setItemName(itemsDTO.getItemName());
+	        item.setPart1(itemsDTO.getPart1());  // null 허용
+	        item.setPart2(itemsDTO.getPart2());  // null 허용
+	        item.setPrice(itemsDTO.getPrice());
+	        item.setUnit(itemsDTO.getUnit());
+	        
+	        // 카테고리 3 설정
+	        item.setCategory3(category3);
+	        
+	        // username은 수정하지 않음, 현재 로그인한 사용자가 물품의 소유자임을 가정
+
+	        // 수정된 정보 저장
+	        itemsRepo.save(item);
+	    }
 
 	/////////////////////////////////////////////////////////////////////////////////// 대체 상품
 	/////////////////////////////////////////////////////////////////////////////////// 조회
