@@ -21,6 +21,7 @@ export default function BasicDatePicker({ onDateAccept }) {
   };
 
   return (
+    <div className='BasicDatePicker'>
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko"> {/* 한국어 로케일 설정 */}
       <DesktopDatePicker
         label="날짜 선택"
@@ -43,5 +44,6 @@ export default function BasicDatePicker({ onDateAccept }) {
         }}
       />
     </LocalizationProvider>
+    </div>
   );
 }

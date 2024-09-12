@@ -1,0 +1,51 @@
+  .OrderBasket {
+
+    .activerow {
+      td{
+        background-color: #ca4242;
+      }
+    }
+
+    .normalrow {
+      td{
+        background-color: #69686F;
+      }
+    }
+
+    .MuiButton-root.greenbutton {
+      background-color: transparent;
+      border: 1px solid #3DD19D;
+      color: #3DD19D;
+  
+      &:hover {
+        background-color: #3DD19D;
+        color: #fff;
+        border: 1px solid transparent;
+      }
+    }
+  
+    .MuiButton-root.bluebutton {
+      background-color: transparent;
+      border: 1px solid #43C5FE;
+      color: #43C5FE;
+  
+      &:hover {
+        background-color: #43C5FE;
+        color: #fff;
+        border: 1px solid transparent;
+      }
+    }
+  
+    .MuiButton-root.bluebutton2 {
+      background-color: #43C5FE;
+      color: #fff;
+      border: 1px solid transparent;
+      
+      &:hover {
+        background-color: transparent;
+        border: 1px solid #43C5FE;
+        color: #43C5FE;
+      }
+    }
+
+  }

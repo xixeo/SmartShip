@@ -396,7 +396,10 @@ export default function Schedule() {
     }
   };
   
-  // Modal 
+  //////////
+  // Modal//
+  /////////
+
   const handleeventclick = async (e) => {
     console.log('e.event',e.event);
     const eventid = e.event.extendedProps.orderId;
@@ -438,7 +441,7 @@ export default function Schedule() {
       }, {});
     
       return (
-        <div className="p-6 w-4/5 mx-auto bg-white rounded-lg shadow-lg"> {/* 모달 넓이를 80%로 설정 */}
+        <div className="p-6 w-4/5 mx-auto bg-white rounded-lg shadow-lg"> 
       <div className="flex justify-between mb-6">
         <h1 className="text-2xl font-bold">{eventDetails[0].title}</h1>
         <h2 className="text-xl font-semibold">담당자: {eventDetails[0].alias}</h2>
