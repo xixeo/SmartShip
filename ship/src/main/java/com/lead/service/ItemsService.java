@@ -78,7 +78,7 @@ public class ItemsService {
 	            );
 	        } else {
 	            // 다른 역할일 경우 예외 처리
-	            throw new RuntimeException("해당 역할에 대한 조회 권한이 없습니다.");
+	            throw new RuntimeException("조회 권한이 없습니다.");
 	        }
 	    };
 

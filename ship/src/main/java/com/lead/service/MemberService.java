@@ -35,8 +35,7 @@ public class MemberService {
         } else {
             System.out.println("Setting role: " + member.getRole());
             
-//            member.setRole(Role.ROLE_USER); // Use Role.ROLE_USER
-            member.setRole(member.getRole()); // Use Role.ROLE_USER
+            member.setRole(member.getRole()); // ROLE 사용자에게 입력받음
             member.setEnabled(true);
             member.setPw(passwordEncoder.encode(member.getPw()));
             memberRepo.save(member);

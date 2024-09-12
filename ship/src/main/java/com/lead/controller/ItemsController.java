@@ -48,14 +48,24 @@ public class ItemsController {
 
 	/////////////////////////////////////////////////////////////////////////////// 조회
 	@GetMapping("/finditem")
-	public ResponseEntity<List<ItemsDTO>> findItems(@RequestParam(required = false) String category1Name,
-			@RequestParam(required = false) String category2Name, @RequestParam(required = false) String category3Name,
-			@RequestParam(required = false) String itemName) {
-
-		List<ItemsDTO> items = itemsService.findItemsByRole(category1Name, category2Name, category3Name, itemName);
-
-		return ResponseEntity.ok(items);
+	public ResponseEntity<?> findItems(@RequestParam(required = false) String category1Name,
+	                                   @RequestParam(required = false) String category2Name,
+	                                   @RequestParam(required = false) String category3Name,
+	                                   @RequestParam(required = false) String itemName) {
+	    try {
+	        // 역할에 따라 아이템 조회
+	        List<ItemsDTO> items = itemsService.findItemsByRole(category1Name, category2Name, category3Name, itemName);
+	        
+	        System.out.println("===========================물품 조회 한다");
+	        // 정상적으로 조회된 경우 목록 반환
+	        return ResponseEntity.ok(items);
+	        
+	    } catch (RuntimeException e) {
+	        // 예외가 발생한 경우, 오류 메시지를 사용자에게 반환
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류 발생: " + e.getMessage());
+	    }
 	}
+
 
 	/////////////////////////////////////////////////////////////////////////////// 등록
 //	@PostMapping("/supplier/items")
@@ -78,9 +88,12 @@ public class ItemsController {
         
 		try {
 			itemsService.updateItem(itemId, itemsDTO, username);
+			
+			System.out.println("===========================물품정보 수정 한다");
+			
 			return ResponseEntity.ok("물품이 성공적으로 수정되었습니다.");
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("물품 수정에 실패했습니다.");
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류 발생: " + e.getMessage());
 		}
 	}
 
@@ -95,6 +108,7 @@ public class ItemsController {
 			LocalDate releaseDateLocal = LocalDate.parse(releaseDate);
 
 			System.out.println("===========================물품 추천 한다");
+			
 			List<ItemRecommendDTO> recommendations = itemRecommendService.getRecommendedItems(selectedItemId,
 					releaseDateLocal);
 

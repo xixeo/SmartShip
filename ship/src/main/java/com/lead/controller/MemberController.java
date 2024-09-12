@@ -20,10 +20,18 @@ public class MemberController {
 	private final MemberService memService; 
 	
 	@PostMapping("/signup")
-	public String joinMembers(@RequestBody Member member) {
-		System.out.println("===========================회원가입 한다");
-		return memService.joinMembers(member); 
+	public ResponseEntity<String> joinMembers(@RequestBody Member member) {
+	    try {
+	        System.out.println("===========================회원가입 한다");
+	        String result = memService.joinMembers(member); // 회원가입 로직 처리
+	        return ResponseEntity.ok(result); // 성공 메시지 반환
+
+	    } catch (RuntimeException e) {
+	        // 예외 발생 시 오류 메시지 반환
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원가입 중 오류 발생: " + e.getMessage());
+	    }
 	}
+
 	
 	@PostMapping("/unsub")
 	public ResponseEntity<String> unsubMember() {
@@ -33,6 +41,7 @@ public class MemberController {
 
         try {
         	memService.unsubMember(username);
+        	System.out.println("===========================회원탈퇴 한다");
             return ResponseEntity.ok("회원탈퇴가 완료되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
