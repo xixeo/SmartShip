@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox,
   Button, Paper, TextField, InputAdornment, Select, MenuItem, Box, FormControlLabel,
-  Switch, IconButton
+  Switch, IconButton, FormControl, InputLabel
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Pagination from '@mui/material/Pagination';
@@ -14,32 +14,15 @@ import Modal from '../Compo/Modal';
 
 // 테이블 헤더 정의
 const headCells = [
+  { id: 'no', label: 'No.', width: '5%' },
   { id: 'category1Name', label: 'Category 1', width: '13%' },
   { id: 'category2Name', label: 'Category 2', width: '13%' },
   { id: 'category3Name', label: 'Category 3', width: '13%' },
   { id: 'itemName', label: '물품명', width: '13%' },
-  { id: 'quantity', label: '수량', width: '10%' },
-  { id: 'totalPrice', label: '총 가격', width: '10%' },
-  { id: 'supplierName', label: '판매자', width: '13%' },
-  { id: 'leadtime', label: '리드타임', width: '10%' },
+  { id: 'totalPrice', label: '가격', width: '12%' },
+  { id: 'supplierName', label: '화폐단위', width: '12%' },
+  { id: 'saleStatus', label: '판매여부', width: '14%' },
 ];
-
-// null값 처리 & 가격 단위 구분 함수
-const formatCellValue = (value, unit) => {
-  if (value == null || value === '') {
-    return '-';
-  }
-  if (unit) {
-    switch (unit) {
-      case 'USD': return `$ ${value}`;
-      case 'KRW': return `₩ ${value}`;
-      case 'EUR': return `€ ${value}`;
-      case 'JPY': return `¥ ${value}`;
-      default: return value;
-    }
-  }
-  return value;
-};
 
 // 테이블 헤더 컴포넌트
 function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, allRowsSelected }) {
@@ -74,7 +57,7 @@ function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, allRowsSel
 }
 
 // 메인 테이블 컴포넌트
-function ListTableDB() {
+function ListSupplier() {
   const navigate = useNavigate();
   const [initialRows, setInitialRows] = useState([]);
   const [rows, setRows] = useState([]);
@@ -85,15 +68,14 @@ function ListTableDB() {
   const [category1Name, setCategoryName] = useState('');
   const [category2Name, setCategory2Name] = useState('');
   const [category3Name, setCategory3Name] = useState('');
-  const [modalOpen, setModalOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // 장바구니로 이동 물어보기 모달상태
-  const [leadTimeModalOpen, setLeadTimeModalOpen] = useState(false);
-  const [selectedLeadTimeData, setSelectedLeadTimeData] = useState([]);
   const [showSelected, setShowSelected] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState({}); // 선택된 공급업체 상태
+  const [saleStatus, setSaleStatus] = useState({}); // 판매여부 상태를 관리할 객체
+  const currencyDisplayNames = { USD: '달러', EUR: '유로', JPY: '엔화', KRW: '원화' };
 
    // 사용자 이름을 로컬 스토리지에서 가져옴
    const username = localStorage.getItem('username') || 'Guest';
+   const alias = localStorage.getItem('alias') || 'Guest';
    const token = localStorage.getItem('token');
 
    const generateKey = (row) => {
@@ -104,41 +86,49 @@ function ListTableDB() {
     const data = jsonData.finditem.map(item => ({
       ...item,
       quantity: 1,
-      leadtime: 1
+      leadtime: 1,
+      saleStatus: 'In Stock' // 기본 판매여부를 판매중으로 설정
     }));
     setInitialRows(data);
     setRows(data);
   }, []);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await fetch('/finditem',
-  //       {
-  //       headers: {
-  //         'Authorization': `Bearer ${token}`,
-  //       }
-  //       }
-  //       );
-  //       if (!response.ok) {
-  //         throw new Error('Network response was not ok');
-  //       }
-  //       const data = await response.json();
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         const response = await fetch('/finditem',
+//         {
+//         headers: {
+//           'Authorization': `Bearer ${token}`,
+//         }
+//         }
+//         );
+//         if (!response.ok) {
+//           throw new Error('Network response was not ok');
+//         }
+//         const data = await response.json();
       
-  //       const processedData = data.map(item => ({
-  //         ...item,
-  //         quantity: 1,
-  //         leadtime: 1
-  //       }));
-  //       setInitialRows(processedData);
-  //       setRows(processedData);
-  //     } catch (error) {
-  //       console.error('데이터 로딩 중 오류 발생:', error);
-  //     }
-  //   };
+//         // 사용자의 역할 확인
+//         const userRole = localStorage.getItem('role'); // 역할이 로컬 스토리지에 저장되어 있다고 가정
+//         const filteredData = userRole === 'ROLE_SUPPLIER'
+//             ? data.filter(item => item.supplierName === username) // 공급업체 역할일 경우 필터링
+//             : data;
+
+//         const processedData = filteredData.map(item => ({
+//             ...item,
+//             quantity: 1,
+//             leadtime: 1
+//         }));
+    
+//       setInitialRows(processedData);
+//       setRows(processedData);
+//     } catch (error) {
+//       console.error('데이터 로딩 중 오류 발생:', error);
+//     }
+//   };
   
-  //   fetchData();
-  // }, []);
+//     fetchData();
+// }, [username, token]);
 
   const category1Options = [...new Set(rows.map((row) => row.category1Name))];
   
@@ -155,11 +145,10 @@ function ListTableDB() {
       const matchesCategory1 = category1Name ? row.category1Name === category1Name : true;
       const matchesCategory2 = category2Name ? row.category2Name === category2Name : true;
       const matchesCategory3 = category3Name ? row.category3Name === category3Name : true;
-      const matchesSearchQuery = searchQuery ?
-        row.itemName.toLowerCase().includes(searchQuery.toLowerCase()) : true;
-      return matchesCategory1 && matchesCategory2 && matchesCategory3 && matchesSearchQuery;
-    });
-  }, [rows, category1Name, category2Name, category3Name, searchQuery, showSelected]);
+      const matchesSearchQuery = searchQuery ? row.itemName.toLowerCase().includes(searchQuery.toLowerCase()) : true;
+    return matchesCategory1 && matchesCategory2 && matchesCategory3 && matchesSearchQuery;
+  });
+}, [rows, category1Name, category2Name, category3Name, searchQuery, showSelected]);
 
   const filteredRowsBySelection = useMemo(() => {
     return showSelected ? filteredRows.filter(row => selected.has(row.itemId)) : filteredRows;
@@ -254,8 +243,6 @@ function ListTableDB() {
     return uniqueRows.length > 0 && uniqueRows.every(row => selected.has(row.itemId));
   }, [uniqueRows, selected]);
 
-  const openModal = () => setModalOpen(true);
-
   const handleSearchReset = () => {
     setSearchQuery('');
     setRows(initialRows);
@@ -285,48 +272,41 @@ function ListTableDB() {
     ) || {};
   };
 
-  // 로그인한 사용자별 장바구니 추가 함수
-  const handleAddToCart = async () => {
-    console.log('장바구니 담기 버튼 클릭됨');
-    const cartItems = uniqueRows
-      .filter(row => selected.has(row.itemId))
-      .map(row => ({
-        itemsId: row.itemId,
-        quantity: row.quantity
-      }));
-
-    console.log('전송할 장바구니 아이템:', cartItems);
-
-    try {
-      const response = await fetch('/goCart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(cartItems),
-      });
-
-      if (response.ok) {
-        console.log('장바구니 추가 성공');
-        setIsModalOpen(true);
-      } else {
-        console.error('장바구니 추가 실패:', response.statusText);
-      }
-    } catch (error) {
-      console.error('장바구니 추가 중 오류 발생:', error);
-    }
+  const handleItemNameChange = (itemId, event) => {
+    const newItemName = event.target.value;
+    setRows(rows.map(row =>
+      row.itemId === itemId ? { ...row, itemName: newItemName } : row
+    ));
+  };
+  
+  const handlePriceChange = (itemId, event) => {
+    const newPrice = parseFloat(event.target.value) || 0;
+    setRows(rows.map(row =>
+      row.itemId === itemId ? { ...row, totalPrice: newPrice } : row
+    ));
+  };
+  
+  const handleCurrencyChange = (itemId, event) => {
+    const newCurrency = event.target.value;
+    setRows(rows.map(row =>
+      row.itemId === itemId ? { ...row, currency: newCurrency } : row
+    ));
   };
 
-  // 모달의 '장바구니로 이동' 버튼 클릭 시 동작
-  const handleNavigateToCart = () => {
-    setIsModalOpen(false);
-    navigate('/order');
+  const handleSaleStatusChange = (itemId, event) => {
+    const newSaleStatus = event.target.checked ? 'In Stock' : 'Out of Stock';
+    setRows(rows.map(row =>
+      row.itemId === itemId ? { ...row, saleStatus: newSaleStatus } : row
+    ));
   };
+
+  const isItemSelected = (itemId) => selected.has(itemId);
+
+  const currencyOptions = ['USD', 'EUR', 'JPY', 'KRW'];
 
   return (
     <div className="list-table-root flex flex-col p-6">
-      <div className="text-xl font-semibold text-white mb-4">물품 리스트</div>
+      <div className="text-xl font-semibold text-white mb-4">{`[ ${alias} ] 물품 관리`}</div>
       <div className="flex items-center justify-between gap-4 mb-4">
         <div className="flex items-center gap-4">
           <Select
@@ -395,6 +375,7 @@ function ListTableDB() {
             className="custom-toggle"
           />
         </div>
+        <div className='flex space-x-3'>
         <Button
           onClick={handleSearchButtonClick}
           variant="contained"
@@ -402,6 +383,28 @@ function ListTableDB() {
         >
           검색
         </Button>
+        <Button
+        //   onClick={handleSearchButtonClick}
+          variant="contained"
+          className="bluebutton"
+        >
+          등록
+        </Button>
+        <Button
+        //   onClick={handleSearchButtonClick}
+          variant="contained"
+          className="bluebutton"
+        >
+          삭제
+        </Button>
+        <Button
+        //   onClick={handleSearchButtonClick}
+          variant="contained"
+          className="bluebutton"
+        >
+          저장
+        </Button>
+        </div>
       </div>
 
       <div className="bg-custom">
@@ -414,104 +417,118 @@ function ListTableDB() {
               allRowsSelected={allRowsSelected}
             />
             <TableBody>
-              {uniqueRows.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row) => (
+            {uniqueRows.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row, index) => (
                 <TableRow
-                key={generateKey(row)}
                 hover
-                selected={selected.has(row.itemId)}
-              >
-                <TableCell padding="checkbox" style={{ width: '5%' }}>
-                  <Checkbox
-                    checked={selected.has(row.itemId)}
-                    inputProps={{ 'aria-labelledby': row.itemId }}
-                    onChange={() => handleClick(null, row.itemId)} // 체크박스를 클릭할 때만 처리
-                  />
+                role="checkbox"
+                aria-checked={isItemSelected(row.itemId)}
+                tabIndex={-1}
+                key={row.itemId}
+                selected={isItemSelected(row.itemId)}
+                >
+                <TableCell padding="checkbox">
+                    <Checkbox
+                    color="default"
+                    checked={isItemSelected(row.itemId)}
+                    onChange={(event) => handleClick(event, row.itemId)}
+                    />
                 </TableCell>
-                  <TableCell align="center" className="item-cell">{formatCellValue(row.category1Name)}</TableCell>
-                  <TableCell align="center" className="item-cell">{formatCellValue(row.category2Name)}</TableCell>
-                  <TableCell align="center" className="item-cell">{formatCellValue(row.category3Name)}</TableCell>
-                  <TableCell align="center" className="item-cell">{formatCellValue(row.itemName)}</TableCell>
-                  <TableCell align="center" className="item-cell">
+                <TableCell align="center" className="item-cell">{(page - 1) * rowsPerPage + index + 1}</TableCell>
+                <TableCell>
+                        {/* Category 1 드롭다운 */}
+                        <FormControl fullWidth>
+                            <InputLabel>카테고리 1</InputLabel>
+                            <Select
+                                className="select-supplier"
+                                value={category1Name}
+                                onChange={(e) => setCategoryName(e.target.value)}
+                            >
+                                {category1Options.map((option) => (
+                                    <MenuItem key={option} value={option}>
+                                        {option}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                </TableCell>
+                <TableCell>
+                        {/* Category 2 드롭다운 */}
+                        <FormControl fullWidth>
+                            <InputLabel>카테고리 2</InputLabel>
+                            <Select
+                                className="select-supplier"
+                                value={category2Name}
+                                onChange={(e) => setCategory2Name(e.target.value)}
+                                disabled={!category1Name}
+                            >
+                                {category2Options.map((option) => (
+                                    <MenuItem key={option} value={option}>
+                                        {option}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                </TableCell>
+                <TableCell>
+                        {/* Category 3 드롭다운 */}
+                        <FormControl fullWidth>
+                            <InputLabel>카테고리 3</InputLabel>
+                            <Select
+                                className="select-supplier"
+                                value={category3Name}
+                                onChange={(e) => setCategory3Name(e.target.value)}
+                                disabled={!category2Name}
+                            >
+                                {category3Options.map((option) => (
+                                    <MenuItem key={option} value={option}>
+                                        {option}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </TableCell>
+                <TableCell align="center">
                     <TextField
-                      className="custom-quantity"
-                      type="number"
-                      value={row.quantity}
-                      onChange={(event) => handleQuantityChange(row.itemId, event)}
-                      inputProps={{ min: 1 }}
-                      size="small"
-                      variant="outlined"
+                    className="custom-quantity"
+                    value={row.itemName}
+                    onChange={(event) => handleItemNameChange(row.itemId, event)}
+                    fullWidth
+                    />
+                </TableCell>
+                <TableCell align="center">
+                    <TextField
+                    className="custom-quantity"
+                    type="number"
+                    value={row.totalPrice}
+                    onChange={(event) => handlePriceChange(row.itemId, event)}
+                    InputProps={{
+                        startAdornment: <InputAdornment position="start">₩</InputAdornment>,
+                    }}
+                    fullWidth
+                    />
+                </TableCell>
+                <TableCell align="center">
+                <Select
+                    className="select-supplier"
+                    value={row.currency}
+                    onChange={(event) => handleCurrencyChange(row.itemId, event)}
+                    fullWidth
+                >
+                    {Object.entries(currencyDisplayNames).map(([code, displayName]) => (
+                    <MenuItem key={code} value={code}>
+                        {displayName}
+                    </MenuItem>
+                    ))}
+                </Select>
+                </TableCell>
+                <TableCell align="center">
+                    <Switch
+                      checked={row.saleStatus === 'In Stock'}
+                      onChange={(event) => handleSaleStatusChange(row.itemId, event)}
                     />
                   </TableCell>
-                  {/* 공급업체에 대한 가격 */}
-                  <TableCell 
-                    align="center" 
-                    className={`price-cell ${!selectedSupplier[row.itemId] ? 'price-cell-no-price' : ''}`}
-                  >
-                    {(() => {
-                      // 현재 선택된 공급업체의 데이터 찾기
-                      const supplierName = selectedSupplier[row.itemId];
-                      const data = rows.find(r =>
-                        r.category1Name === row.category1Name &&
-                        r.category2Name === row.category2Name &&
-                        r.category3Name === row.category3Name &&
-                        r.itemName === row.itemName &&
-                        r.supplierName === supplierName
-                      ) || {};
-
-                      // 가격과 단위 설정
-                      const price = data.price || 0; // 데이터에서 가격을 찾고, 없으면 0으로 설정
-                      const unit = data.unit || '';
-
-                      // 가격 표시
-                      const displayPrice = supplierName
-                        ? formatCellValue(row.quantity * price, unit) // 공급업체가 선택되면 계산된 가격 표시
-                        : '-'; // 공급업체가 선택되지 않으면 '-' 표시
-
-                      return displayPrice;
-                    })()}
-                  </TableCell>
-                  {/* category1,2,3, itemName이 일치하는 항목에 대한 판매자 목록 */}
-                  <TableCell align="center" className='item-cell'>
-                    <Select
-                      className="select-supplier"
-                      value={selectedSupplier[row.itemId] || ''}
-                      onChange={(event) => handleSupplierChange(row.itemId, event.target.value)}
-                      size="small"
-                    >
-                      {[...new Set(rows
-                        .filter(r =>
-                          r.category1Name === row.category1Name &&
-                          r.category2Name === row.category2Name &&
-                          r.category3Name === row.category3Name &&
-                          r.itemName === row.itemName
-                        )
-                        .map(r => r.supplierName))
-                      ].map((supplierName) => (
-                        <MenuItem 
-                          key={`${row.itemId}-${supplierName}`}
-                          value={supplierName}
-                        >
-                          {supplierName}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </TableCell>
-
-                  <TableCell align="center" style={{ width: '9%' }}>
-                      <Button
-                        onClick={() => (row.leadtime)}
-                        variant="contained"
-                        className="greenbutton"
-                      >
-                        리드타임
-                      </Button>
-                    </TableCell>
                 </TableRow>
-              ))}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 53 * emptyRows }}>
-                </TableRow>
-              )}
+            ))}
             </TableBody>
           </Table>
         </TableContainer>
@@ -540,42 +557,9 @@ function ListTableDB() {
             ))}
           </Select>
         </div>
-        <div className="flex gap-4">
-          {/* 장바구니 담기 버튼 */}
-          <Button
-            className='bluebutton2'
-            onClick={handleAddToCart}>
-            장바구니 담기
-          </Button>
-
-          {/* 모달 컴포넌트 */}
-          <Modal
-            open={isModalOpen}
-            setOpen={setIsModalOpen}
-            title="장바구니 추가 성공"
-            footer={
-              <div>
-                <button onClick={handleNavigateToCart} className="bg-blue-500 text-white px-4 py-2 rounded mr-2">
-                  장바구니로 이동
-                </button>
-                <button onClick={() => setIsModalOpen(false)} className="bg-gray-400 text-white px-4 py-2 rounded">
-                  닫기
-                </button>
-              </div>
-            }
-          >
-            장바구니에 아이템이 추가되었습니다. 장바구니로 이동하시겠습니까?
-          </Modal>
-        </div>
       </div>
-      {/* 리드타임 모달 */}
-      {/* <LeadTimeModal
-        open={leadTimeModalOpen}
-        setOpen={setLeadTimeModalOpen}
-        leadTimeData={selectedLeadTimeData} // 선택된 리드타임 데이터 전달
-      /> */}
     </div>
   );
 }
 
-export default ListTableDB;
+export default ListSupplier;
