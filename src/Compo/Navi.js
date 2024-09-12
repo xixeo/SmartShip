@@ -31,7 +31,7 @@ const Navi = () => {
           {!isCollapsed && <span>선용품 리스트</span>}
           {!isCollapsed && <FaChevronRight className="right-arrow" />}
         </li>
-        <li className="menu-item" onClick={() => navigate('/listtablesupplier')}>
+        <li className="menu-item" onClick={() => navigate('/listsupplier')}>
           <FaBox className="icon" />
           {!isCollapsed && <span>판매물품 리스트</span>}
           {!isCollapsed && <FaChevronRight className="right-arrow" />}

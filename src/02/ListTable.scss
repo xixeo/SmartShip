@@ -279,18 +279,21 @@
       color: #ffffff;
     }
   
-    .MuiSwitch-switchBase {
-      color: #b0b0b0; 
-      &.Mui-checked {
-        color: #b0b0b0; 
-      }
-    }
-  
     .MuiSwitch-track {
       background-color: #d0d0d0; 
     }
 
     margin-left: 16px;
+  }
+
+  .select-supplier, .custom-quantity {
+    width: 100%; /* 부모 요소에 맞게 너비를 조절 */
+  }
+
+  .supplier-toggle {
+    .MuiSwitch-track {
+      background-color: #d0d0d0; 
+    }
   }
 
   .select-supplier, .custom-quantity {
