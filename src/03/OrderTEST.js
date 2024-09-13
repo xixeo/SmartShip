@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Table, TableBody, TableHead, TableRow, TableCell } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -13,6 +15,9 @@ import BasicDatePicker from './BasicDatePicker';
 import dayjs from 'dayjs';
 import Modal from '@mui/material/Modal'
 
+//////////////////////
+//    확장 아이콘    //
+//////////////////////
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
@@ -24,9 +29,9 @@ const ExpandMore = styled((props) => {
   transform: (props) => (props.expand ? 'rotate(180deg)' : 'rotate(0deg)'),
 }));
 
-////////////////////////
-// 데이터처리 관련 함수//
-///////////////////////
+//////////////////////
+//   데이터 처리1    //
+//////////////////////
 const groupByUsername = (orderDetails) => {
   return orderDetails.reduce((groups, detail) => {
     const { username } = detail;
@@ -186,42 +191,42 @@ export default function OrderTest() {
     // ];
     try {
       const response = await fetch(`getCart/${selectedDate}`,
-      {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      }
-      }
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        }
       );
-      if(!response.ok) {
+      if (!response.ok) {
         throw new Error('orderbasket response was not ok');
       };
       const orderbasket = await response.json();
-       // 응답이 객체인지 확인하고 cartItem이 정의되어 있는지 확인
-    if (orderbasket && orderbasket.cartItem) {
-      const basket = {
-        orderId: orderbasket.cartItem.cartId,
-        createdAt: orderbasket.cartItem.createdAt,
-        orderDetails: orderbasket.cartItem.cartItems,
-      };
-      const lists = Addbestdate([basket], selectedDate);
-      setListdatas(lists);
-    }
+      // 응답이 객체인지 확인하고 cartItem이 정의되어 있는지 확인
+      if (orderbasket && orderbasket.cartItem) {
+        const basket = {
+          orderId: orderbasket.cartItem.cartId,
+          createdAt: orderbasket.cartItem.createdAt,
+          orderDetails: orderbasket.cartItem.cartItems,
+        };
+        const lists = Addbestdate([basket], selectedDate);
+        setListdatas(lists);
+      }
     } catch (error) {
       console.error('Failed to fetch orderbasket:', error);
     }
   };
 
   //////////////////////
-  // 받아온 데이터 처리//
-  /////////////////////
+  //   데이터  처리2   //
+  //////////////////////
 
   const orderDetails = listdatas[0]?.orderDetails || [];
   const groupedData = groupByUsername(orderDetails);
   // const isBeforeToday = groupedData[username].map((detail) => {dayjs(detail.bestOrderDate).isBefore(dayjs(), 'day')});
 
   //////////////////////
-  // 날짜선택 관련 함수//
-  /////////////////////
+  //  날짜 관련 함수   //
+  //////////////////////
 
   useEffect(() => {
     fetchorderlist(selectedDate.format('YYYY-MM-DD'));
@@ -238,8 +243,8 @@ export default function OrderTest() {
   }, []);
 
   //////////////////////
-  // 카드확장 관련 함수//
-  /////////////////////
+  //  카드 확장 함수   //
+  //////////////////////
 
   const handleExpandClick = (username) => () => {
     setExpanded({
@@ -249,8 +254,8 @@ export default function OrderTest() {
   };
 
   //////////////////////
-  // 체크박스 관련 함수//
-  /////////////////////
+  //  체크박스  함수   //
+  //////////////////////
 
   const isSell = () => {
 
@@ -258,7 +263,7 @@ export default function OrderTest() {
 
   // 손자 체크박스 비활성화 관리
   const isCheckboxDisabled = (username, cartItemId) => {
-    const detail = groupedData[username].find((item) => item.cartItemId === cartItemId);
+    const detail = groupedData[username].find((item) => item.cartItemId);
     const today = new Date();
     return new Date(detail.bestOrderDate) < today;  // 비활성화 조건
   };
@@ -342,43 +347,37 @@ export default function OrderTest() {
 
   // 부모 체크박스 상태 업데이트
   const updateParentCheckState = (newCheckedChildren) => {
+    // 모든 자식 체크박스가 선택되었는지 확인
     const allChildrenChecked = Object.keys(groupedData).every((username) => {
-      const childrenChecked = newCheckedChildren[username];
-      return !childrenChecked || groupedData[username].every((detail) => isCheckboxDisabled(username, detail.cartItemId) || checkedGrandchildren[`${username}-${detail.cartItemId}`]);
+      // 각 username에 해당하는 모든 손자 체크박스가 선택되었는지 확인
+      const allGrandchildrenChecked = groupedData[username].every((detail) => {
+        const key = `${username}-${detail.cartItemId}`;
+        // 손자 체크박스가 비활성화되었거나 선택된 경우만 true
+        return isCheckboxDisabled(username, detail.cartItemId) || checkedGrandchildren[key];
+      });
+      
+      // 자식 체크박스가 선택된 상태이고, 모든 손자 체크박스가 선택되었는지 확인
+      const check = !newCheckedChildren[username] ? newCheckedChildren[username] && allGrandchildrenChecked : newCheckedChildren[username] || allGrandchildrenChecked;
+      // console.log('check',check);
+      return check;
     });
+    
+    // console.log('모든 자식 체크박스 선택됨?', allChildrenChecked);/
+    
+    // 부모 체크박스 상태를 업데이트
     setCheckedParent(allChildrenChecked);
   };
 
-  ///////////////////////
-  // 체크박스 선택된 함수//
-  //////////////////////
-
-  // 체크된 항목의 아이디 추출
-  const getcheckedItemIds = () => {
-    return Object.keys(groupedData).flatMap((username) => {
-      return groupedData[username]
-        .filter((item) => checkedGrandchildren[`${username}-${item.cartItemId}`] || false)
-        .map((item) => ({
-          itemsId : item.itemsId,
-        }));
-    });
-  }
-
-  // 체크된 항목의 아이디와 수량을 추출
-  const getCheckedItemsWithQuantity = () => {
-    return Object.keys(groupedData).flatMap((username) => {
-      return groupedData[username]
-        .filter((item) => checkedGrandchildren[`${username}-${item.cartItemId}`] || false)
-        .map((item) => ({
-          itemsId: item.itemsId,
-          quantity: item.quantity,
-        }));
-    });
-  };
+  useEffect(() => {
+    // 자식 체크박스 상태를 기반으로 부모 체크박스 상태를 업데이트
+    updateParentCheckState(checkedChildren);
+    console.log('useEffect - 부모 체크박스 상태 업데이트:', checkedChildren);
+  }, [checkedGrandchildren, groupedData, checkedChildren]); // 의존성 배열에 필요한 변수 추가
+  
 
   //////////////////////
-  // 리드타임 관련 함수//
-  /////////////////////
+  //  리드타임  함수   //
+  //////////////////////
 
   const getLongestCheckedLeadTime = (username) => {
     const data = groupedData[username] || [];
@@ -396,8 +395,8 @@ export default function OrderTest() {
 
 
   //////////////////////
-  // 통화단위 관련 함수//
-  /////////////////////
+  //  통화 단위 함수   //
+  //////////////////////
 
   // 통화 기호를 반환하는 헬퍼 함수
   const getCurrencySymbol = (currencyCode) => {
@@ -421,6 +420,7 @@ export default function OrderTest() {
       default: return totalPrice.toLocaleString();
     }
   };
+
   // 카드안에서 총합계
   const getFormattedCardTotal = (username) => {
     const data = groupedData[username] || [];
@@ -465,9 +465,47 @@ export default function OrderTest() {
   const totals = calculateTotalByCurrency();
 
   //////////////////////
-  // 버튼모달 관련 함수//
-  /////////////////////
+  //  정보 추출 함수   //
+  //////////////////////
 
+  // 선택한 항목의 아이디 추출 
+  const getItemIds = (cartItemId) => {
+    return Object.keys(groupedData).flatMap((username) => {
+      // 각 username 그룹에서 해당 cartItemId를 가진 항목을 필터링하여 추출
+      return groupedData[username]
+        .filter((detail) => detail.cartItemId === cartItemId)
+        .map((detail) => detail.itemsId);
+    });
+  };
+
+  // 체크된 항목의 아이디 추출
+  const getcheckedItemIds = () => {
+    return Object.keys(groupedData).flatMap((username) => {
+      return groupedData[username]
+        .filter((item) => checkedGrandchildren[`${username}-${item.cartItemId}`] || false)
+        .map((item) => ({
+          itemsId: item.itemsId,
+        }));
+    });
+  };
+
+  // 체크된 항목의 아이디와 수량을 추출
+  const getCheckedItemsWithQuantity = () => {
+    return Object.keys(groupedData).flatMap((username) => {
+      return groupedData[username]
+        .filter((item) => checkedGrandchildren[`${username}-${item.cartItemId}`] || false)
+        .map((item) => ({
+          itemsId: item.itemsId,
+          quantity: item.quantity,
+        }));
+    });
+  };
+
+  //////////////////////
+  //  버튼 관련 함수   //
+  //////////////////////
+
+  // 삭제버튼 - 체크한 행 itemsid
   const handleDelete = async () => {
     // 손자 체크박스에서 체크된 아이템 필터링
     const checkedItemIds = getcheckedItemIds();
@@ -478,26 +516,53 @@ export default function OrderTest() {
 
     try {
       const response = await fetch(`delItem`,
-      {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(itemsId),
-      }
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(itemsId),
+        }
       );
-      if(!response.ok) {
+      if (!response.ok) {
         throw new Error('orderbasket delete item response was not ok');
       };
       setDeleteOpen(false);
-      
+      window.location.reload();
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handlePerchase = async () => {
+  // 행삭제버튼 - 선택한 행 itemsid
+  const handledeleteitem = async (cartItemId) => {
+    //선택한 행들 아이템 아이디 뽑아야함
+    const selectitemsid = getItemIds(cartItemId);
+    console.log('selectitemid', selectitemsid);
+
+    try {
+      const response = await fetch(`delItem`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(selectitemsid),
+        }
+      );
+      if (!response.ok) {
+        throw new Error('orderbasket delete item response was not ok');
+      };
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // 구매버튼
+  const handlePerchase = async (selectedDate) => {
 
     const checkitemidandquantity = getCheckedItemsWithQuantity();
 
@@ -505,16 +570,16 @@ export default function OrderTest() {
 
     try {
       const response = await fetch(`saveToOrder/${selectedDate}`,
-      {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(checkitemidandquantity),
-      }
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(checkitemidandquantity),
+        }
       );
-      if(!response.ok) {
+      if (!response.ok) {
         throw new Error('orderbasket perchase item response was not ok');
       };
       setPerchasOpen(false);
@@ -523,11 +588,13 @@ export default function OrderTest() {
     }
   };
 
-
   return (
     <div className="flex-col text-white OrderBasket">
       <div className="bg-[#2F2E38] m-5 p-5 rounded-lg">
-        <BasicDatePicker onDateAccept={(date) => setSelectedDate(date)} />
+        <div className='flex m-2'>
+          <h4 className='m-2'>창고 출고 예정일 </h4>
+          <BasicDatePicker onDateAccept={(date) => setSelectedDate(date)} />
+        </div>
         <div className='flex justify-between m-2 p-2'>
           <FormControlLabel
             label="전체 선택"
@@ -540,7 +607,7 @@ export default function OrderTest() {
             }
           />
           <Button className='bluebutton' onClick={() => setDeleteOpen(true)} >삭제</Button>
-          <Modal open={deleteopen} setOpen={setDeleteOpen}>
+          <Modal open={deleteopen} setOpen={() => setDeleteOpen}>
             <Box
               className="modalContent"
               sx={{
@@ -627,13 +694,14 @@ export default function OrderTest() {
                       <TableCell align="center">Price</TableCell>
                       <TableCell align="center">BestOrderDate</TableCell>
                       <TableCell align="center">PastLeadtime</TableCell>
+                      <TableCell padding='checkbox' align="center"></TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {groupedData[username].map((detail) => {
                       return (
                         // <TableRow key={detail.cartItemId}  className={dayjs(detail.bestOrderDate).isBefore(dayjs(), 'day') ? 'activerow' : 'normalrow'}>
-                        <TableRow key={detail.cartItemId} className={new Date(detail.bestOrderDate) < dayjs() ? 'activerow' : 'normalrow'}>
+                        <TableRow key={detail.cartItemId} className={new Date(detail.bestOrderDate) <= dayjs() ? 'activerow' : 'normalrow'}>
                           <TableCell padding='checkbox' sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>
                             <Checkbox
                               checked={checkedGrandchildren[`${username}-${detail.cartItemId}`] || false}
@@ -652,6 +720,8 @@ export default function OrderTest() {
                           </TableCell>
                           <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.bestOrderDate}</TableCell>
                           <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.itemsId}</TableCell>
+                          {/* <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}><IconButton onClick={()=>handledeleteitem(detail.cartItemId)} size='small' sx={{ color: 'white' }}><DeleteIcon fontSize="inherit" /></IconButton></TableCell> */}
+                          <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}><IconButton onClick={() => handledeleteitem(detail.cartItemId)} size='small' sx={{ color: 'white' }}><ClearOutlinedIcon fontSize="inherit" /></IconButton></TableCell>
                         </TableRow>
                       );
                     })}
@@ -683,7 +753,7 @@ export default function OrderTest() {
             </div>
           </div>
           <Button className='bluebutton2' onClick={() => setPerchasOpen(true)}>구매신청</Button>
-          <Modal open={perchasopen} setOpen={setPerchasOpen}>
+          <Modal open={perchasopen} setOpen={() => setPerchasOpen}>
             <Box
               className="modalContent"
               sx={{
