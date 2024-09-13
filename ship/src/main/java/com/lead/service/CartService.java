@@ -116,8 +116,9 @@ public class CartService {
 					.orElseThrow(() -> new RuntimeException("리드타임 정보가 없습니다."));
 			return releaseDate.minusDays(leadtime.getLeadtime());
 		}).min(LocalDate::compareTo) // 가장 늦은 bestOrderDate 반환
-				.orElse(releaseDate);
+				.orElse(releaseDate);		
 	}
+
 
 	/////////////////////////////////////////////////////////////////////////////////// 장바구니
 	/////////////////////////////////////////////////////////////////////////////////// 추가
@@ -203,32 +204,43 @@ public class CartService {
 	/////////////////////////////////////////////////////////////////////////////////// 저장
 	  @Transactional
 	  public OrdersDTO saveCartItemsToOrder(List<CartItemDTO> cartItems, LocalDate releaseDate) {
-		  
-		  // JWT 토큰에서 사용자 정보 추출 (SecurityContextHolder)
-		    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		    String username = authentication.getName(); // 토큰에서 username 추출
-		    
+	      // JWT 토큰에서 사용자 정보 추출
+	      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	      String username = authentication.getName(); // 토큰에서 username 추출
+	      
 	      // 사용자 정보 확인
 	      Member member = memberRepo.findByUsername(username)
-	              .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
-	
+	          .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
+
 	      // 주문 정보 생성
 	      Orders order = new Orders();
 	      order.setMember(member);
 	      order.setReleaseDate(releaseDate);
-	      order.setBestOrderDate(calculateBestOrderDate(cartItems, releaseDate)); // 계산된 bestOrderDate
+
+	      // bestOrderDate 계산
+	      LocalDate bestOrderDate = calculateBestOrderDate(cartItems, releaseDate);
+	      
+	      // 디버깅: 날짜 값 출력
+	      System.out.println("Calculated Best Order Date: " + bestOrderDate);
+	      System.out.println("Provided Release Date: " + releaseDate);
+
+	      // releaseDate와 bestOrderDate 비교
+	      if (releaseDate.isAfter(bestOrderDate)) {
+	          throw new RuntimeException("계산된 주문 최적 날짜가 릴리즈 날짜 이후입니다: " + releaseDate);
+	      }
+
+	      order.setBestOrderDate(bestOrderDate);
 	      order.setOrderDate(LocalDate.now());
-	
 	      Orders savedOrder = ordersRepo.save(order);
-	
+
 	      // OrderDetail 저장 및 장바구니에서 삭제
 	      for (CartItemDTO itemDetail : cartItems) {
 	          List<CartItem> cartItemList = cartItemRepo.findByItem_ItemsIdAndCart_Member_Username(itemDetail.getItemsId(), username);
-	
+
 	          if (cartItemList.isEmpty()) {
 	              throw new RuntimeException("해당 사용자에게 해당 품목이 장바구니에 없습니다: " + itemDetail.getItemsId());
 	          }
-	
+
 	          // OrderDetail 저장 및 장바구니 삭제
 	          for (CartItem cartItem : cartItemList) {
 	              // OrderDetail 저장
@@ -237,13 +249,12 @@ public class CartService {
 	              orderDetail.setItem(cartItem.getItem());
 	              orderDetail.setQuantity(itemDetail.getQuantity()); 
 	              orderDetailRepo.save(orderDetail);
-	              
+
 	              // 구매 횟수 증가
 	              Items item = cartItem.getItem();
-	              item.setPurchaseCount(item.getPurchaseCount() + 1); // 구매 횟수 증가
-	              itemsRepo.save(item); // 변경된 재고 및 구매 횟수 저장
-	
-	
+	              item.setPurchaseCount(item.getPurchaseCount() + 1);
+	              itemsRepo.save(item);
+
 	              // 장바구니에서 삭제
 	              cartItemRepo.delete(cartItem);
 	          }

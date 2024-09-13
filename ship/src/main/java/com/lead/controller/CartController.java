@@ -37,7 +37,7 @@ public class CartController {
 		        return ResponseEntity.ok("성공적으로 저장 되었습니다.");
 		    } catch (Exception e) {
 		    	  e.printStackTrace(); // 에러 로그 출력
-		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("저장 되지 않았습니다.");
+		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("저장 되지 않았습니다." + e.getMessage());
 		    }
 	}
 
@@ -57,7 +57,7 @@ public class CartController {
 	        return ResponseEntity.ok(response);
 	    } catch (Exception e) {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                .body("장바구니 내역을 조회하지 못했습니다.");
+	                .body("장바구니 내역을 조회하지 못했습니다." + e.getMessage());
 	    }
 	}
 
@@ -86,7 +86,7 @@ public class CartController {
 			return ResponseEntity.ok("주문이 성공적으로 저장되었습니다.");
 		} catch (Exception e) {
 			System.err.println("주문을 저장하는 중 오류 :" + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("주문을 저장하는 중 오류가 발생했습니다.");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("주문을 저장하는 중 오류가 발생했습니다." + e.getMessage());
 		}
 	}
 
