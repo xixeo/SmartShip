@@ -61,10 +61,12 @@ export default function OrderTest() {
   const [checkedChildren, setCheckedChildren] = useState({}); // 자식 체크박스 상태
   const [checkedGrandchildren, setCheckedGrandchildren] = useState([]); // 손자 체크박스 상태
   const [listdatas, setListdatas] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(() => {
+  const [selectedDate, setSelectedDate] = useState(
+    () => {
     const savedDate = localStorage.getItem('selectedDate');
     return savedDate ? dayjs(savedDate) : dayjs().add(1, 'month');
-  });
+  }
+);
   const [deleteopen, setDeleteOpen] = useState(false);
   const [perchasopen, setPerchasOpen] = useState(false);
 
@@ -76,7 +78,7 @@ export default function OrderTest() {
   //  ==================
 
   const fetchorderlist = async (selectedDate) => {
-    // const orderbasket = [
+     const orderbasket = [
     //   {
     //     "message": "장바구니 내역이 성공적으로 조회되었습니다.",
     //     "cartItem": {
@@ -188,7 +190,7 @@ export default function OrderTest() {
     //       ]
     //     }
     //   }
-    // ];
+     ];
     try {
       const response = await fetch(`getCart/${selectedDate}`,
         {
@@ -237,10 +239,16 @@ export default function OrderTest() {
     localStorage.setItem('selectedDate', selectedDate.format('YYYY-MM-DD'));
   }, [selectedDate]);
 
-  useEffect(() => {
-    // 새로고침 시에 저장된 날짜를 삭제
-    localStorage.removeItem('selectedDate');
-  }, []);
+  // 페이지 새로 고침 시 localStorage의 날짜를 삭제하고 싶지 않은 경우
+useEffect(() => {
+  // const handleBeforeUnload = (e) => {
+  //   e.preventDefault();
+  //   // 페이지 이동 시 localStorage 비우기
+  //   localStorage.removeItem('selectedDate');
+  // };
+  // window.addEventListener('beforeunload', handleBeforeUnload);
+  // return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+}, []);
 
   //////////////////////
   //  카드 확장 함수   //
@@ -316,64 +324,79 @@ export default function OrderTest() {
   };
 
   // 손자 체크박스 상태 관리
-  const handleGrandchildChange = (username, cartItemId) => (event) => {
-    const newChecked = event.target.checked;
-    const newCheckedGrandchildren = { ...checkedGrandchildren, [`${username}-${cartItemId}`]: newChecked };
-    setCheckedGrandchildren(newCheckedGrandchildren);
+const handleGrandchildChange = (username, cartItemId) => (event) => {
+  const newChecked = event.target.checked;
+  const newCheckedGrandchildren = { ...checkedGrandchildren, [`${username}-${cartItemId}`]: newChecked };
+  
+  // 비활성화된 체크박스 상태 업데이트
+  if (isCheckboxDisabled(username, cartItemId)) {
+    newCheckedGrandchildren[`${username}-${cartItemId}`] = false;
+  }
 
-    // Update child and parent checkbox states
-    updateChildCheckState(username, newCheckedGrandchildren);
-  };
+  setCheckedGrandchildren(newCheckedGrandchildren);
+
+  // 자식과 부모 체크박스 상태 업데이트
+  updateChildCheckState(username, newCheckedGrandchildren);
+};
 
   // 자식 체크박스 상태 업데이트
-  const updateChildCheckState = (username, newCheckedGrandchildren) => {
-    const allGrandchildrenDisabled = groupedData[username].every((detail) => isCheckboxDisabled(username, detail.cartItemId));
+const updateChildCheckState = (username, newCheckedGrandchildren) => {
+  const allGrandchildrenDisabled = groupedData[username].every((detail) => isCheckboxDisabled(username, detail.cartItemId));
 
-    const allGrandchildrenChecked = groupedData[username].every((detail) => {
-      const key = `${username}-${detail.cartItemId}`;
-      return isCheckboxDisabled(username, detail.cartItemId) || newCheckedGrandchildren[key];
-    });
+  const allGrandchildrenChecked = groupedData[username].every((detail) => {
+    const key = `${username}-${detail.cartItemId}`;
+    return isCheckboxDisabled(username, detail.cartItemId) || newCheckedGrandchildren[key];
+  });
 
-    const newCheckedChildren = {
-      ...checkedChildren,
-      [username]: allGrandchildrenChecked && !allGrandchildrenDisabled,
-    };
-
-    setCheckedChildren(newCheckedChildren);
-
-    // Update parent checkbox state
-    updateParentCheckState(newCheckedChildren);
+  const newCheckedChildren = {
+    ...checkedChildren,
+    [username]: allGrandchildrenChecked && !allGrandchildrenDisabled,
   };
+
+  setCheckedChildren(newCheckedChildren);
 
   // 부모 체크박스 상태 업데이트
-  const updateParentCheckState = (newCheckedChildren) => {
-    // 모든 자식 체크박스가 선택되었는지 확인
-    const allChildrenChecked = Object.keys(groupedData).every((username) => {
-      // 각 username에 해당하는 모든 손자 체크박스가 선택되었는지 확인
-      const allGrandchildrenChecked = groupedData[username].every((detail) => {
-        const key = `${username}-${detail.cartItemId}`;
-        // 손자 체크박스가 비활성화되었거나 선택된 경우만 true
-        return isCheckboxDisabled(username, detail.cartItemId) || checkedGrandchildren[key];
-      });
-      
-      // 자식 체크박스가 선택된 상태이고, 모든 손자 체크박스가 선택되었는지 확인
-      const check = !newCheckedChildren[username] ? newCheckedChildren[username] && allGrandchildrenChecked : newCheckedChildren[username] || allGrandchildrenChecked;
-      // console.log('check',check);
-      return check;
+  updateParentCheckState(newCheckedChildren);
+};
+
+// 부모 체크박스 상태 업데이트
+const updateParentCheckState = (newCheckedChildren) => {
+  const allChildrenChecked = Object.keys(groupedData).every((username) => {
+    const allGrandchildrenChecked = groupedData[username].every((detail) => {
+      const key = `${username}-${detail.cartItemId}`;
+      return isCheckboxDisabled(username, detail.cartItemId) || checkedGrandchildren[key];
     });
-    
-    // console.log('모든 자식 체크박스 선택됨?', allChildrenChecked);/
-    
-    // 부모 체크박스 상태를 업데이트
-    setCheckedParent(allChildrenChecked);
+
+    return !newCheckedChildren[username] ? newCheckedChildren[username] && allGrandchildrenChecked : newCheckedChildren[username] || allGrandchildrenChecked;
+  });
+
+  setCheckedParent(allChildrenChecked);
+};
+
+// 자손 & 자식 체크박스 비동기화 감시 후 부모 체크박스 상태 업데이트
+useEffect(() => {
+  const updateCheckboxStates = () => {
+    const newCheckedGrandchildren = { ...checkedGrandchildren };
+    const newCheckedChildren = { ...checkedChildren };
+
+    Object.keys(groupedData).forEach((username) => {
+      const allDetailsDisabled = groupedData[username].every((detail) => isCheckboxDisabled(username, detail.cartItemId));
+      
+      if (allDetailsDisabled) {
+        newCheckedChildren[username] = false;
+        groupedData[username].forEach((detail) => {
+          newCheckedGrandchildren[`${username}-${detail.cartItemId}`] = false;
+        });
+      }
+    });
+
+    setCheckedChildren(newCheckedChildren);
+    setCheckedGrandchildren(newCheckedGrandchildren);
   };
 
-  useEffect(() => {
-    // 자식 체크박스 상태를 기반으로 부모 체크박스 상태를 업데이트
-    updateParentCheckState(checkedChildren);
-    console.log('useEffect - 부모 체크박스 상태 업데이트:', checkedChildren);
-  }, [checkedGrandchildren, groupedData, checkedChildren]); // 의존성 배열에 필요한 변수 추가
-  
+  updateCheckboxStates();
+}, [groupedData, checkedGrandchildren]); // groupedData 또는 checkedGrandchildren 변경 시 실행
+
 
   //////////////////////
   //  리드타임  함수   //

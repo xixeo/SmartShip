@@ -9,8 +9,8 @@ import './BasicDatePicker.css'
 
 export default function BasicDatePicker({ onDateAccept }) {
   const [value, setValue] = React.useState(() => {
-    const today = dayjs();
-    return today.add(1, 'month'); // 현재 날짜에서 한 달 뒤로 설정
+    const savedDate = localStorage.getItem('selectedDate');
+    return savedDate ? dayjs(savedDate) : dayjs().add(1, 'month');
   });
 
   const handleAccept = (newValue) => {
@@ -35,7 +35,8 @@ export default function BasicDatePicker({ onDateAccept }) {
         onAccept={handleAccept} // accept 버튼을 눌렀을 때만 최종 값 업데이트
         closeOnSelect={false} // 날짜 선택 후 달력이 닫히지 않도록 설정
         components={{
-          TextField: TextField,
+          // TextField: (props) => <TextField {...props} />,
+          TextField: <TextField />,
         }}
         slotProps={{
           actionBar: {
