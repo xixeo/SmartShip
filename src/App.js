@@ -10,6 +10,7 @@ import Board from './DashBoard/Board';
 import Schedule from './01/Schedule';
 import ListTableDB from './02/ListTableDB';
 import ListSupplier from './02/ListSupplier';
+import ListSupplier2 from './02/ListSupplier2';
 import Order from './03/Order';
 import OrderTEST from './03/OrderTEST'; 
 import BasicDatePicker from './03/BasicDatePicker'; 
@@ -47,7 +48,8 @@ function App() {
                   <Route path="/" element={<MainApp />} />
                   <Route path="/schedule" element={<Schedule />} />
                   <Route path="/listtabledb" element={<ListTableDB />} />
-                  <Route path="/listsupplier" element={<ListSupplier />} />  
+                  <Route path="/listsupplier" element={<ListSupplier />} /> 
+                  <Route path="/listsupplier2" element={<ListSupplier2 />} />
                   <Route path="/order" element={<Order />}  />
                   <Route path="/ordertest" element={<OrderTEST />} />
                   <Route path="/ordertest2" element={<BasicDatePicker />} />

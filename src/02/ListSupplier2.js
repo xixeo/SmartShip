@@ -1,10 +1,8 @@
-//part1,2 추가
-
 import React, { useState, useMemo, useEffect } from 'react';
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox,
-  Button, Paper, TextField, InputAdornment, Select, MenuItem, FormControlLabel,
-  Switch, IconButton
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox,
+    Button, Paper, TextField, InputAdornment, Select, MenuItem, Box, FormControlLabel,
+    Switch, IconButton, FormControl, InputLabel
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Pagination from '@mui/material/Pagination';
@@ -16,34 +14,17 @@ import Modal from '../Compo/Modal';
 
 // 테이블 헤더 정의
 const headCells = [
-  { id: 'category1Name', label: 'Category 1', width: '10%' },
-  { id: 'category2Name', label: 'Category 2', width: '10%' },
-  { id: 'category3Name', label: 'Category 3', width: '10%' },
+  { id: 'no', label: 'No.', width: '5%' },
+  { id: 'category1Name', label: 'Category 1', width: '13%' },
+  { id: 'category2Name', label: 'Category 2', width: '13%' },
+  { id: 'category3Name', label: 'Category 3', width: '13%' },
+  { id: 'itemName', label: '물품명', width: '10%' },
   { id: 'part1', label: 'part 1', width: '10%' },
   { id: 'part2', label: 'part 2', width: '10%' },
-  { id: 'itemName', label: '물품명', width: '10%' },
-  { id: 'quantity', label: '수량', width: '5%' },
-  { id: 'totalPrice', label: '총 가격', width: '10%' },
-  { id: 'supplierName', label: '판매자', width: '10%' },
-  { id: 'leadtime', label: '리드타임', width: '10%' },
+  { id: 'totalPrice', label: '가격', width: '10%' },
+  { id: 'supplierName', label: '화폐단위', width: '6%' },
+  { id: 'saleStatus', label: '판매여부', width: '5%' },
 ];
-
-// null값 처리 & 가격 단위 구분 함수
-const formatCellValue = (value, unit) => {
-  if (value == null || value === '') {
-    return '-';
-  }
-  if (unit) {
-    switch (unit) {
-      case 'USD': return `$ ${value}`;
-      case 'KRW': return `₩ ${value}`;
-      case 'EUR': return `€ ${value}`;
-      case 'JPY': return `¥ ${value}`;
-      default: return value;
-    }
-  }
-  return value;
-};
 
 // 테이블 헤더 컴포넌트
 function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, allRowsSelected }) {
@@ -89,38 +70,27 @@ function ListTableDB() {
   const [category1Name, setCategoryName] = useState('');
   const [category2Name, setCategory2Name] = useState('');
   const [category3Name, setCategory3Name] = useState('');
+
   const [part1, setPart1] = useState('');
   const [part2, setPart2] = useState('');
-  const [modalOpen, setModalOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // 장바구니로 이동 물어보기 모달상태
-  const [leadTimeModalOpen, setLeadTimeModalOpen] = useState(false);
-  const [selectedLeadTimeData, setSelectedLeadTimeData] = useState([]);
   const [showSelected, setShowSelected] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState({}); // 선택된 공급업체 상태
+  const [saleStatus, setSaleStatus] = useState({}); // 판매여부 상태를 관리할 객체
+  const currencyDisplayNames = { USD: '달러', EUR: '유로', JPY: '엔화', KRW: '원화' };
+
+  // 카테고리 상태 선언
+  const [category1Options, setCategory1Options] = useState([]);
+  const [category2Options, setCategory2Options] = useState([]);
+  const [category3Options, setCategory3Options] = useState([]);
 
    // 사용자 이름을 로컬 스토리지에서 가져옴
    const username = localStorage.getItem('username') || 'Guest';
+   const alias = localStorage.getItem('alias') || 'Guest';
    const token = localStorage.getItem('token');
 
    const generateKey = (row) => {
     return `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.part1}-${row.part2}-${row.itemName}`;
   };
-
-  const getUniqueSuppliers = (row) => {
-  const suppliers = [...new Set(rows
-    .filter(r =>
-      r.category1Name === row.category1Name &&
-      r.category2Name === row.category2Name &&
-      r.category3Name === row.category3Name &&
-      r.part1 === row.part1 &&
-      r.part2 === row.part2 &&
-      r.itemName === row.itemName
-    )
-    .map(r => r.supplierName))
-  ];
-
-  return suppliers;
-};
 
   // useEffect(() => {
   //   const data = jsonData.finditem.map(item => ({
@@ -132,21 +102,20 @@ function ListTableDB() {
   //   setRows(data);
   // }, []);
 
+  // 데이터 로딩
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/finditem',
-        {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        }
-        }
-        );
+        const response = await fetch('/finditem', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-      
+
         const processedData = data.map(item => ({
           ...item,
           quantity: 1,
@@ -158,19 +127,85 @@ function ListTableDB() {
         console.error('데이터 로딩 중 오류 발생:', error);
       }
     };
-  
+
     fetchData();
+  }, [token]);
+
+  // category1Options 데이터 가져오기
+  useEffect(() => {
+    const fetchCategory1Data = async () => {
+      try {
+        const response = await fetch('/category1');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setCategory1Options(data);
+      } catch (error) {
+        console.error('카테고리1 로딩 중 오류 발생:', error);
+      }
+    };
+
+    fetchCategory1Data();
   }, []);
 
-  const category1Options = [...new Set(rows.map((row) => row.category1Name))];
-  
-  const category2Options = useMemo(() => {
-    return [...new Set(rows.filter((row) => row.category1Name === category1Name).map((row) => row.category2Name))];
+  // category2Options 데이터 가져오기
+  useEffect(() => {
+    const fetchCategory2Data = async () => {
+      if (category1Name) {
+        try {
+          const response = await fetch(`/category2?category1Name=${category1Name}`);
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          const data = await response.json();
+          setCategory2Options(data);
+        } catch (error) {
+          console.error('카테고리2 로딩 중 오류 발생:', error);
+        }
+      }
+    };
+
+    fetchCategory2Data();
+  }, [category1Name]);
+
+  // category3Options 데이터 가져오기
+  useEffect(() => {
+    const fetchCategory3Data = async () => {
+      if (category2Name) {
+        try {
+          const response = await fetch(`/category3?category2Name=${category2Name}`);
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          const data = await response.json();
+          setCategory3Options(data);
+        } catch (error) {
+          console.error('카테고리3 로딩 중 오류 발생:', error);
+        }
+      }
+    };
+
+    fetchCategory3Data();
+  }, [category2Name]);
+
+  // category2Options 업데이트
+  const category2OptionsMemo = useMemo(() => {
+    return [...new Set(rows.filter(row => row.category1Name === category1Name).map(row => row.category2Name))];
   }, [category1Name, rows]);
 
-  const category3Options = useMemo(() => {
-    return [...new Set(rows.filter((row) => row.category2Name === category2Name).map((row) => row.category3Name))];
+  useEffect(() => {
+    setCategory2Options(category2OptionsMemo);
+  }, [category2OptionsMemo]);
+
+  // category3Options 업데이트
+  const category3OptionsMemo = useMemo(() => {
+    return [...new Set(rows.filter(row => row.category2Name === category2Name).map(row => row.category3Name))];
   }, [category2Name, rows]);
+
+  useEffect(() => {
+    setCategory3Options(category3OptionsMemo);
+  }, [category3OptionsMemo]);
 
   const filteredRows = useMemo(() => {
     return rows.filter((row) => {
@@ -309,8 +344,6 @@ function ListTableDB() {
     return uniqueRows.length > 0 && uniqueRows.every(row => selected.has(row.itemId));
   }, [uniqueRows, selected]);
 
-  const openModal = () => setModalOpen(true);
-
   const handleSearchReset = () => {
     setSearchQuery('');
     setRows(initialRows);
@@ -319,14 +352,6 @@ function ListTableDB() {
   const handleSearchButtonClick = () => {
     setRows(filteredRows);
     setPage(1);
-  };
-
-  // 공급업체를 선택할 때 현재 선택된 품목의 공급업체를 변경 (같은 itemName이라도 다른 물품이면 다른 supplier 고를 수 있음)
-  const handleSupplierChange = (itemId, supplierName) => {
-    setSelectedSupplier(prev => ({
-      ...prev,
-      [itemId]: supplierName
-    }));
   };
 
   // 공통 데이터 조회 함수
@@ -342,64 +367,27 @@ function ListTableDB() {
     ) || {};
   };
 
-  // 로그인한 사용자별 장바구니 추가 함수
-  const handleAddToCart = async () => {
-    console.log('장바구니 담기 버튼 클릭됨');
-    const cartItems = uniqueRows
-      .filter(row => selected.has(row.itemId))
-      .map(row => ({
-        itemsId: row.itemId,
-        quantity: row.quantity
-      }));
-
-    console.log('전송할 장바구니 아이템:', cartItems);
-
-    try {
-      const response = await fetch('/goCart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(cartItems),
-      });
-
-      if (response.ok) {
-        console.log('장바구니 추가 성공');
-        setIsModalOpen(true);
-      } else {
-        console.error('장바구니 추가 실패:', response.statusText);
-      }
-    } catch (error) {
-      console.error('장바구니 추가 중 오류 발생:', error);
-    }
-  };
-
-  // 모달의 '장바구니로 이동' 버튼 클릭 시 동작
-  const handleNavigateToCart = () => {
-    setIsModalOpen(false);
-    navigate('/order');
-  };
+  const isItemSelected = (itemId) => selected.has(itemId);
 
   return (
     <div className="list-table-root flex flex-col p-6">
-      <div className="text-xl font-semibold text-white mb-4">물품 리스트</div>
+      <div className="text-xl font-semibold text-white mb-4">{`[ ${alias} ] 물품 관리`}</div>
       <div className="flex items-center justify-between gap-4 mb-4">
         <div className="flex items-center gap-4">
           <Select
             value={category1Name}
-            onChange={handleCategory1Change}
+            onChange={(e) => setCategoryName(e.target.value)}
             displayEmpty
             className="select-custom"
           >
             <MenuItem value=""><div>Categories 1</div></MenuItem>
-            {category1Options.map((option) => (
-              <MenuItem key={option} value={option}>{option}</MenuItem>
+            {category1Options.map(option => (
+            <MenuItem key={option} value={option}>{option}</MenuItem>
             ))}
           </Select>
           <Select
             value={category2Name}
-            onChange={handleCategory2Change}
+            onChange={(e) => setCategory2Name(e.target.value)}
             displayEmpty
             className="select-custom"
           >
@@ -410,7 +398,7 @@ function ListTableDB() {
           </Select>
           <Select
             value={category3Name}
-            onChange={handleCategory3Change}
+            onChange={(e) => setCategory3Name(e.target.value)}
             displayEmpty
             className="select-custom"
           >
@@ -446,6 +434,8 @@ function ListTableDB() {
             }}
             className='custom-textfield'
           />
+        </div>
+        <div className='flex space-x-3'>
         <Button
           onClick={handleSearchButtonClick}
           variant="contained"
@@ -453,14 +443,29 @@ function ListTableDB() {
         >
           검색
         </Button>
+        <Button
+        //   onClick={handleSearchButtonClick}
+          variant="contained"
+          className="bluebutton"
+        >
+          등록
+        </Button>
+        <Button
+        //   onClick={handleSearchButtonClick}
+          variant="contained"
+          className="bluebutton"
+        >
+          삭제
+        </Button>
+        <Button
+        //   onClick={handleSearchButtonClick}
+          variant="contained"
+          className="bluebutton"
+        >
+          저장
+        </Button>
         </div>
-          <FormControlLabel
-            control={<Switch checked={showSelected} onChange={() => setShowSelected(!showSelected)} />}
-            label={showSelected ? '선택 품목 보기' : '전체 품목 보기'}
-            className="custom-toggle"
-          />
       </div>
-
       <div className="bg-custom">
         <TableContainer component={Paper} sx={{ minHeight: '400px', width: '100%' }}>
           <Table>
@@ -471,25 +476,29 @@ function ListTableDB() {
               allRowsSelected={allRowsSelected}
             />
             <TableBody>
-              {uniqueRows.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row) => (
+              {uniqueRows.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row, index) => (
                 <TableRow
-                key={generateKey(row)}
                 hover
-                selected={selected.has(row.itemId)}
-              >
-                <TableCell padding="checkbox" style={{ width: '5%' }}>
-                  <Checkbox
-                    checked={selected.has(row.itemId)}
-                    inputProps={{ 'aria-labelledby': row.itemId }}
-                    onChange={() => handleClick(null, row.itemId)} // 체크박스를 클릭할 때만 처리
-                  />
+                role="checkbox"
+                aria-checked={isItemSelected(row.itemId)}
+                tabIndex={-1}
+                key={row.itemId}
+                selected={isItemSelected(row.itemId)}
+                >
+                <TableCell padding="checkbox">
+                    <Checkbox
+                    color="default"
+                    checked={isItemSelected(row.itemId)}
+                    onChange={(event) => handleClick(event, row.itemId)}
+                    />
                 </TableCell>
-                  <TableCell align="center" className="item-cell">{formatCellValue(row.category1Name)}</TableCell>
-                  <TableCell align="center" className="item-cell">{formatCellValue(row.category2Name)}</TableCell>
-                  <TableCell align="center" className="item-cell">{formatCellValue(row.category3Name)}</TableCell>
-                  <TableCell align="center" className="item-cell">{formatCellValue(row.part1)}</TableCell>
-                  <TableCell align="center" className="item-cell">{formatCellValue(row.part2)}</TableCell>
-                  <TableCell align="center" className="item-cell">{formatCellValue(row.itemName)}</TableCell>
+                  <TableCell align="center" className="item-cell">{(page - 1) * rowsPerPage + index + 1}</TableCell>
+                  <TableCell align="center" className="item-cell">{row.category1Name}</TableCell>
+                  <TableCell align="center" className="item-cell">{row.category2Name}</TableCell>
+                  <TableCell align="center" className="item-cell">{row.category3Name}</TableCell>
+                  <TableCell align="center" className="item-cell">{row.itemName}</TableCell>
+                  <TableCell align="center" className="item-cell">{row.part1}</TableCell>
+                  <TableCell align="center" className="item-cell">{row.part2}</TableCell>
                   <TableCell align="center" className="item-cell">
                     <TextField
                       className="custom-quantity"
@@ -519,54 +528,8 @@ function ListTableDB() {
                         r.supplierName === supplierName
                       ) || {};
 
-                      // 가격과 단위 설정
-                      const price = data.price || 0; // 데이터에서 가격을 찾고, 없으면 0으로 설정
-                      const unit = data.unit || '';
-
-                      // 가격 표시
-                      const displayPrice = supplierName
-                        ? formatCellValue(row.quantity * price, unit) // 공급업체가 선택되면 계산된 가격 표시
-                        : '-'; // 공급업체가 선택되지 않으면 '-' 표시
-
-                      return displayPrice;
                     })()}
                   </TableCell>
-                  {/* category1,2,3,part1,2 itemName이 일치하는 항목에 대한 판매자 목록 */}
-                  <TableCell align="center" className='item-cell'>
-                    <Select
-                      className="select-supplier"
-                      value={selectedSupplier[row.itemId] || ''}
-                      onChange={(event) => handleSupplierChange(row.itemId, event.target.value)}
-                      size="small"
-                    >
-                      {[...new Set(rows
-                        .filter(r =>
-                          r.category1Name === row.category1Name &&
-                          r.category2Name === row.category2Name &&
-                          r.category3Name === row.category3Name &&
-                          r.itemName === row.itemName
-                        )
-                        .map(r => r.supplierName))
-                      ].map((supplierName) => (
-                        <MenuItem 
-                          key={`${row.itemId}-${supplierName}`}
-                          value={supplierName}
-                        >
-                          {supplierName}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </TableCell>
-
-                  <TableCell align="center" style={{ width: '9%' }}>
-                      <Button
-                        onClick={() => (row.leadtime)}
-                        variant="contained"
-                        className="greenbutton"
-                      >
-                        리드타임
-                      </Button>
-                    </TableCell>
                 </TableRow>
               ))}
               {emptyRows > 0 && (
@@ -601,46 +564,7 @@ function ListTableDB() {
             ))}
           </Select>
         </div>
-        <div className="flex gap-4">
-          {/* 장바구니 담기 버튼 */}
-          <Button
-            className='bluebutton2'
-            onClick={handleAddToCart}>
-            장바구니 담기
-          </Button>
-
-          {/* 모달 컴포넌트 */}
-<Modal
-  open={isModalOpen}
-  setOpen={setIsModalOpen}
-  title="장바구니 추가 성공"
-  footer={
-    <div className="flex justify-center space-x-2">
-      <button
-        onClick={handleNavigateToCart}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-      >
-        장바구니로 이동
-      </button>
-      <button
-        onClick={() => setIsModalOpen(false)}
-        className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
-      >
-        닫기
-      </button>
-    </div>
-  }
->
-  장바구니에 아이템이 추가되었습니다. 장바구니로 이동하시겠습니까?
-</Modal>
-        </div>
       </div>
-      {/* 리드타임 모달 */}
-      {/* <LeadTimeModal
-        open={leadTimeModalOpen}
-        setOpen={setLeadTimeModalOpen}
-        leadTimeData={selectedLeadTimeData} // 선택된 리드타임 데이터 전달
-      /> */}
     </div>
   );
 }

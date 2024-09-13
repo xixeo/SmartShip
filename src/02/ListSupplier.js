@@ -82,53 +82,53 @@ function ListSupplier() {
     return `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.itemName}`;
   };
 
+  // useEffect(() => {
+  //   const data = jsonData.finditem.map(item => ({
+  //     ...item,
+  //     quantity: 1,
+  //     leadtime: 1,
+  //     saleStatus: 'In Stock' // 기본 판매여부를 판매중으로 설정
+  //   }));
+  //   setInitialRows(data);
+  //   setRows(data);
+  // }, []);
+
   useEffect(() => {
-    const data = jsonData.finditem.map(item => ({
-      ...item,
-      quantity: 1,
-      leadtime: 1,
-      saleStatus: 'In Stock' // 기본 판매여부를 판매중으로 설정
-    }));
-    setInitialRows(data);
-    setRows(data);
-  }, []);
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         const response = await fetch('/finditem',
-//         {
-//         headers: {
-//           'Authorization': `Bearer ${token}`,
-//         }
-//         }
-//         );
-//         if (!response.ok) {
-//           throw new Error('Network response was not ok');
-//         }
-//         const data = await response.json();
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/finditem',
+        {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+        }
+        );
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
       
-//         // 사용자의 역할 확인
-//         const userRole = localStorage.getItem('role'); // 역할이 로컬 스토리지에 저장되어 있다고 가정
-//         const filteredData = userRole === 'ROLE_SUPPLIER'
-//             ? data.filter(item => item.supplierName === username) // 공급업체 역할일 경우 필터링
-//             : data;
+        // 사용자의 역할 확인
+        const userRole = localStorage.getItem('role'); // 역할이 로컬 스토리지에 저장되어 있다고 가정
+        const filteredData = userRole === 'ROLE_SUPPLIER'
+            ? data.filter(item => item.supplierName === username) // 공급업체 역할일 경우 필터링
+            : data;
 
-//         const processedData = filteredData.map(item => ({
-//             ...item,
-//             quantity: 1,
-//             leadtime: 1
-//         }));
+        const processedData = filteredData.map(item => ({
+            ...item,
+            quantity: 1,
+            leadtime: 1
+        }));
     
-//       setInitialRows(processedData);
-//       setRows(processedData);
-//     } catch (error) {
-//       console.error('데이터 로딩 중 오류 발생:', error);
-//     }
-//   };
+      setInitialRows(processedData);
+      setRows(processedData);
+    } catch (error) {
+      console.error('데이터 로딩 중 오류 발생:', error);
+    }
+  };
   
-//     fetchData();
-// }, [username, token]);
+    fetchData();
+}, [username, token]);
 
   const category1Options = [...new Set(rows.map((row) => row.category1Name))];
   
@@ -369,11 +369,7 @@ function ListSupplier() {
             }}
             className='custom-textfield'
           />
-          <FormControlLabel
-            control={<Switch checked={showSelected} onChange={() => setShowSelected(!showSelected)} />}
-            label={showSelected ? '선택 품목 보기' : '전체 품목 보기'}
-            className="custom-toggle"
-          />
+
         </div>
         <div className='flex space-x-3'>
         <Button

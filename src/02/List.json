@@ -131,7 +131,7 @@
         "price": 9200,
         "unit": "KRW",
         "purchaseCount":null,
-        "supplierName": "패션하우스 4",
+        "supplierName": "패션하우스",
         "alias":"minjoo",
         "leadtime":null
       },
@@ -146,7 +146,7 @@
         "price": 39900.00,
         "unit": "KRW",
         "purchaseCount":null,
-        "supplierName": "패션하우스 5",
+        "supplierName": "패션하우스",
         "alias":"minjoo",
         "leadtime":null
       },
@@ -161,7 +161,7 @@
         "price": 59900.00,
         "unit": "KRW",
         "purchaseCount":null,
-        "supplierName": "패션하우스 6",
+        "supplierName": "패션하우스",
         "alias":"minjoo",
         "leadtime":null
       },
