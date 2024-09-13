@@ -159,7 +159,7 @@ public class ItemsService {
 		// 필수 입력값 확인
 		if (itemsDTO.getCategory1Name() == null || itemsDTO.getCategory2Name() == null
 				|| itemsDTO.getCategory3Name() == null || itemsDTO.getItemName() == null || itemsDTO.getPart1() == null
-				|| itemsDTO.getPrice() == null || itemsDTO.getUnit() == null) {
+				|| itemsDTO.getPrice() == null || itemsDTO.getUnit() == null || itemsDTO.getLeadtime() == null) {
 			throw new RuntimeException("필수 입력값을 모두 입력해 주세요.");
 		}		
 
@@ -187,7 +187,17 @@ public class ItemsService {
 		newItem.setForSale(true);
 
 		// 물품 저장
-		itemsRepo.save(newItem);
+		//itemsRepo.save(newItem);
+		
+		 // 물품 저장
+	    Items savedItem = itemsRepo.save(newItem);
+
+	    // Leadtime 저장
+	    Leadtime leadtime = new Leadtime();
+	    leadtime.setItems(savedItem);
+	    leadtime.setLeadtime(itemsDTO.getLeadtime());
+
+	    leadtimeRepo.save(leadtime);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////// 상품
