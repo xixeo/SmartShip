@@ -14,14 +14,14 @@ import Modal from '../Compo/Modal';
 
 // 테이블 헤더 정의
 const headCells = [
-  { id: 'no', label: 'No.', width: '5%' },
+  { id: 'no', label: 'No.', width: '2%' },
   { id: 'category1Name', label: 'Category 1', width: '13%' },
   { id: 'category2Name', label: 'Category 2', width: '13%' },
   { id: 'category3Name', label: 'Category 3', width: '13%' },
   { id: 'itemName', label: '물품명', width: '13%' },
-  { id: 'totalPrice', label: '가격', width: '12%' },
-  { id: 'supplierName', label: '화폐단위', width: '12%' },
-  { id: 'saleStatus', label: '판매여부', width: '14%' },
+  { id: 'totalPrice', label: '가격', width: '13%' },
+  { id: 'supplierName', label: '화폐단위', width: '13%' },
+  { id: 'saleStatus', label: '판매여부', width: '13%' },
 ];
 
 // 테이블 헤더 컴포넌트

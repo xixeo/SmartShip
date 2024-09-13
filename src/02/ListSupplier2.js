@@ -14,17 +14,17 @@ import Modal from '../Compo/Modal';
 
 // 테이블 헤더 정의
 const headCells = [
-  { id: 'no', label: 'No.', width: '5%' },
-  { id: 'category1Name', label: 'Category 1', width: '13%' },
-  { id: 'category2Name', label: 'Category 2', width: '13%' },
-  { id: 'category3Name', label: 'Category 3', width: '13%' },
+  { id: 'no', label: 'No.', width: '2%' },
+  { id: 'category1Name', label: 'Category 1', width: '12%' },
+  { id: 'category2Name', label: 'Category 2', width: '12%' },
+  { id: 'category3Name', label: 'Category 3', width: '12%' },
   { id: 'itemName', label: '물품명', width: '10%' },
   { id: 'part1', label: 'part 1', width: '10%' },
   { id: 'part2', label: 'part 2', width: '10%' },
   { id: 'totalPrice', label: '가격', width: '10%' },
-  { id: 'supplierName', label: '화폐단위', width: '6%' },
-  { id: 'saleStatus', label: '판매여부', width: '5%' },
-];
+  { id: 'supplierName', label: '화폐단위', width: '7%' },
+  { id: 'saleStatus', label: '판매여부', width: '10%' },
+]; 
 
 // 테이블 헤더 컴포넌트
 function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, allRowsSelected }) {

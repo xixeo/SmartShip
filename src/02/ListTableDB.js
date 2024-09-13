@@ -19,9 +19,9 @@ const headCells = [
   { id: 'category1Name', label: 'Category 1', width: '10%' },
   { id: 'category2Name', label: 'Category 2', width: '10%' },
   { id: 'category3Name', label: 'Category 3', width: '10%' },
+  { id: 'itemName', label: '물품명', width: '10%' },
   { id: 'part1', label: 'part 1', width: '10%' },
   { id: 'part2', label: 'part 2', width: '10%' },
-  { id: 'itemName', label: '물품명', width: '10%' },
   { id: 'quantity', label: '수량', width: '5%' },
   { id: 'totalPrice', label: '총 가격', width: '10%' },
   { id: 'supplierName', label: '판매자', width: '10%' },
@@ -487,9 +487,9 @@ function ListTableDB() {
                   <TableCell align="center" className="item-cell">{formatCellValue(row.category1Name)}</TableCell>
                   <TableCell align="center" className="item-cell">{formatCellValue(row.category2Name)}</TableCell>
                   <TableCell align="center" className="item-cell">{formatCellValue(row.category3Name)}</TableCell>
+                  <TableCell align="center" className="item-cell">{formatCellValue(row.itemName)}</TableCell>
                   <TableCell align="center" className="item-cell">{formatCellValue(row.part1)}</TableCell>
                   <TableCell align="center" className="item-cell">{formatCellValue(row.part2)}</TableCell>
-                  <TableCell align="center" className="item-cell">{formatCellValue(row.itemName)}</TableCell>
                   <TableCell align="center" className="item-cell">
                     <TextField
                       className="custom-quantity"
@@ -544,6 +544,8 @@ function ListTableDB() {
                           r.category1Name === row.category1Name &&
                           r.category2Name === row.category2Name &&
                           r.category3Name === row.category3Name &&
+                          r.part1 === row.part1 &&
+                          r.part2 === row.part2 &&
                           r.itemName === row.itemName
                         )
                         .map(r => r.supplierName))
