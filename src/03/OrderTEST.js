@@ -741,8 +741,8 @@ useEffect(() => {
                           <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>
                             {formatPrice(detail.price, detail.quantity, detail.unit)}
                           </TableCell>
-                          <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.bestOrderDate}</TableCell>
-                          <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.itemsId}</TableCell>
+                          <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.bestOrderDate}({detail.leadtime}일)</TableCell>
+                          <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}><Button className='greenbutton'>과거 리드타임</Button></TableCell>
                           {/* <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}><IconButton onClick={()=>handledeleteitem(detail.cartItemId)} size='small' sx={{ color: 'white' }}><DeleteIcon fontSize="inherit" /></IconButton></TableCell> */}
                           <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}><IconButton onClick={() => handledeleteitem(detail.cartItemId)} size='small' sx={{ color: 'white' }}><ClearOutlinedIcon fontSize="inherit" /></IconButton></TableCell>
                         </TableRow>
