@@ -14,13 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.lead.dto.ItemRecommendDTO;
 import com.lead.dto.ItemsDTO;
-import com.lead.entity.Category1;
-import com.lead.entity.Category2;
 import com.lead.entity.Category3;
 import com.lead.entity.Items;
 import com.lead.entity.Leadtime;
-import com.lead.repository.Category1Repo;
-import com.lead.repository.Category2Repo;
 import com.lead.repository.Category3Repo;
 import com.lead.repository.ItemsRepo;
 import com.lead.repository.LeadtimeRepo;
@@ -43,12 +39,6 @@ public class ItemsService {
 	@Autowired
 	private LeadtimeRepo leadtimeRepo;
 	
-	@Autowired
-	private Category1Repo category1Repo;
-	
-	@Autowired
-	private Category2Repo category2Repo;
-
 	@Autowired
 	private Category3Repo category3Repo;
 
@@ -179,7 +169,7 @@ public class ItemsService {
 	            updatedItemDto.getCategory1Name(),
 	            updatedItemDto.getCategory2Name(),
 	            updatedItemDto.getCategory3Name())
-	            .orElseThrow(() -> new RuntimeException("Category3 not found with the provided category1, category2, and category3 names"));
+	            .orElseThrow(() -> new RuntimeException("Category3을 찾을 수 없습니다."));
 	    
 	    
 	    // 아이템 정보 업데이트
