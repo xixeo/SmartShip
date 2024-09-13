@@ -19,4 +19,6 @@ public interface Category3Repo extends JpaRepository<Category3, Integer> {
     Optional<Category3> findByCategoryNames(@Param("categoryName") String categoryName,
                                             @Param("category2Name") String category2Name,
                                             @Param("category3Name") String category3Name);
+    
+    Optional<Category3> findByCategory3Name(String category3Name);
 }

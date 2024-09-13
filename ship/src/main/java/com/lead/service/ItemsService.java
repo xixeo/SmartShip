@@ -17,9 +17,11 @@ import com.lead.dto.ItemsDTO;
 import com.lead.entity.Category3;
 import com.lead.entity.Items;
 import com.lead.entity.Leadtime;
+import com.lead.entity.Member;
 import com.lead.repository.Category3Repo;
 import com.lead.repository.ItemsRepo;
 import com.lead.repository.LeadtimeRepo;
+import com.lead.repository.MemberRepo;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -40,16 +42,18 @@ public class ItemsService {
 	private LeadtimeRepo leadtimeRepo;
 	
 	@Autowired
+	private MemberRepo memberRepo;
+
+//	@Autowired
+//	private Category1Repo category1Repo;
+//
+//	@Autowired
+//	private Category2Repo category2Repo;
+
+	@Autowired
 	private Category3Repo category3Repo;
 
-	/////////////////////////////////////////////////////////////////////////////////// 전체
-	/////////////////////////////////////////////////////////////////////////////////// 상품
-	/////////////////////////////////////////////////////////////////////////////////// 조회
-	/////////////////////////////////////////////////////////////////////////////////// ROLE.SUPPLIER
-	/////////////////////////////////////////////////////////////////////////////////// 입장
-	/////////////////////////////////////////////////////////////////////////////////// /
-	/////////////////////////////////////////////////////////////////////////////////// ROLE.USER
-	/////////////////////////////////////////////////////////////////////////////////// 입장
+	/////////////////////////////////////////////////////////////////////////////////// 전체상품조회ROLE.SUPPILER/ROLE.USER입장
 	@Transactional(readOnly = true)
 	public List<ItemsDTO> findItemsByRole(String category1Name, String category2Name, String category3Name,
 			String itemName) {
@@ -145,62 +149,90 @@ public class ItemsService {
 
 	/////////////////////////////////////////////////////////////////////////////////// 상품
 	/////////////////////////////////////////////////////////////////////////////////// 등록
+	public void addItem(ItemsDTO itemsDTO, String username, Authentication authentication) {
+
+		// 현재 사용자(공급자)가 이 물품의 소유자인지 확인
+		if (authentication.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_SUPPLIER"))) {
+			throw new RuntimeException("물품 등록 권한이 없습니다.");
+		}
+
+		// 필수 입력값 확인
+		if (itemsDTO.getCategory1Name() == null || itemsDTO.getCategory2Name() == null
+				|| itemsDTO.getCategory3Name() == null || itemsDTO.getItemName() == null || itemsDTO.getPart1() == null
+				|| itemsDTO.getPrice() == null || itemsDTO.getUnit() == null) {
+			throw new RuntimeException("필수 입력값을 모두 입력해 주세요.");
+		}		
+
+        // supplierName 설정
+        itemsDTO.setSupplierName(username);
+
+        // Member 조회 (supplierName을 통해)
+        Member member = memberRepo.findByUsername(itemsDTO.getSupplierName())
+                .orElseThrow(() -> new RuntimeException("해당 공급자를 찾을 수 없습니다."));
+
+		// Category3 조회
+		Category3 category3 = category3Repo.findByCategory3Name(itemsDTO.getCategory3Name())
+				.orElseThrow(() -> new RuntimeException("Category3을 찾을 수 없습니다."));
+
+		// 새로운 Item 생성 및 설정
+		Items newItem = new Items();
+		newItem.setCategory3(category3);
+		newItem.setItemName(itemsDTO.getItemName());
+		newItem.setPart1(itemsDTO.getPart1());
+		newItem.setPart2(itemsDTO.getPart2()); // Nullable
+		newItem.setPrice(itemsDTO.getPrice());
+		newItem.setUnit(itemsDTO.getUnit());
+		newItem.setMember(member);
+		newItem.setEnabled(true);
+		newItem.setForSale(true);
+
+		// 물품 저장
+		itemsRepo.save(newItem);
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////// 상품
 	/////////////////////////////////////////////////////////////////////////////////// 수정
 	@Transactional
-    public ItemsDTO updateItem(Integer itemId, ItemsDTO updatedItemDto, String username) {
+	public ItemsDTO updateItem(Integer itemId, ItemsDTO updatedItemDto, String username) {
 
-		
-		 // 현재 로그인한 사용자 확인
-	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		// 수정할 아이템 찾기
+		Items item = itemsRepo.findById(itemId).orElseThrow(() -> new RuntimeException("해당 물품을 찾지 못했습니다."));
 
-	    // 수정할 아이템 찾기
-	    Items item = itemsRepo.findById(itemId)
-	            .orElseThrow(() -> new RuntimeException("해당 물품을 찾지 못했습니다."));
+		// 현재 사용자(공급자)가 이 물품의 소유자인지 확인
+		if (!item.getMember().getUsername().equals(username)) {
+			throw new RuntimeException("해당 물품을 수정할 권한이 없습니다.");
+		}
 
-	    // 현재 사용자(공급자)가 이 물품의 소유자인지 확인
-	    if (!item.getMember().getUsername().equals(username)) {
-	        throw new RuntimeException("해당 물품을 수정할 권한이 없습니다.");
-	    }
+		// Category1, Category2, Category3을 모두 사용하여 Category3 엔티티 찾기
+		Category3 category3 = category3Repo
+				.findByCategoryNames(updatedItemDto.getCategory1Name(), updatedItemDto.getCategory2Name(),
+						updatedItemDto.getCategory3Name())
+				.orElseThrow(() -> new RuntimeException("Category3을 찾을 수 없습니다."));
 
-	    // Category1, Category2, Category3을 모두 사용하여 Category3 엔티티 찾기
-	    Category3 category3 = category3Repo.findByCategoryNames(
-	            updatedItemDto.getCategory1Name(),
-	            updatedItemDto.getCategory2Name(),
-	            updatedItemDto.getCategory3Name())
-	            .orElseThrow(() -> new RuntimeException("Category3을 찾을 수 없습니다."));
-	    
-	    
-	    // 아이템 정보 업데이트
-	    item.setCategory3(category3);  // Category3 설정
-        item.setItemName(updatedItemDto.getItemName());
-        item.setPart1(updatedItemDto.getPart1());
-        item.setPart2(updatedItemDto.getPart2());
-        item.setPrice(updatedItemDto.getPrice());
-        item.setUnit(updatedItemDto.getUnit());
-        item.setForSale(updatedItemDto.isForSale());
+		// 아이템 정보 업데이트
+		item.setCategory3(category3); // Category3 설정
+		item.setItemName(updatedItemDto.getItemName());
+		item.setPart1(updatedItemDto.getPart1());
+		item.setPart2(updatedItemDto.getPart2());
+		item.setPrice(updatedItemDto.getPrice());
+		item.setUnit(updatedItemDto.getUnit());
+		item.setForSale(updatedItemDto.isForSale());
 
-        itemsRepo.save(item);
+		itemsRepo.save(item);
 
-        return convertToDto(item);
-    }
+		return convertToDto(item);
+	}
 
-    // Entity를 DTO로 변환하는 메소드
-    private ItemsDTO convertToDto(Items item) {
-        return ItemsDTO.builder()
-        		 .category1Name(item.getCategory3().getCategory2().getCategory1().getCategoryName()) // Category1 이름 설정
-                 .category2Name(item.getCategory3().getCategory2().getCategory2Name())               // Category2 이름 설정
-                 .category3Name(item.getCategory3().getCategory3Name())                             // Category3 이름 설정
-                 .itemId(item.getItemsId())
-                 .itemName(item.getItemName())
-                 .part1(item.getPart1())
-                 .part2(item.getPart2())
-                 .price(item.getPrice())
-                 .unit(item.getUnit())
-                 .forSale(item.isForSale()) 
-                 .build();
-    }
+	// Entity를 DTO로 변환하는 메소드
+	private ItemsDTO convertToDto(Items item) {
+		return ItemsDTO.builder().category1Name(item.getCategory3().getCategory2().getCategory1().getCategoryName()) // Category1
+																														// 이름
+																														// 설정
+				.category2Name(item.getCategory3().getCategory2().getCategory2Name()) // Category2 이름 설정
+				.category3Name(item.getCategory3().getCategory3Name()) // Category3 이름 설정
+				.itemId(item.getItemsId()).itemName(item.getItemName()).part1(item.getPart1()).part2(item.getPart2())
+				.price(item.getPrice()).unit(item.getUnit()).forSale(item.isForSale()).build();
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////// 상품
 	/////////////////////////////////////////////////////////////////////////////////// 삭제

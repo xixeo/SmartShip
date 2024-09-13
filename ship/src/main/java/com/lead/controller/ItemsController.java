@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -69,17 +70,23 @@ public class ItemsController {
 
 
 	/////////////////////////////////////////////////////////////////////////////// 등록
-//	@PostMapping("/supplier/items")
-//	public ResponseEntity<String> createItem(@RequestBody ItemsDTO itemsDTO){
-//		
-//		try {
-//			itemsService.createItem(itemsDTO);
-//			return ResponseEntity.ok("상품이 성공적으로 등록되었습니다.");
-//		} catch(Exception e) {
-//			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("물품 등록에 실패했습니다.");
-//		}
-//	}
-//	
+	@PostMapping("/supplier/items/add")
+	public ResponseEntity<String> addItem(@RequestBody ItemsDTO itemsDTO) {
+	    // JWT 토큰에서 사용자 정보 추출
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    String username = authentication.getName(); // 토큰에서 username 추출
+	    
+	    try {
+	        // 아이템 등록 서비스 호출
+	        itemsService.addItem(itemsDTO, username, authentication);
+	        return ResponseEntity.ok("상품이 성공적으로 등록되었습니다.");
+	    } catch(Exception e) {
+	        // 예외 발생 시 오류 로그 출력
+	        e.printStackTrace(); // 서버 콘솔에 오류 출력
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("물품 등록에 실패했습니다. " + e.getMessage());
+	    }
+	}
+	
 	/////////////////////////////////////////////////////////////////////////////// 수정
 	@PutMapping("/supplier/items/{itemId}")
 	public ResponseEntity<String> updateItem(@PathVariable Integer itemId, @RequestBody ItemsDTO itemsDTO) {
