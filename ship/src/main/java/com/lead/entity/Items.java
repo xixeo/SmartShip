@@ -61,5 +61,5 @@ public class Items {
 
     @OneToMany(mappedBy = "items")
     private Set<Leadtime> leadtimes;
-    
+
 }
