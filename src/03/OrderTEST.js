@@ -16,6 +16,7 @@ import dayjs from 'dayjs';
 import Modal from '@mui/material/Modal'
 import { isYesterday } from 'date-fns';
 import { json } from 'react-router-dom';
+import { Visibility } from '@mui/icons-material';
 
 //////////////////////
 //    확장 아이콘    //
@@ -237,8 +238,8 @@ export default function OrderTest() {
 
   const orderdate = selectedDate.format('YYYY-MM-DD');
   const today = new Date();
-const yesterday = new Date();
-yesterday.setDate(today.getDate() - 1);
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
 
   useEffect(() => {
     fetchorderlist(selectedDate.format('YYYY-MM-DD'));
@@ -270,8 +271,8 @@ yesterday.setDate(today.getDate() - 1);
   //////////////////////
 
   const handleCheckboxClick = (event, username, cartItemId, quantity) => {
-    event.stopPropagation(); 
-    handleGrandchildChange(username, cartItemId, quantity)(event); 
+    event.stopPropagation();
+    handleGrandchildChange(username, cartItemId, quantity)(event);
   };
 
   const isSell = () => {
@@ -283,7 +284,7 @@ yesterday.setDate(today.getDate() - 1);
     const detail = groupedData[username].find((item) => item.cartItemId === cartItemId);
     const today = new Date();
     const tomorrow = new Date();
-    tomorrow.setDate(today.getDate()-1)
+    tomorrow.setDate(today.getDate() - 1)
     return new Date(detail.bestOrderDate) < tomorrow;  // 비활성화 조건
   };
 
@@ -384,15 +385,15 @@ yesterday.setDate(today.getDate() - 1);
     const updateCheckboxStates = () => {
       const newCheckedGrandchildren = { ...checkedGrandchildren };
       const newCheckedChildren = { ...checkedChildren };
-  
+
       Object.keys(groupedData).forEach((username) => {
         // 자식 체크박스의 상태를 결정할 변수를 선언
         let hasActiveGrandchildren = false;
-  
+
         groupedData[username].forEach((detail) => {
           const key = `${username}-${detail.cartItemId}`;
           const isDisabled = isCheckboxDisabled(username, detail.cartItemId);
-  
+
           if (isDisabled) {
             newCheckedGrandchildren[key] = false; // 비활성화된 손자 체크박스 해제
           } else {
@@ -400,13 +401,13 @@ yesterday.setDate(today.getDate() - 1);
             if (newCheckedChildren[username]) {
               newCheckedGrandchildren[key] = true;
             }
-  
+
             if (!isDisabled) {
               hasActiveGrandchildren = true; // 활성화된 손자 체크박스가 있음
             }
           }
         });
-  
+
         // 자식 체크박스 상태 업데이트
         if (!hasActiveGrandchildren) {
           newCheckedChildren[username] = false; // 모든 손자 체크박스가 비활성화된 경우 자식 체크박스도 해제
@@ -414,15 +415,15 @@ yesterday.setDate(today.getDate() - 1);
           newCheckedChildren[username] = newCheckedChildren[username]; // 자식 체크박스 상태 유지
         }
       });
-  
+
       // 상태 업데이트
       setCheckedChildren(newCheckedChildren);
       setCheckedGrandchildren(newCheckedGrandchildren);
     };
-  
+
     updateCheckboxStates();
   }, [groupedData, checkedChildren]);
-  
+
   //////////////////////
   //  리드타임  함수   //
   //////////////////////
@@ -647,14 +648,14 @@ yesterday.setDate(today.getDate() - 1);
     }
   };
 
-   //   ======================
+  //   ======================
   //   || 대체 추천 상품 시작 ||
   //    ======================
 
   // 비활성화된 손자체크박스 갯수
   const countDisabledGrandchildren = () => {
     let disabledCount = 0;
-  
+
     Object.keys(groupedData).forEach((username) => {
       groupedData[username].forEach((detail) => {
         const key = `${username}-${detail.cartItemId}`;
@@ -663,46 +664,44 @@ yesterday.setDate(today.getDate() - 1);
         }
       });
     });
-  
+
     return disabledCount;
   };
-  
+
   const disabledCount = countDisabledGrandchildren();
   // console.log(`비활성화된 자손 체크박스의 개수: ${disabledCount}`);
   const [selectedRow, setSelectedRow] = useState(null);
-  const [recommenditem, setRecommendItem] = useState({});
+  const [recommenditem, setRecommendItem] = useState([]);
 
-  const handleClickrow = async(cartItemId,orderdate) =>{
+  const handleClickrow = async (cartItemId, orderdate) => {
     setSelectedRow(cartItemId);
     const selectitem = getItemIds(cartItemId);
     console.log(selectitem);
-    try{
-      const response = await fetch(`recommend?selectedItemId=${selectitem}&releaseDate=${orderdate}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      )
-      if (!response.ok) {
-        throw new Error('Recommend item response was not ok');
-      };
-      const responseText = await response.text();
-      console.log(responseText)
-    // 응답 텍스트가 JSON 형식인지 확인한 후 파싱
-    let recoitems;
+    // const recoitems = [{
+    //   'itemsId': 2,
+    //   'itemName': '청바지',
+    //   'price': 40100.00,
+    //   'unit': 'KRW',
+    //   'supplierName': '수플린',
+    //   'leadtime': 20,
+    //   'recommendedOrderDate': '2024-10-10'
+    // },];
     try {
-      recoitems = JSON.parse(responseText);
-    } catch (e) {
-      console.error('Failed to parse JSON:', e);
-      // JSON 파싱 실패 시 대체 처리
-      return;
-    }
-
-    console.log(recoitems);
+        const response = await fetch(`recommend?selectedItemId=${selectitem}&releaseDate=${orderdate}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          }
+        )
+        if (!response.ok) {
+          throw new Error('Recommend item response was not ok');
+        };
+        const recoitems = await response.json();
+      console.log('reco',recoitems);
       setRecommendItem(recoitems);
-      console.log(recommenditem)
-    }catch (error) {
+      console.log('최종',recommenditem)
+    } catch (error) {
       console.error('Failed to fetch recommend:', error);
     }
   }
@@ -820,8 +819,8 @@ yesterday.setDate(today.getDate() - 1);
                     {groupedData[username].map((detail) => {
                       return (
                         // <TableRow key={detail.cartItemId}  className={dayjs(detail.bestOrderDate).isBefore(dayjs(), 'day') ? 'activerow' : 'normalrow'}>
-                        <TableRow key={detail.cartItemId} className={new Date(detail.bestOrderDate) < yesterday ? 'activerow' : 'normalrow'}>
-                          <TableCell padding='checkbox' onClick={() => handleClickrow(detail.cartItemId, orderdate)} sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>
+                        <TableRow key={detail.cartItemId} onClick={() => handleClickrow(detail.cartItemId, orderdate)} className={new Date(detail.bestOrderDate) < yesterday ? 'activerow' : 'normalrow'}>
+                          <TableCell padding='checkbox' sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>
                             <Checkbox
                               checked={checkedGrandchildren[`${username}-${detail.cartItemId}`] || false}
                               onChange={(event) => handleCheckboxClick(event, username, detail.cartItemId, detail.quantity)}
@@ -929,53 +928,33 @@ yesterday.setDate(today.getDate() - 1);
         </div>
       </div>
       {/* 추천상품 시작 */}
-      <div>
+     { disabledCount>0 ?<div>
         <div className='flex items-center justify-center'>
-        <h2 className='font-bold'>창고 출고 예정일까지 수령 불가능한 상품이 있습니다.</h2>
-        <h2 className='ml-2 text-[#5BF4FF]'>({disabledCount}건)</h2>
+          <h2 className='font-bold'>창고 출고 예정일까지 수령 불가능한 상품이 있습니다.</h2>
+          <h2 className='ml-2 text-[#5BF4FF]'>({disabledCount}건)</h2>
         </div>
-      <div className="bg-[#2F2E38] m-5 p-5 rounded-lg">
-        <div className='flex items-center ml-3'>
-          <h4 className='text-[#5BF4FF] text-xl font-bold'>{getItemName(selectedRow)}</h4>
-          <h4 className='font-bold text-base ml-2'>대체 추천 상품</h4>
-        </div>
-        <div className='flex items-center justify-center'>
-          {/* {Object.keys(recommenditem).map((detail) => (
-        <div key={detail.itemsId} className='bg-[#373640] rounded-lg w-1/4 m-3'>
-          <div>{detail.itemName}</div>
-          <div>
-            <div>{detail.username}</div>
-            <div>{detail.price}</div>
+        <div className="bg-[#2F2E38] m-5 p-5 rounded-lg">
+          <div className='flex items-center ml-3'>
+            <h4 className='text-[#5BF4FF] text-xl font-bold'>{getItemName(selectedRow)}</h4>
+            <h4 className='font-bold text-base ml-2'>대체 추천 상품</h4>
           </div>
-          <div>
-            <div>{detail.recommendedOrderDate}</div>
-            <div>(예상 리드타임 : {detail.leadtime}일)</div>
-          </div>
-        </div>
-        ))} */}
-        <div className='bg-[#373640] border rounded-lg w-1/4 m-3 p-3'>
-        <div className='text-xl font-bold m-2'>복숭아</div>
-          <div className='flex justify-between items-center m-2'>
-            <div className='text-lg font-bold'>민주샵</div>
-            <div className='text-base font-bold'>₩ 50000</div>
-          </div>
-          <div className='flex justify-between items-center m-2'>
-            <div className='text-base font-bold'>2024-10-30</div>
-            <div className='text-[#bebebe] text-sm'>(예상 리드타임 : 30일)</div>
+          <div className='flex items-center justify-start'>
+        {recommenditem.map(detail => (
+            <div key={detail.itemsId} className='bg-[#373640] border-[#373640] rounded-lg w-1/4 m-3 p-3'>
+              <div className='text-xl font-bold m-2'>{detail.itemName}</div>
+              <div className='flex justify-between items-center m-2'>
+                <div className='text-lg font-bold'>{detail.supplierName}</div>
+                <div className='text-base font-bold'>{getCurrencySymbol(detail.unit)} {detail.price}</div>
+              </div>
+              <div className='flex justify-between items-center m-2'>
+                <div className='text-base font-bold'>{detail.recommendedOrderDate}</div>
+                <div className='text-[#bebebe] text-sm'>(예상 리드타임 : {detail.leadtime}일)</div>
+              </div>
+            </div>
+            ))}
           </div>
         </div>
-        <div className='bg-[#373640] border rounded-lg w-1/4 m-3'>
-
-        </div>
-        <div className='bg-[#373640] border rounded-lg w-1/4 m-3'>
-
-        </div>
-        <div className='bg-[#373640] border rounded-lg w-1/4 m-3'>
-
-        </div>
-        </div>
-      </div>
-      </div>
+      </div>:null}
     </div>
   );
 }
