@@ -32,6 +32,8 @@ const ExpandMore = styled((props) => {
 //////////////////////
 //   데이터 처리1    //
 //////////////////////
+
+// 상품 판매자별로 새로 배열설정
 const groupByUsername = (orderDetails) => {
   return orderDetails.reduce((groups, detail) => {
     const { username } = detail;
@@ -43,6 +45,7 @@ const groupByUsername = (orderDetails) => {
   }, {});
 };
 
+// 리드타임으로 계산해서 최적발주일 데이터 추가
 const Addbestdate = (basket, selectedDate) => {
   console.log('seldate', selectedDate);
   console.log('basket', basket);
@@ -63,10 +66,10 @@ export default function OrderTest() {
   const [listdatas, setListdatas] = useState([]);
   const [selectedDate, setSelectedDate] = useState(
     () => {
-    const savedDate = localStorage.getItem('selectedDate');
-    return savedDate ? dayjs(savedDate) : dayjs().add(1, 'month');
-  }
-);
+      const savedDate = localStorage.getItem('selectedDate');
+      return savedDate ? dayjs(savedDate) : dayjs().add(1, 'month');
+    }
+  );
   const [deleteopen, setDeleteOpen] = useState(false);
   const [perchasopen, setPerchasOpen] = useState(false);
 
@@ -78,119 +81,119 @@ export default function OrderTest() {
   //  ==================
 
   const fetchorderlist = async (selectedDate) => {
-     const orderbasket = [
-    //   {
-    //     "message": "장바구니 내역이 성공적으로 조회되었습니다.",
-    //     "cartItem": {
-    //       "cartId": 9,
-    //       "username": "유승호",
-    //       "alias": "a해운선사",
-    //       "releaseDate": "2024-09-11",
-    //       "bestOrderDate": "2024-08-13",
-    //       "createdAt": "2024-09-11T14:43:26",
-    //       "cartItems": [
-    //         {
-    //           "cartItemId": 7,
-    //           "category1Name": "패션의류",
-    //           "category2Name": "여성패션",
-    //           "category3Name": "팬츠",
-    //           "itemsId": 1,
-    //           "itemName": "청바지",
-    //           "quantity": 15,
-    //           "price": 39900.00,
-    //           "unit": "KRW",
-    //           "username": "민주샵",
-    //           "leadtime": 30,
-    //           "recommendedOrderDate": "2024-08-21"
-    //         },
-    //         {
-    //           "cartItemId": 8,
-    //           "category1Name": "패션의류",
-    //           "category2Name": "여성패션",
-    //           "category3Name": "팬츠",
-    //           "itemsId": 2,
-    //           "itemName": "청바지",
-    //           "quantity": 15,
-    //           "price": 40100.00,
-    //           "unit": "KRW",
-    //           "username": "수플린",
-    //           "leadtime": 15,
-    //           "recommendedOrderDate": "2024-08-22"
-    //         },
-    //         {
-    //           "cartItemId": 9,
-    //           "category1Name": "패션의류",
-    //           "category2Name": "남성패션",
-    //           "category3Name": "팬츠",
-    //           "itemsId": 3,
-    //           "itemName": "청바지",
-    //           "quantity": 15,
-    //           "price": 39800.00,
-    //           "unit": "KRW",
-    //           "username": "민주샵",
-    //           "leadtime": 25,
-    //           "recommendedOrderDate": "2024-08-28"
-    //         },
-    //         {
-    //           "cartItemId": 10,
-    //           "category1Name": "패션의류",
-    //           "category2Name": "캐주얼/유니섹스",
-    //           "category3Name": "팬츠",
-    //           "itemsId": 4,
-    //           "itemName": "청바지",
-    //           "quantity": 15,
-    //           "price": 38800.00,
-    //           "unit": "KRW",
-    //           "username": "쿠팡",
-    //           "leadtime": 31,
-    //           "recommendedOrderDate": "2024-08-26"
-    //         },
-    //         {
-    //           "cartItemId": 11,
-    //           "category1Name": "패션잡화",
-    //           "category2Name": "모자/장갑/ACC",
-    //           "category3Name": "양말/ACC",
-    //           "itemsId": 5,
-    //           "itemName": "양말",
-    //           "quantity": 15,
-    //           "price": 12500.00,
-    //           "unit": "KRW",
-    //           "username": "토라삭스",
-    //           "leadtime": 10,
-    //           "recommendedOrderDate": "2024-09-08"
-    //         },
-    //         {
-    //           "cartItemId": 12,
-    //           "category1Name": "뷰티",
-    //           "category2Name": "향수",
-    //           "category3Name": "여성향수",
-    //           "itemsId": 6,
-    //           "itemName": "NO.5",
-    //           "quantity": 15,
-    //           "price": 299000.00,
-    //           "unit": "KRW",
-    //           "username": "첼시마켓",
-    //           "leadtime": 20,
-    //           "recommendedOrderDate": "2024-08-24"
-    //         },
-    //         {
-    //           "cartItemId": 19,
-    //           "category1Name": "뷰티",
-    //           "category2Name": "향수",
-    //           "category3Name": "캔들/디퓨저",
-    //           "itemsId": 7,
-    //           "itemName": "양키캔들",
-    //           "quantity": 5,
-    //           "price": 49900.00,
-    //           "unit": "KRW",
-    //           "username": "첼시마켓",
-    //           "leadtime": 4,
-    //           "recommendedOrderDate": "2024-08-13"
-    //         }
-    //       ]
-    //     }
-    //   }
-     ];
+    const orderbasket = [
+      //   {
+      //     "message": "장바구니 내역이 성공적으로 조회되었습니다.",
+      //     "cartItem": {
+      //       "cartId": 9,
+      //       "username": "유승호",
+      //       "alias": "a해운선사",
+      //       "releaseDate": "2024-09-11",
+      //       "bestOrderDate": "2024-08-13",
+      //       "createdAt": "2024-09-11T14:43:26",
+      //       "cartItems": [
+      //         {
+      //           "cartItemId": 7,
+      //           "category1Name": "패션의류",
+      //           "category2Name": "여성패션",
+      //           "category3Name": "팬츠",
+      //           "itemsId": 1,
+      //           "itemName": "청바지",
+      //           "quantity": 15,
+      //           "price": 39900.00,
+      //           "unit": "KRW",
+      //           "username": "민주샵",
+      //           "leadtime": 30,
+      //           "recommendedOrderDate": "2024-08-21"
+      //         },
+      //         {
+      //           "cartItemId": 8,
+      //           "category1Name": "패션의류",
+      //           "category2Name": "여성패션",
+      //           "category3Name": "팬츠",
+      //           "itemsId": 2,
+      //           "itemName": "청바지",
+      //           "quantity": 15,
+      //           "price": 40100.00,
+      //           "unit": "KRW",
+      //           "username": "수플린",
+      //           "leadtime": 15,
+      //           "recommendedOrderDate": "2024-08-22"
+      //         },
+      //         {
+      //           "cartItemId": 9,
+      //           "category1Name": "패션의류",
+      //           "category2Name": "남성패션",
+      //           "category3Name": "팬츠",
+      //           "itemsId": 3,
+      //           "itemName": "청바지",
+      //           "quantity": 15,
+      //           "price": 39800.00,
+      //           "unit": "KRW",
+      //           "username": "민주샵",
+      //           "leadtime": 25,
+      //           "recommendedOrderDate": "2024-08-28"
+      //         },
+      //         {
+      //           "cartItemId": 10,
+      //           "category1Name": "패션의류",
+      //           "category2Name": "캐주얼/유니섹스",
+      //           "category3Name": "팬츠",
+      //           "itemsId": 4,
+      //           "itemName": "청바지",
+      //           "quantity": 15,
+      //           "price": 38800.00,
+      //           "unit": "KRW",
+      //           "username": "쿠팡",
+      //           "leadtime": 31,
+      //           "recommendedOrderDate": "2024-08-26"
+      //         },
+      //         {
+      //           "cartItemId": 11,
+      //           "category1Name": "패션잡화",
+      //           "category2Name": "모자/장갑/ACC",
+      //           "category3Name": "양말/ACC",
+      //           "itemsId": 5,
+      //           "itemName": "양말",
+      //           "quantity": 15,
+      //           "price": 12500.00,
+      //           "unit": "KRW",
+      //           "username": "토라삭스",
+      //           "leadtime": 10,
+      //           "recommendedOrderDate": "2024-09-08"
+      //         },
+      //         {
+      //           "cartItemId": 12,
+      //           "category1Name": "뷰티",
+      //           "category2Name": "향수",
+      //           "category3Name": "여성향수",
+      //           "itemsId": 6,
+      //           "itemName": "NO.5",
+      //           "quantity": 15,
+      //           "price": 299000.00,
+      //           "unit": "KRW",
+      //           "username": "첼시마켓",
+      //           "leadtime": 20,
+      //           "recommendedOrderDate": "2024-08-24"
+      //         },
+      //         {
+      //           "cartItemId": 19,
+      //           "category1Name": "뷰티",
+      //           "category2Name": "향수",
+      //           "category3Name": "캔들/디퓨저",
+      //           "itemsId": 7,
+      //           "itemName": "양키캔들",
+      //           "quantity": 5,
+      //           "price": 49900.00,
+      //           "unit": "KRW",
+      //           "username": "첼시마켓",
+      //           "leadtime": 4,
+      //           "recommendedOrderDate": "2024-08-13"
+      //         }
+      //       ]
+      //     }
+      //   }
+    ];
     try {
       const response = await fetch(`getCart/${selectedDate}`,
         {
@@ -230,25 +233,21 @@ export default function OrderTest() {
   //  날짜 관련 함수   //
   //////////////////////
 
+  const orderdate = selectedDate.format('YYYY-MM-DD');
+
   useEffect(() => {
     fetchorderlist(selectedDate.format('YYYY-MM-DD'));
-    // console.log('sel1',selectedDate);
+    // console.log('sel1', selectedDate);
   }, [selectedDate]);
 
   useEffect(() => {
-    localStorage.setItem('selectedDate', selectedDate.format('YYYY-MM-DD'));
+    localStorage.setItem('selectedDate', orderdate);
   }, [selectedDate]);
 
-  // 페이지 새로 고침 시 localStorage의 날짜를 삭제하고 싶지 않은 경우
-useEffect(() => {
-  // const handleBeforeUnload = (e) => {
-  //   e.preventDefault();
-  //   // 페이지 이동 시 localStorage 비우기
-  //   localStorage.removeItem('selectedDate');
-  // };
-  // window.addEventListener('beforeunload', handleBeforeUnload);
-  // return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-}, []);
+  useEffect(() => {
+    // 새로고침 시 localStorage 비우기
+    localStorage.removeItem('selectedDate');
+  }, []);
 
   //////////////////////
   //  카드 확장 함수   //
@@ -271,7 +270,7 @@ useEffect(() => {
 
   // 손자 체크박스 비활성화 관리
   const isCheckboxDisabled = (username, cartItemId) => {
-    const detail = groupedData[username].find((item) => item.cartItemId);
+    const detail = groupedData[username].find((item) => item.cartItemId === cartItemId);
     const today = new Date();
     return new Date(detail.bestOrderDate) < today;  // 비활성화 조건
   };
@@ -324,80 +323,94 @@ useEffect(() => {
   };
 
   // 손자 체크박스 상태 관리
-const handleGrandchildChange = (username, cartItemId) => (event) => {
-  const newChecked = event.target.checked;
-  const newCheckedGrandchildren = { ...checkedGrandchildren, [`${username}-${cartItemId}`]: newChecked };
-  
-  // 비활성화된 체크박스 상태 업데이트
-  if (isCheckboxDisabled(username, cartItemId)) {
-    newCheckedGrandchildren[`${username}-${cartItemId}`] = false;
-  }
+  const handleGrandchildChange = (username, cartItemId) => (event) => {
+    const newChecked = event.target.checked;
+    const newCheckedGrandchildren = { ...checkedGrandchildren, [`${username}-${cartItemId}`]: newChecked };
 
-  setCheckedGrandchildren(newCheckedGrandchildren);
+    setCheckedGrandchildren(newCheckedGrandchildren);
 
-  // 자식과 부모 체크박스 상태 업데이트
-  updateChildCheckState(username, newCheckedGrandchildren);
-};
+    // 자식과 부모 체크박스 상태 업데이트
+    updateChildCheckState(username, newCheckedGrandchildren);
+  };
 
   // 자식 체크박스 상태 업데이트
-const updateChildCheckState = (username, newCheckedGrandchildren) => {
-  const allGrandchildrenDisabled = groupedData[username].every((detail) => isCheckboxDisabled(username, detail.cartItemId));
+  const updateChildCheckState = (username, newCheckedGrandchildren) => {
+    const allGrandchildrenDisabled = groupedData[username].every((detail) => isCheckboxDisabled(username, detail.cartItemId));
 
-  const allGrandchildrenChecked = groupedData[username].every((detail) => {
-    const key = `${username}-${detail.cartItemId}`;
-    return isCheckboxDisabled(username, detail.cartItemId) || newCheckedGrandchildren[key];
-  });
-
-  const newCheckedChildren = {
-    ...checkedChildren,
-    [username]: allGrandchildrenChecked && !allGrandchildrenDisabled,
-  };
-
-  setCheckedChildren(newCheckedChildren);
-
-  // 부모 체크박스 상태 업데이트
-  updateParentCheckState(newCheckedChildren);
-};
-
-// 부모 체크박스 상태 업데이트
-const updateParentCheckState = (newCheckedChildren) => {
-  const allChildrenChecked = Object.keys(groupedData).every((username) => {
     const allGrandchildrenChecked = groupedData[username].every((detail) => {
       const key = `${username}-${detail.cartItemId}`;
-      return isCheckboxDisabled(username, detail.cartItemId) || checkedGrandchildren[key];
+      return isCheckboxDisabled(username, detail.cartItemId) || newCheckedGrandchildren[key];
     });
 
-    return !newCheckedChildren[username] ? newCheckedChildren[username] && allGrandchildrenChecked : newCheckedChildren[username] || allGrandchildrenChecked;
-  });
-
-  setCheckedParent(allChildrenChecked);
-};
-
-// 자손 & 자식 체크박스 비동기화 감시 후 부모 체크박스 상태 업데이트
-useEffect(() => {
-  const updateCheckboxStates = () => {
-    const newCheckedGrandchildren = { ...checkedGrandchildren };
-    const newCheckedChildren = { ...checkedChildren };
-
-    Object.keys(groupedData).forEach((username) => {
-      const allDetailsDisabled = groupedData[username].every((detail) => isCheckboxDisabled(username, detail.cartItemId));
-      
-      if (allDetailsDisabled) {
-        newCheckedChildren[username] = false;
-        groupedData[username].forEach((detail) => {
-          newCheckedGrandchildren[`${username}-${detail.cartItemId}`] = false;
-        });
-      }
-    });
+    const newCheckedChildren = {
+      ...checkedChildren,
+      [username]: allGrandchildrenChecked && !allGrandchildrenDisabled,
+    };
 
     setCheckedChildren(newCheckedChildren);
-    setCheckedGrandchildren(newCheckedGrandchildren);
+
+    // 부모 체크박스 상태 업데이트
+    updateParentCheckState(newCheckedChildren);
   };
 
-  updateCheckboxStates();
-}, [groupedData, checkedGrandchildren]); // groupedData 또는 checkedGrandchildren 변경 시 실행
+  // 부모 체크박스 상태 업데이트
+  const updateParentCheckState = (newCheckedChildren) => {
+    const allChildrenChecked = Object.keys(groupedData).every((username) => {
+      const allGrandchildrenChecked = groupedData[username].every((detail) => {
+        const key = `${username}-${detail.cartItemId}`;
+        return isCheckboxDisabled(username, detail.cartItemId) || checkedGrandchildren[key];
+      });
 
+      return !newCheckedChildren[username] ? newCheckedChildren[username] && allGrandchildrenChecked : newCheckedChildren[username] || allGrandchildrenChecked;
+    });
 
+    setCheckedParent(allChildrenChecked);
+  };
+
+  // 손자 체크박스의 비동기상태를 감시, 자식체크박스에 영향 & 그 반대도 영향
+  useEffect(() => {
+    const updateCheckboxStates = () => {
+      const newCheckedGrandchildren = { ...checkedGrandchildren };
+      const newCheckedChildren = { ...checkedChildren };
+  
+      Object.keys(groupedData).forEach((username) => {
+        // 자식 체크박스의 상태를 결정할 변수를 선언
+        let hasActiveGrandchildren = false;
+  
+        groupedData[username].forEach((detail) => {
+          const key = `${username}-${detail.cartItemId}`;
+          const isDisabled = isCheckboxDisabled(username, detail.cartItemId);
+  
+          if (isDisabled) {
+            newCheckedGrandchildren[key] = false; // 비활성화된 손자 체크박스 해제
+          } else {
+            // 자식 체크박스의 상태가 true면 손자 체크박스도 true로 설정
+            if (newCheckedChildren[username]) {
+              newCheckedGrandchildren[key] = true;
+            }
+  
+            if (!isDisabled) {
+              hasActiveGrandchildren = true; // 활성화된 손자 체크박스가 있음
+            }
+          }
+        });
+  
+        // 자식 체크박스 상태 업데이트
+        if (!hasActiveGrandchildren) {
+          newCheckedChildren[username] = false; // 모든 손자 체크박스가 비활성화된 경우 자식 체크박스도 해제
+        } else {
+          newCheckedChildren[username] = newCheckedChildren[username]; // 자식 체크박스 상태 유지
+        }
+      });
+  
+      // 상태 업데이트
+      setCheckedChildren(newCheckedChildren);
+      setCheckedGrandchildren(newCheckedGrandchildren);
+    };
+  
+    updateCheckboxStates();
+  }, [groupedData, checkedChildren]);
+  
   //////////////////////
   //  리드타임  함수   //
   //////////////////////
@@ -415,7 +428,6 @@ useEffect(() => {
 
     return Math.max(...checkedLeadTimes) + ' 일'; // 가장 긴 leadtime을 반환
   };
-
 
   //////////////////////
   //  통화 단위 함수   //
@@ -585,14 +597,15 @@ useEffect(() => {
   };
 
   // 구매버튼
-  const handlePerchase = async (selectedDate) => {
+  const handlePerchase = async (orderdate) => {
 
     const checkitemidandquantity = getCheckedItemsWithQuantity();
 
     console.log('checkedItemDetails', checkitemidandquantity);
+    // console.log('seldate', orderdate);
 
     try {
-      const response = await fetch(`saveToOrder/${selectedDate}`,
+      const response = await fetch(`saveToOrder/${orderdate}`,
         {
           method: 'POST',
           headers: {
@@ -606,6 +619,7 @@ useEffect(() => {
         throw new Error('orderbasket perchase item response was not ok');
       };
       setPerchasOpen(false);
+      // window.location.reload(); 새로고침하는건데 새로고침보다는... 내 주문목록으로 넘겨주는게 맞는걸까?
     } catch (error) {
       console.log(error);
     }
@@ -797,12 +811,27 @@ useEffect(() => {
                 boxShadow: 24, // 그림자 (선택 사항)
               }}
             >
-              <Box sx={{ marginBottom: 2, fontSize: 'large', fontWeight: 'bold', color: 'white' }}>주문하시겠습니까?</Box>
+              <Box
+                sx={{
+                  marginBottom: 2,
+                  fontSize: 'large',
+                  fontWeight: 'bold',
+                  color: 'white',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center', // 수평 중앙 정렬
+                  justifyContent: 'center', // 수직 중앙 정렬
+                }}
+              >
+                주문하시겠습니까?
+                <h4 className='text-sm'>창고 출고 예정일 : {orderdate}</h4>
+              </Box>
+
               <Box sx={{ display: 'flex', gap: 2 }}>
                 <Button sx={{ color: 'white', bgcolor: '#43C5FE' }}
                   onClick={() => {
                     setPerchasOpen(false);
-                    handlePerchase();
+                    handlePerchase(orderdate);
                   }}>
                   확인
                 </Button>
@@ -816,6 +845,9 @@ useEffect(() => {
             </Box>
           </Modal>
         </div>
+      </div>
+      <div className="bg-[#2F2E38] m-5 p-5 rounded-lg">
+
       </div>
     </div>
   );
