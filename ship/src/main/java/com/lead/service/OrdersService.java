@@ -33,7 +33,7 @@ public class OrdersService {
 						order.getMember().getAlias(), 
 						order.getReleaseDate(), 
 						order.getBestOrderDate(),
-						order.getOrderDate(), null // OrderDetail
+						order.getOrderDate(), order.getMemo(), null // OrderDetail
 
 				)).collect(Collectors.toList());
 	}
@@ -49,11 +49,14 @@ public class OrdersService {
 						orderDetail.getItem().getCategory3().getCategory2().getCategory2Name(),
 						orderDetail.getItem().getCategory3().getCategory3Name(), orderDetail.getItem().getItemsId(), orderDetail.getItem().getItemName(),
 						orderDetail.getQuantity(), orderDetail.getItem().getPrice(), orderDetail.getItem().getUnit(),
-						orderDetail.getItem().getMember().getUsername(), null);
+						orderDetail.getItem().getMember().getUsername(), 
+						null,
+						orderDetail.isOrdering()
+						);
 			}).collect(Collectors.toList());
 
 			return new OrdersDTO(order.getOrderId(), order.getMember().getUsername(), order.getMember().getAlias(),
-					order.getReleaseDate(), order.getBestOrderDate(), order.getOrderDate(),
+					order.getReleaseDate(), order.getBestOrderDate(), order.getOrderDate(), order.getMemo(),
 					orderDetailDTOs);
 		}).collect(Collectors.toList());
 	}

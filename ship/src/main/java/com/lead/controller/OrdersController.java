@@ -1,9 +1,28 @@
 package com.lead.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.lead.dto.OrderDetailDTO;
+import com.lead.service.OrderDetailService;
 
 @RestController
 public class OrdersController {
+
+	@Autowired
+	private OrderDetailService orderDetailService;
+
+	// orderDetail 업데이트
+	@PutMapping("/orderUpdate")
+	public ResponseEntity<OrderDetailDTO> updateOrderDetail(@RequestParam Integer orderDetailId,
+			@RequestParam Integer newQuantity, @RequestParam Integer newItemId) {
+		OrderDetailDTO updatedOrderDetail = orderDetailService.updateOrderDetail(orderDetailId, newQuantity,
+				newItemId);
+		return ResponseEntity.ok(updatedOrderDetail);
+	}
 
 //	@Autowired
 //	private OrdersService ordersService;

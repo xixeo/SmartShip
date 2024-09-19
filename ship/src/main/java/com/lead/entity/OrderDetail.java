@@ -33,4 +33,7 @@ public class OrderDetail {
 
     @Column(nullable = false)
     private Integer quantity;
+    
+    @Column(name = "ordering", nullable = false)
+    private boolean ordering; 
 }

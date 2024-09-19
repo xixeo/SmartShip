@@ -266,7 +266,7 @@ public class CartService {
 	              savedOrder.getMember().getAlias(), 
 	              savedOrder.getReleaseDate(), 
 	              savedOrder.getBestOrderDate(),
-	              savedOrder.getOrderDate(), null);
+	              savedOrder.getOrderDate(), savedOrder.getMemo(), null);
 	  }
 
 }
