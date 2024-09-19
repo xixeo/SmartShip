@@ -8,21 +8,22 @@ import SearchIcon from '@mui/icons-material/Search';
 import Pagination from '@mui/material/Pagination';
 import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
-import jsonData from './List.json'; // JSON 파일 import
 import './ListTable.scss';
 import Modal from '../Compo/Modal';
 
 // 테이블 헤더 정의
 const headCells = [
   { id: 'no', label: 'No.', width: '2%' },
-  { id: 'category1Name', label: 'Category 1', width: '13%' },
-  { id: 'category2Name', label: 'Category 2', width: '13%' },
-  { id: 'category3Name', label: 'Category 3', width: '13%' },
-  { id: 'itemName', label: '물품명', width: '13%' },
-  { id: 'totalPrice', label: '가격', width: '13%' },
-  { id: 'supplierName', label: '화폐단위', width: '13%' },
-  { id: 'saleStatus', label: '판매여부', width: '13%' },
-];
+  { id: 'category1Name', label: 'Category 1', width: '12%' },
+  { id: 'category2Name', label: 'Category 2', width: '12%' },
+  { id: 'category3Name', label: 'Category 3', width: '12%' },
+  { id: 'itemName', label: '물품명', width: '10%' },
+  { id: 'part1', label: 'part 1', width: '10%' },
+  { id: 'part2', label: 'part 2', width: '10%' },
+  { id: 'totalPrice', label: '가격', width: '10%' },
+  { id: 'supplierName', label: '화폐단위', width: '7%' },
+  { id: 'saleStatus', label: '판매여부', width: '10%' },
+]; 
 
 // 테이블 헤더 컴포넌트
 function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, allRowsSelected }) {
@@ -81,17 +82,6 @@ function ListSupplier() {
    const generateKey = (row) => {
     return `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.itemName}`;
   };
-
-  // useEffect(() => {
-  //   const data = jsonData.finditem.map(item => ({
-  //     ...item,
-  //     quantity: 1,
-  //     leadtime: 1,
-  //     saleStatus: 'In Stock' // 기본 판매여부를 판매중으로 설정
-  //   }));
-  //   setInitialRows(data);
-  //   setRows(data);
-  // }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -433,7 +423,6 @@ function ListSupplier() {
                 <TableCell>
                         {/* Category 1 드롭다운 */}
                         <FormControl fullWidth>
-                            <InputLabel>카테고리 1</InputLabel>
                             <Select
                                 className="select-supplier"
                                 value={category1Name}
@@ -450,7 +439,6 @@ function ListSupplier() {
                 <TableCell>
                         {/* Category 2 드롭다운 */}
                         <FormControl fullWidth>
-                            <InputLabel>카테고리 2</InputLabel>
                             <Select
                                 className="select-supplier"
                                 value={category2Name}
@@ -468,7 +456,6 @@ function ListSupplier() {
                 <TableCell>
                         {/* Category 3 드롭다운 */}
                         <FormControl fullWidth>
-                            <InputLabel>카테고리 3</InputLabel>
                             <Select
                                 className="select-supplier"
                                 value={category3Name}
@@ -482,24 +469,16 @@ function ListSupplier() {
                                 ))}
                             </Select>
                         </FormControl>
-                    </TableCell>
-                <TableCell align="center">
-                    <TextField
-                    className="custom-quantity"
-                    value={row.itemName}
-                    onChange={(event) => handleItemNameChange(row.itemId, event)}
-                    fullWidth
-                    />
                 </TableCell>
+                <TableCell align="center" className="item-cell">{row.itemName}</TableCell>
+                <TableCell align="center" className="item-cell">{row.part1}</TableCell>
+                <TableCell align="center" className="item-cell">{row.part2}</TableCell>
                 <TableCell align="center">
                     <TextField
                     className="custom-quantity"
                     type="number"
                     value={row.totalPrice}
                     onChange={(event) => handlePriceChange(row.itemId, event)}
-                    InputProps={{
-                        startAdornment: <InputAdornment position="start">₩</InputAdornment>,
-                    }}
                     fullWidth
                     />
                 </TableCell>

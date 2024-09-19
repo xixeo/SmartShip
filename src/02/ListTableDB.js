@@ -10,37 +10,24 @@ import SearchIcon from '@mui/icons-material/Search';
 import Pagination from '@mui/material/Pagination';
 import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
-import jsonData from './List.json'; // JSON 파일 import
 import './ListTable.scss';
 import Modal from '../Compo/Modal';
 
 // 테이블 헤더 정의
 const headCells = [
-  { id: 'category1Name', label: 'Category 1', width: '10%' },
-  { id: 'category2Name', label: 'Category 2', width: '10%' },
-  { id: 'category3Name', label: 'Category 3', width: '10%' },
-  { id: 'itemName', label: '물품명', width: '10%' },
-  { id: 'part1', label: 'part 1', width: '10%' },
-  { id: 'part2', label: 'part 2', width: '10%' },
-  { id: 'quantity', label: '수량', width: '5%' },
-  { id: 'totalPrice', label: '총 가격', width: '10%' },
-  { id: 'supplierName', label: '판매자', width: '10%' },
-  { id: 'leadtime', label: '리드타임', width: '10%' },
+  { id: 'category1Name', label: 'Category 1', width: '14%' },
+  { id: 'category2Name', label: 'Category 2', width: '14%' },
+  { id: 'category3Name', label: 'Category 3', width: '14%' },
+  { id: 'itemName', label: '물품명', width: '15%' },
+  { id: 'part1', label: 'part 1', width: '14%' },
+  { id: 'part2', label: 'part 2', width: '14%' },
+  { id: 'quantity', label: '수량', width: '10%' }
 ];
 
 // null값 처리 & 가격 단위 구분 함수
 const formatCellValue = (value, unit) => {
   if (value == null || value === '') {
     return '-';
-  }
-  if (unit) {
-    switch (unit) {
-      case 'USD': return `$ ${value}`;
-      case 'KRW': return `₩ ${value}`;
-      case 'EUR': return `€ ${value}`;
-      case 'JPY': return `¥ ${value}`;
-      default: return value;
-    }
   }
   return value;
 };
@@ -89,14 +76,9 @@ function ListTableDB() {
   const [category1Name, setCategoryName] = useState('');
   const [category2Name, setCategory2Name] = useState('');
   const [category3Name, setCategory3Name] = useState('');
-  const [part1, setPart1] = useState('');
-  const [part2, setPart2] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false); // 장바구니로 이동 물어보기 모달상태
-  const [leadTimeModalOpen, setLeadTimeModalOpen] = useState(false);
-  const [selectedLeadTimeData, setSelectedLeadTimeData] = useState([]);
   const [showSelected, setShowSelected] = useState(false);
-  const [selectedSupplier, setSelectedSupplier] = useState({}); // 선택된 공급업체 상태
 
    // 사용자 이름을 로컬 스토리지에서 가져옴
    const username = localStorage.getItem('username') || 'Guest';
@@ -105,32 +87,6 @@ function ListTableDB() {
    const generateKey = (row) => {
     return `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.part1}-${row.part2}-${row.itemName}`;
   };
-
-  const getUniqueSuppliers = (row) => {
-  const suppliers = [...new Set(rows
-    .filter(r =>
-      r.category1Name === row.category1Name &&
-      r.category2Name === row.category2Name &&
-      r.category3Name === row.category3Name &&
-      r.part1 === row.part1 &&
-      r.part2 === row.part2 &&
-      r.itemName === row.itemName
-    )
-    .map(r => r.supplierName))
-  ];
-
-  return suppliers;
-};
-
-  // useEffect(() => {
-  //   const data = jsonData.finditem.map(item => ({
-  //     ...item,
-  //     quantity: 1,
-  //     leadtime: 1
-  //   }));
-  //   setInitialRows(data);
-  //   setRows(data);
-  // }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -200,39 +156,6 @@ function ListTableDB() {
   useEffect(() => {
     setPage(1);
   }, [searchQuery, category1Name, category2Name, category3Name, rowsPerPage, showSelected]);
-
-  useEffect(() => {
-    const autoSelectSingleSupplier = () => {
-      // 모든 품목에 대해 카테고리와 품목이 일치하는 항목을 찾음
-      const updatedRows = rows.map(row => {
-        // 현재 품목에 대한 공급업체 목록을 추출
-        const suppliers = [...new Set(rows
-          .filter(r =>
-            r.category1Name === row.category1Name &&
-            r.category2Name === row.category2Name &&
-            r.category3Name === row.category3Name &&
-            r.part1 === row.part1 &&
-            r.part2 === row.part2 &&
-            r.itemName === row.itemName
-          )
-          .map(r => r.supplierName))];
-        
-        // 공급업체가 하나인 경우 자동으로 선택
-        if (suppliers.length === 1) {
-          setSelectedSupplier(prev => ({
-            ...prev,
-            [row.itemId]: suppliers[0]  // 공급업체가 하나면 자동으로 설정
-          }));
-        }
-  
-        return row;
-      });
-  
-      setRows(updatedRows);  // 상태 업데이트
-    };
-  
-    autoSelectSingleSupplier();
-  }, [rows]);
   
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
@@ -319,14 +242,6 @@ function ListTableDB() {
   const handleSearchButtonClick = () => {
     setRows(filteredRows);
     setPage(1);
-  };
-
-  // 공급업체를 선택할 때 현재 선택된 품목의 공급업체를 변경 (같은 itemName이라도 다른 물품이면 다른 supplier 고를 수 있음)
-  const handleSupplierChange = (itemId, supplierName) => {
-    setSelectedSupplier(prev => ({
-      ...prev,
-      [itemId]: supplierName
-    }));
   };
 
   // 공통 데이터 조회 함수
@@ -501,74 +416,6 @@ function ListTableDB() {
                       variant="outlined"
                     />
                   </TableCell>
-                  {/* 공급업체에 대한 가격 */}
-                  <TableCell 
-                    align="center" 
-                    className={`price-cell ${!selectedSupplier[row.itemId] ? 'price-cell-no-price' : ''}`}
-                  >
-                    {(() => {
-                      // 현재 선택된 공급업체의 데이터 찾기
-                      const supplierName = selectedSupplier[row.itemId];
-                      const data = rows.find(r =>
-                        r.category1Name === row.category1Name &&
-                        r.category2Name === row.category2Name &&
-                        r.category3Name === row.category3Name &&
-                        r.part1 === row.part1 &&
-                        r.part2 === row.part2 &&
-                        r.itemName === row.itemName &&
-                        r.supplierName === supplierName
-                      ) || {};
-
-                      // 가격과 단위 설정
-                      const price = data.price || 0; // 데이터에서 가격을 찾고, 없으면 0으로 설정
-                      const unit = data.unit || '';
-
-                      // 가격 표시
-                      const displayPrice = supplierName
-                        ? formatCellValue(row.quantity * price, unit) // 공급업체가 선택되면 계산된 가격 표시
-                        : '-'; // 공급업체가 선택되지 않으면 '-' 표시
-
-                      return displayPrice;
-                    })()}
-                  </TableCell>
-                  {/* category1,2,3,part1,2 itemName이 일치하는 항목에 대한 판매자 목록 */}
-                  <TableCell align="center" className='item-cell'>
-                    <Select
-                      className="select-supplier"
-                      value={selectedSupplier[row.itemId] || ''}
-                      onChange={(event) => handleSupplierChange(row.itemId, event.target.value)}
-                      size="small"
-                    >
-                      {[...new Set(rows
-                        .filter(r =>
-                          r.category1Name === row.category1Name &&
-                          r.category2Name === row.category2Name &&
-                          r.category3Name === row.category3Name &&
-                          r.part1 === row.part1 &&
-                          r.part2 === row.part2 &&
-                          r.itemName === row.itemName
-                        )
-                        .map(r => r.supplierName))
-                      ].map((supplierName) => (
-                        <MenuItem 
-                          key={`${row.itemId}-${supplierName}`}
-                          value={supplierName}
-                        >
-                          {supplierName}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </TableCell>
-
-                  <TableCell align="center" style={{ width: '9%' }}>
-                      <Button
-                        onClick={() => (row.leadtime)}
-                        variant="contained"
-                        className="greenbutton"
-                      >
-                        리드타임
-                      </Button>
-                    </TableCell>
                 </TableRow>
               ))}
               {emptyRows > 0 && (
@@ -637,12 +484,6 @@ function ListTableDB() {
 </Modal>
         </div>
       </div>
-      {/* 리드타임 모달 */}
-      {/* <LeadTimeModal
-        open={leadTimeModalOpen}
-        setOpen={setLeadTimeModalOpen}
-        leadTimeData={selectedLeadTimeData} // 선택된 리드타임 데이터 전달
-      /> */}
     </div>
   );
 }

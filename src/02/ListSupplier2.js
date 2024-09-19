@@ -8,7 +8,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import Pagination from '@mui/material/Pagination';
 import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
-import jsonData from './List.json'; // JSON 파일 import
 import './ListTable.scss';
 import Modal from '../Compo/Modal';
 
@@ -71,17 +70,23 @@ function ListTableDB() {
   const [category2Name, setCategory2Name] = useState('');
   const [category3Name, setCategory3Name] = useState('');
 
-  const [part1, setPart1] = useState('');
-  const [part2, setPart2] = useState('');
   const [showSelected, setShowSelected] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState({}); // 선택된 공급업체 상태
   const [saleStatus, setSaleStatus] = useState({}); // 판매여부 상태를 관리할 객체
   const currencyDisplayNames = { USD: '달러', EUR: '유로', JPY: '엔화', KRW: '원화' };
 
-  // 카테고리 상태 선언
-  const [category1Options, setCategory1Options] = useState([]);
-  const [category2Options, setCategory2Options] = useState([]);
-  const [category3Options, setCategory3Options] = useState([]);
+  const [selectCategory1, setSelectCategory1] = useState('');
+  const [selectCategory2, setSelectCategory2] = useState('');
+  const [selectCategory3, setSelectCategory3] = useState('');
+
+  // 선택된 카테고리 이름
+  const category1Options = [...new Set(rows.map((row) => row.category1Name))];
+  const category2Options = useMemo(() => {
+    return [...new Set(rows.filter((row) => row.category1Name === selectCategory1).map((row) => row.category2Name))];
+  }, [selectCategory1, rows]);
+  const category3Options = useMemo(() => {
+    return [...new Set(rows.filter((row) => row.category2Name === selectCategory2).map((row) => row.category3Name))];
+  }, [selectCategory2, rows]);
 
    // 사용자 이름을 로컬 스토리지에서 가져옴
    const username = localStorage.getItem('username') || 'Guest';
@@ -91,16 +96,6 @@ function ListTableDB() {
    const generateKey = (row) => {
     return `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.part1}-${row.part2}-${row.itemName}`;
   };
-
-  // useEffect(() => {
-  //   const data = jsonData.finditem.map(item => ({
-  //     ...item,
-  //     quantity: 1,
-  //     leadtime: 1
-  //   }));
-  //   setInitialRows(data);
-  //   setRows(data);
-  // }, []);
 
   // 데이터 로딩
   useEffect(() => {
@@ -130,82 +125,6 @@ function ListTableDB() {
 
     fetchData();
   }, [token]);
-
-  // category1Options 데이터 가져오기
-  useEffect(() => {
-    const fetchCategory1Data = async () => {
-      try {
-        const response = await fetch('/category1');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setCategory1Options(data);
-      } catch (error) {
-        console.error('카테고리1 로딩 중 오류 발생:', error);
-      }
-    };
-
-    fetchCategory1Data();
-  }, []);
-
-  // category2Options 데이터 가져오기
-  useEffect(() => {
-    const fetchCategory2Data = async () => {
-      if (category1Name) {
-        try {
-          const response = await fetch(`/category2?category1Name=${category1Name}`);
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          const data = await response.json();
-          setCategory2Options(data);
-        } catch (error) {
-          console.error('카테고리2 로딩 중 오류 발생:', error);
-        }
-      }
-    };
-
-    fetchCategory2Data();
-  }, [category1Name]);
-
-  // category3Options 데이터 가져오기
-  useEffect(() => {
-    const fetchCategory3Data = async () => {
-      if (category2Name) {
-        try {
-          const response = await fetch(`/category3?category2Name=${category2Name}`);
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          const data = await response.json();
-          setCategory3Options(data);
-        } catch (error) {
-          console.error('카테고리3 로딩 중 오류 발생:', error);
-        }
-      }
-    };
-
-    fetchCategory3Data();
-  }, [category2Name]);
-
-  // category2Options 업데이트
-  const category2OptionsMemo = useMemo(() => {
-    return [...new Set(rows.filter(row => row.category1Name === category1Name).map(row => row.category2Name))];
-  }, [category1Name, rows]);
-
-  useEffect(() => {
-    setCategory2Options(category2OptionsMemo);
-  }, [category2OptionsMemo]);
-
-  // category3Options 업데이트
-  const category3OptionsMemo = useMemo(() => {
-    return [...new Set(rows.filter(row => row.category2Name === category2Name).map(row => row.category3Name))];
-  }, [category2Name, rows]);
-
-  useEffect(() => {
-    setCategory3Options(category3OptionsMemo);
-  }, [category3OptionsMemo]);
 
   const filteredRows = useMemo(() => {
     return rows.filter((row) => {
@@ -375,8 +294,8 @@ function ListTableDB() {
       <div className="flex items-center justify-between gap-4 mb-4">
         <div className="flex items-center gap-4">
           <Select
-            value={category1Name}
-            onChange={(e) => setCategoryName(e.target.value)}
+            value={selectCategory1}
+            onChange={(e) => setSelectCategory1(e.target.value)}
             displayEmpty
             className="select-custom"
           >
@@ -386,8 +305,8 @@ function ListTableDB() {
             ))}
           </Select>
           <Select
-            value={category2Name}
-            onChange={(e) => setCategory2Name(e.target.value)}
+            value={selectCategory2}
+            onChange={(e) => setSelectCategory2(e.target.value)}
             displayEmpty
             className="select-custom"
           >
@@ -397,8 +316,8 @@ function ListTableDB() {
             ))}
           </Select>
           <Select
-            value={category3Name}
-            onChange={(e) => setCategory3Name(e.target.value)}
+            value={selectCategory3}
+            onChange={(e) => setSelectCategory3(e.target.value)}
             displayEmpty
             className="select-custom"
           >
