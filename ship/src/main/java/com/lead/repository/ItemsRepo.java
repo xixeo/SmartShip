@@ -14,11 +14,14 @@ import com.lead.entity.Items;
 @Repository
 public interface ItemsRepo extends JpaRepository<Items, Integer>, JpaSpecificationExecutor<Items> {
 
+	// 대체상품추천
 		@Query(value = """
             SELECT
                 i.items_id,
                 i.item_name,
                 i.price,
+                i.unit,
+                i.username AS supplierName,
                 l.leadtime
             FROM
                 Items i

@@ -272,8 +272,10 @@ public class ItemsService {
 			ItemRecommendDTO dto = new ItemRecommendDTO();
 			dto.setItemsId((Integer) result[0]); // itemsId
 			dto.setItemName((String) result[1]); // itemName
-			dto.setPrice((BigDecimal) result[2]); // price
-			dto.setLeadtime((Integer) result[3]); // leadtime
+			dto.setPrice((BigDecimal) result[4]); // price
+			dto.setUnit((String) result[2]); // unit
+			dto.setSupplierName((String) result[3]); // supplierName
+			dto.setLeadtime((Integer) result[5]); // leadtime
 			return dto;
 		}).collect(Collectors.toList());
 	}

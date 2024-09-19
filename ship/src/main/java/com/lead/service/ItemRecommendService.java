@@ -27,12 +27,14 @@ public class ItemRecommendService {
             Integer itemsId = (Integer) result[0];
             String itemName = (String) result[1];
             BigDecimal price = (BigDecimal) result[2];
-            Integer leadtime = (Integer) result[3];
+            String unit = (String) result[3];
+            String supplierName = (String) result[4];
+            Integer leadtime = (Integer) result[5];
 
             // 기간내에 가능한지 계산
             LocalDate recommendedOrderDate = releaseDate.minusDays(leadtime);
 
-            ItemRecommendDTO dto = new ItemRecommendDTO(itemsId, itemName, price, leadtime, recommendedOrderDate);
+            ItemRecommendDTO dto = new ItemRecommendDTO(itemsId, itemName, price, unit, supplierName, leadtime, recommendedOrderDate);
             recommendedItems.add(dto);
         }
 

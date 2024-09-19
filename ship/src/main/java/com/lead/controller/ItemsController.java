@@ -1,6 +1,7 @@
 package com.lead.controller;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,23 +127,25 @@ public class ItemsController {
 	/////////////////////////////////////////////////////////////////////////////// 대체상품추천
 
 	@GetMapping("/recommend")
-	public ResponseEntity<String> getRecommendations(@RequestParam("selectedItemId") Integer selectedItemId,
-			@RequestParam("releaseDate") String releaseDate) {
+	public ResponseEntity<List<ItemRecommendDTO>> getRecommendations(
+	        @RequestParam("selectedItemId") Integer selectedItemId,
+	        @RequestParam("releaseDate") String releaseDate) {
 
-		try {
-			// 문자열을 LocalDate로 변환
-			LocalDate releaseDateLocal = LocalDate.parse(releaseDate);
+	    try {
+	        // 문자열을 LocalDate로 변환
+	        LocalDate releaseDateLocal = LocalDate.parse(releaseDate);
 
-			System.out.println("===========================물품 추천 한다");
-			
-			List<ItemRecommendDTO> recommendations = itemRecommendService.getRecommendedItems(selectedItemId,
-					releaseDateLocal);
+	        System.out.println("===========================물품 추천 한다");
+	        
+	        List<ItemRecommendDTO> recommendations = itemRecommendService.getRecommendedItems(selectedItemId, releaseDateLocal);
 
-			return ResponseEntity.ok(recommendations.toString()); // 리스트를 문자열로 변환하여 응답
-		} catch (Exception e) {
-			System.err.println("\"추천 물품을 조회하는 중 오류: " + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("추천 물품을 조회하는 중 오류가 발생했습니다.");
-		}
+	        // JSON 형식으로 List<ItemRecommendDTO>를 반환
+	        return ResponseEntity.ok(recommendations);
+	    } catch (Exception e) {
+	        System.err.println("추천 물품을 조회하는 중 오류: " + e.getMessage());
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body(Collections.emptyList()); // 오류 발생 시 빈 리스트를 반환
+	    }
 	}
 
 }

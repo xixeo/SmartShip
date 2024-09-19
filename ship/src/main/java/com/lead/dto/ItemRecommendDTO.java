@@ -15,6 +15,8 @@ public class ItemRecommendDTO {
 	   private Integer itemsId;
 	    private String itemName;
 	    private BigDecimal price;
+	    private String unit;
+	    private String supplierName;
 	    private Integer leadtime;
 	    private LocalDate recommendedOrderDate;
 }
