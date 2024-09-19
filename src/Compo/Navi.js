@@ -41,6 +41,11 @@ const Navi = () => {
           {!isCollapsed && <span>발주 스케줄링</span>}
           {!isCollapsed && <FaChevronRight className="right-arrow" />}
         </li>
+        <li className="menu-item" onClick={() => navigate('/MyOrderList')}> 
+          <FaShoppingCart className="icon" />
+          {!isCollapsed && <span>주문목록</span>}
+          {!isCollapsed && <FaChevronRight className="right-arrow" />}
+        </li>
       </ul>
       <div className="toggle-btn" onClick={toggleSidebar}>
         <span className="arrow">{isCollapsed ? '→' : '←'}</span>

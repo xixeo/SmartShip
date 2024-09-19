@@ -14,6 +14,9 @@ import './Order.scss';
 import BasicDatePicker from './BasicDatePicker';
 import dayjs from 'dayjs';
 import Modal from '@mui/material/Modal'
+import { isYesterday } from 'date-fns';
+import { json } from 'react-router-dom';
+import { Visibility } from '@mui/icons-material';
 
 //////////////////////
 //    확장 아이콘    //
@@ -234,6 +237,9 @@ export default function OrderTest() {
   //////////////////////
 
   const orderdate = selectedDate.format('YYYY-MM-DD');
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
 
   useEffect(() => {
     fetchorderlist(selectedDate.format('YYYY-MM-DD'));
@@ -264,6 +270,11 @@ export default function OrderTest() {
   //  체크박스  함수   //
   //////////////////////
 
+  const handleCheckboxClick = (event, username, cartItemId, quantity) => {
+    event.stopPropagation();
+    handleGrandchildChange(username, cartItemId, quantity)(event);
+  };
+
   const isSell = () => {
 
   }
@@ -272,7 +283,9 @@ export default function OrderTest() {
   const isCheckboxDisabled = (username, cartItemId) => {
     const detail = groupedData[username].find((item) => item.cartItemId === cartItemId);
     const today = new Date();
-    return new Date(detail.bestOrderDate) < today;  // 비활성화 조건
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() - 1)
+    return new Date(detail.bestOrderDate) < tomorrow;  // 비활성화 조건
   };
 
   // 자식 체크박스 비활성화 관리
@@ -372,15 +385,15 @@ export default function OrderTest() {
     const updateCheckboxStates = () => {
       const newCheckedGrandchildren = { ...checkedGrandchildren };
       const newCheckedChildren = { ...checkedChildren };
-  
+
       Object.keys(groupedData).forEach((username) => {
         // 자식 체크박스의 상태를 결정할 변수를 선언
         let hasActiveGrandchildren = false;
-  
+
         groupedData[username].forEach((detail) => {
           const key = `${username}-${detail.cartItemId}`;
           const isDisabled = isCheckboxDisabled(username, detail.cartItemId);
-  
+
           if (isDisabled) {
             newCheckedGrandchildren[key] = false; // 비활성화된 손자 체크박스 해제
           } else {
@@ -388,13 +401,13 @@ export default function OrderTest() {
             if (newCheckedChildren[username]) {
               newCheckedGrandchildren[key] = true;
             }
-  
+
             if (!isDisabled) {
               hasActiveGrandchildren = true; // 활성화된 손자 체크박스가 있음
             }
           }
         });
-  
+
         // 자식 체크박스 상태 업데이트
         if (!hasActiveGrandchildren) {
           newCheckedChildren[username] = false; // 모든 손자 체크박스가 비활성화된 경우 자식 체크박스도 해제
@@ -402,15 +415,15 @@ export default function OrderTest() {
           newCheckedChildren[username] = newCheckedChildren[username]; // 자식 체크박스 상태 유지
         }
       });
-  
+
       // 상태 업데이트
       setCheckedChildren(newCheckedChildren);
       setCheckedGrandchildren(newCheckedGrandchildren);
     };
-  
+
     updateCheckboxStates();
   }, [groupedData, checkedChildren]);
-  
+
   //////////////////////
   //  리드타임  함수   //
   //////////////////////
@@ -503,13 +516,23 @@ export default function OrderTest() {
   //  정보 추출 함수   //
   //////////////////////
 
-  // 선택한 항목의 아이디 추출 
+  // 선택한 항목의 아이템아이디 추출 
   const getItemIds = (cartItemId) => {
     return Object.keys(groupedData).flatMap((username) => {
       // 각 username 그룹에서 해당 cartItemId를 가진 항목을 필터링하여 추출
       return groupedData[username]
         .filter((detail) => detail.cartItemId === cartItemId)
         .map((detail) => detail.itemsId);
+    });
+  };
+
+  // 선택한 항목의 아이템이름 추출 
+  const getItemName = (cartItemId) => {
+    return Object.keys(groupedData).flatMap((username) => {
+      // 각 username 그룹에서 해당 cartItemId를 가진 항목을 필터링하여 추출
+      return groupedData[username]
+        .filter((detail) => detail.cartItemId === cartItemId)
+        .map((detail) => detail.itemName);
     });
   };
 
@@ -625,6 +648,64 @@ export default function OrderTest() {
     }
   };
 
+  //   ======================
+  //   || 대체 추천 상품 시작 ||
+  //    ======================
+
+  // 비활성화된 손자체크박스 갯수
+  const countDisabledGrandchildren = () => {
+    let disabledCount = 0;
+
+    Object.keys(groupedData).forEach((username) => {
+      groupedData[username].forEach((detail) => {
+        const key = `${username}-${detail.cartItemId}`;
+        if (isCheckboxDisabled(username, detail.cartItemId)) {
+          disabledCount += 1;
+        }
+      });
+    });
+
+    return disabledCount;
+  };
+
+  const disabledCount = countDisabledGrandchildren();
+  // console.log(`비활성화된 자손 체크박스의 개수: ${disabledCount}`);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [recommenditem, setRecommendItem] = useState([]);
+
+  const handleClickrow = async (cartItemId, orderdate) => {
+    setSelectedRow(cartItemId);
+    const selectitem = getItemIds(cartItemId);
+    console.log(selectitem);
+    // const recoitems = [{
+    //   'itemsId': 2,
+    //   'itemName': '청바지',
+    //   'price': 40100.00,
+    //   'unit': 'KRW',
+    //   'supplierName': '수플린',
+    //   'leadtime': 20,
+    //   'recommendedOrderDate': '2024-10-10'
+    // },];
+    try {
+        const response = await fetch(`recommend?selectedItemId=${selectitem}&releaseDate=${orderdate}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          }
+        )
+        if (!response.ok) {
+          throw new Error('Recommend item response was not ok');
+        };
+        const recoitems = await response.json();
+      console.log('reco',recoitems);
+      setRecommendItem(recoitems);
+      console.log('최종',recommenditem)
+    } catch (error) {
+      console.error('Failed to fetch recommend:', error);
+    }
+  }
+
   return (
     <div className="flex-col text-white OrderBasket">
       <div className="bg-[#2F2E38] m-5 p-5 rounded-lg">
@@ -738,11 +819,11 @@ export default function OrderTest() {
                     {groupedData[username].map((detail) => {
                       return (
                         // <TableRow key={detail.cartItemId}  className={dayjs(detail.bestOrderDate).isBefore(dayjs(), 'day') ? 'activerow' : 'normalrow'}>
-                        <TableRow key={detail.cartItemId} className={new Date(detail.bestOrderDate) <= dayjs() ? 'activerow' : 'normalrow'}>
+                        <TableRow key={detail.cartItemId} onClick={() => handleClickrow(detail.cartItemId, orderdate)} className={new Date(detail.bestOrderDate) < yesterday ? 'activerow' : 'normalrow'}>
                           <TableCell padding='checkbox' sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>
                             <Checkbox
                               checked={checkedGrandchildren[`${username}-${detail.cartItemId}`] || false}
-                              onChange={handleGrandchildChange(username, detail.cartItemId, detail.quantity)}
+                              onChange={(event) => handleCheckboxClick(event, username, detail.cartItemId, detail.quantity)}
                               disabled={isCheckboxDisabled(username, detail.cartItemId)}
                               sx={{ color: 'white' }}
                             />
@@ -846,9 +927,34 @@ export default function OrderTest() {
           </Modal>
         </div>
       </div>
-      <div className="bg-[#2F2E38] m-5 p-5 rounded-lg">
-
-      </div>
+      {/* 추천상품 시작 */}
+     { disabledCount>0 ?<div>
+        <div className='flex items-center justify-center'>
+          <h2 className='font-bold'>창고 출고 예정일까지 수령 불가능한 상품이 있습니다.</h2>
+          <h2 className='ml-2 text-[#5BF4FF]'>({disabledCount}건)</h2>
+        </div>
+        <div className="bg-[#2F2E38] m-5 p-5 rounded-lg">
+          <div className='flex items-center ml-3'>
+            <h4 className='text-[#5BF4FF] text-xl font-bold'>{getItemName(selectedRow)}</h4>
+            <h4 className='font-bold text-base ml-2'>대체 추천 상품</h4>
+          </div>
+          <div className='flex items-center justify-start'>
+        {recommenditem.map(detail => (
+            <div key={detail.itemsId} className='bg-[#373640] border-[#373640] rounded-lg w-1/4 m-3 p-3'>
+              <div className='text-xl font-bold m-2'>{detail.itemName}</div>
+              <div className='flex justify-between items-center m-2'>
+                <div className='text-lg font-bold'>{detail.supplierName}</div>
+                <div className='text-base font-bold'>{getCurrencySymbol(detail.unit)} {detail.price}</div>
+              </div>
+              <div className='flex justify-between items-center m-2'>
+                <div className='text-base font-bold'>{detail.recommendedOrderDate}</div>
+                <div className='text-[#bebebe] text-sm'>(예상 리드타임 : {detail.leadtime}일)</div>
+              </div>
+            </div>
+            ))}
+          </div>
+        </div>
+      </div>:null}
     </div>
   );
 }

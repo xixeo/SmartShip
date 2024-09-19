@@ -15,6 +15,7 @@ import Order from './03/Order';
 import OrderTEST from './03/OrderTEST'; 
 import BasicDatePicker from './03/BasicDatePicker'; 
 import CategoryDropdown from './02/ListSupplierTest';
+import MyOrderList from './04/MyOrderList';
 
 function App() {
    const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -57,6 +58,7 @@ function App() {
                   <Route path="/signstate" element={<SignState />} />  
                   <Route path="/Board" element={<Board />} />  
                   <Route path="/CategoryDropdown" element={<CategoryDropdown />} />  
+                  <Route path="/MyOrderList" element={<MyOrderList />} />  
                 </Routes>
               </main>
               <Footer />
