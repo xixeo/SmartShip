@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
-import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Table, TableBody, TableHead, TableRow, TableCell } from '@mui/material';
 import Box from '@mui/material/Box';
+import Input from '@mui/joy/Input';
 
 //////////////////////
 //    확장 아이콘    //
@@ -13,127 +13,403 @@ import Box from '@mui/material/Box';
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
     return <IconButton {...other} />;
-  })(({ theme }) => ({
+})(({ theme }) => ({
     marginLeft: 'auto',
     transition: theme.transitions.create('transform', {
-      duration: theme.transitions.duration.shortest,
+        duration: theme.transitions.duration.shortest,
     }),
     transform: (props) => (props.expand ? 'rotate(180deg)' : 'rotate(0deg)'),
-  }));
+}));
 
 export default function MyOrderList() {
     const [expanded, setExpanded] = useState({});
     const [listdata, setListdata] = useState([]);
-    const orderdate = '2024-09-16';
     const token = localStorage.getItem('token');
+    // const orderdate = '2024-09-16';
 
-    useEffect(()=>{
-        const fetchMyorderdata = async() => {
+    useEffect(() => {
+        const fetchMyorderdata = async () => {
             const myorderlist = [
                 {
-
+                    "orderId": 1,
+                    "username": "AWS선박",
+                    "alias": "유승호",
+                    "releaseDate": "2024-05-04",
+                    "bestorder.orderdate": "2024-01-21",
+                    "order.orderdate": "2024-09-06",
+                    "memo": "테스트",
+                    "orderstate": "발주 완료",
+                    "orderDetails": [
+                        {
+                            "orderDetailId": 1,
+                            "category1Name": "패션의류",
+                            "category2Name": "여성패션",
+                            "category3Name": "팬츠",
+                            "itemsId": 1,
+                            "itemName": "치마",
+                            "quantity": 10,
+                            "price": 1200.99,
+                            "unit": "JPY",
+                            "username": "민주샵",
+                            "recommendedorder.orderdate": null,
+                            "ordering": false
+                        },
+                        {
+                            "orderDetailId": 7,
+                            "category1Name": "패션의류",
+                            "category2Name": "여성패션",
+                            "category3Name": "팬츠",
+                            "itemsId": 1,
+                            "itemName": "치마",
+                            "quantity": 5,
+                            "price": 1200.99,
+                            "unit": "JPY",
+                            "username": "민주샵",
+                            "recommendedorder.orderdate": null,
+                            "ordering": false
+                        },
+                        {
+                            "orderDetailId": 8,
+                            "category1Name": "패션의류",
+                            "category2Name": "여성패션",
+                            "category3Name": "팬츠",
+                            "itemsId": 2,
+                            "itemName": "청바지",
+                            "quantity": 10,
+                            "price": 40100.00,
+                            "unit": "KRW",
+                            "username": "수플린",
+                            "recommendedorder.orderdate": null,
+                            "ordering": false
+                        }
+                    ]
+                },
+                {
+                    "orderId": 7,
+                    "username": "AWS선박",
+                    "alias": "유승호",
+                    "releaseDate": "2024-09-25",
+                    "bestorder.orderdate": "2024-09-18",
+                    "order.orderdate": "2024-09-18",
+                    "memo": "다시 테스트",
+                    "orderstate": "발주 예정",
+                    "orderDetails": [
+                        {
+                            "orderDetailId": 5,
+                            "category1Name": "패션의류",
+                            "category2Name": "여성패션",
+                            "category3Name": "팬츠",
+                            "itemsId": 1,
+                            "itemName": "치마",
+                            "quantity": 5,
+                            "price": 1200.99,
+                            "unit": "JPY",
+                            "username": "민주샵",
+                            "recommendedorder.orderdate": null,
+                            "ordering": false
+                        },
+                        {
+                            "orderDetailId": 6,
+                            "category1Name": "패션의류",
+                            "category2Name": "여성패션",
+                            "category3Name": "팬츠",
+                            "itemsId": 2,
+                            "itemName": "청바지",
+                            "quantity": 10,
+                            "price": 40100.00,
+                            "unit": "KRW",
+                            "username": "수플린",
+                            "recommendedorder.orderdate": null,
+                            "ordering": false
+                        },
+                        {
+                            "orderDetailId": 9,
+                            "category1Name": "패션의류",
+                            "category2Name": "여성패션",
+                            "category3Name": "팬츠",
+                            "itemsId": 1,
+                            "itemName": "치마",
+                            "quantity": 7,
+                            "price": 1200.99,
+                            "unit": "JPY",
+                            "username": "민주샵",
+                            "recommendedorder.orderdate": null,
+                            "ordering": false
+                        },
+                        {
+                            "orderDetailId": 10,
+                            "category1Name": "패션의류",
+                            "category2Name": "여성패션",
+                            "category3Name": "팬츠",
+                            "itemsId": 2,
+                            "itemName": "청바지",
+                            "quantity": 12,
+                            "price": 40100.00,
+                            "unit": "KRW",
+                            "username": "수플린",
+                            "recommendedorder.orderdate": null,
+                            "ordering": false
+                        }
+                    ]
+                },
+                {
+                    "orderId": 8,
+                    "username": "민주샵",
+                    "alias": "minjoo",
+                    "releaseDate": "2024-09-25",
+                    "bestorder.orderdate": "2024-09-18",
+                    "order.orderdate": "2024-09-09",
+                    "memo": "질러볼까",
+                    "orderstate": "발주 예정",
+                    "orderDetails": [
+                        {
+                            "orderDetailId": 17,
+                            "category1Name": "뷰티",
+                            "category2Name": "향수",
+                            "category3Name": "여성향수",
+                            "itemsId": 6,
+                            "itemName": "NO.5",
+                            "quantity": 3,
+                            "price": 299000.00,
+                            "unit": "KRW",
+                            "username": "첼시마켓",
+                            "recommendedorder.orderdate": null,
+                            "ordering": false
+                        },
+                        {
+                            "orderDetailId": 18,
+                            "category1Name": "뷰티",
+                            "category2Name": "향수",
+                            "category3Name": "캔들/디퓨저",
+                            "itemsId": 7,
+                            "itemName": "양키캔들",
+                            "quantity": 3,
+                            "price": 49900.00,
+                            "unit": "KRW",
+                            "username": "첼시마켓",
+                            "recommendedorder.orderdate": null,
+                            "ordering": false
+                        }
+                    ]
+                },
+                {
+                    "orderId": 10,
+                    "username": "minju",
+                    "alias": "minju",
+                    "releaseDate": "2024-10-01",
+                    "bestorder.orderdate": "2024-09-10",
+                    "order.orderdate": "2024-09-10",
+                    "memo": null,
+                    "orderstate": "발주 진행",
+                    "orderDetails": [
+                        {
+                            "orderDetailId": 20,
+                            "category1Name": "패션의류",
+                            "category2Name": "여성패션",
+                            "category3Name": "팬츠",
+                            "itemsId": 1,
+                            "itemName": "치마",
+                            "quantity": 10,
+                            "price": 1200.99,
+                            "unit": "JPY",
+                            "username": "민주샵",
+                            "recommendedorder.orderdate": null,
+                            "ordering": false
+                        },
+                        {
+                            "orderDetailId": 21,
+                            "category1Name": "패션의류",
+                            "category2Name": "남성패션",
+                            "category3Name": "팬츠",
+                            "itemsId": 3,
+                            "itemName": "청바지",
+                            "quantity": 10,
+                            "price": 39800.00,
+                            "unit": "KRW",
+                            "username": "민주샵",
+                            "recommendedorder.orderdate": null,
+                            "ordering": false
+                        },
+                        {
+                            "orderDetailId": 22,
+                            "category1Name": "패션의류",
+                            "category2Name": "캐주얼/유니섹스",
+                            "category3Name": "팬츠",
+                            "itemsId": 4,
+                            "itemName": "청바지",
+                            "quantity": 10,
+                            "price": 38800.00,
+                            "unit": "KRW",
+                            "username": "쿠팡",
+                            "recommendedorder.orderdate": null,
+                            "ordering": false
+                        },
+                        {
+                            "orderDetailId": 23,
+                            "category1Name": "뷰티",
+                            "category2Name": "향수",
+                            "category3Name": "여성향수",
+                            "itemsId": 6,
+                            "itemName": "NO.5",
+                            "quantity": 10,
+                            "price": 299000.00,
+                            "unit": "KRW",
+                            "username": "첼시마켓",
+                            "recommendedorder.orderdate": null,
+                            "ordering": false
+                        }
+                    ]
                 },
             ];
-            try{
-                const response = await fetch(``,
-                   {
-                    headers: {
-                        'Authorization' : `Bearer ${token}`
-                    }
-                   }
-                );
-                if (!response.ok) {
-                    throw new Error('myorderlist response was not ok');
-                  };
-                const myorderlist = await response.json();
-                setListdata(myorderlist);
-                fetchMyorderdata();
-            }catch(e){
-                console.log('Failed to fetch getMyOrderList',e)
+            try {
+                // const response = await fetch(`scheduleAll`,
+                //    {
+                //     headers: {
+                //         'Authorization' : `Bearer ${token}`
+                //     }
+                //    }
+                // );
+                // if (!response.ok) {
+                //     throw new Error('myorderlist response was not ok');
+                //   };
+                // const myorderlist = await response.json();
+                const sortdata = myorderlist.sort((a, b) => new Date(b['order.orderdate']) - new Date(a['order.orderdate']))
+                setListdata(sortdata);
+            } catch (e) {
+                console.log('Failed to fetch getMyOrderList', e)
             }
-        }        
-    })
+        }
+        fetchMyorderdata();
+    }, []);
 
+    console.log('data', listdata);
 
-   //////////////////////
-  //  카드 확장 함수   //
- //////////////////////
+    //////////////////////
+    // 데이터 처리 함수  //
+    //////////////////////
 
-  const handleExpandClick = (orderdate) => () => {
-    setExpanded({
-      ...expanded,
-      [orderdate]: !expanded[orderdate],
-    });
-  };
+    const addOrderdetailscount = (order) => {
+        return order.map(order => ({
+            ...order,
+            orderDetailscount: order.orderDetails.length
+        }));
+    };
+    const updateListdata = addOrderdetailscount(listdata);
 
-  return (
-    <div className="flex-col text-white MyOrderList">
-        <h4 className='m-2'>구매 요청 내역</h4>
-      {/* {Object.keys(groupedData).map((username) => ( */}
-        <div key={orderdate} className={` 'text-white rounded-xl m-5 border border-[#69686F]' card`}>
-            {orderdate}
-          <Box sx={{ display: 'flex', alignItems: 'center', padding: '16px' }}>
-            <IconButton
-              onClick={handleExpandClick(orderdate)}
-              aria-expanded={expanded[orderdate] || false}
-              aria-label="show more"
-              className={`transition-transform ${expanded[orderdate] ? 'rotate-180' : ''}`}
-              sx={{ color: 'white', marginLeft: 'auto' }}
-            >
-              <ExpandMoreIcon />
-            </IconButton>
-          </Box>
-          <Collapse in={expanded[orderdate]} timeout="auto" unmountOnExit>
-            <div className="w-full p-4">
-              <Table>
-                <TableHead>
-                  <TableRow
-                    sx={{
-                      'th, td': {
-                        bgcolor: '#47454F',
-                        color: 'white',
-                        fontWeight: 'bold',
-                        border: 'none',
-                      },
-                    }}
-                  >
-                    <TableCell align="center">Item Name</TableCell>
-                    <TableCell align="center">Quantity</TableCell>
-                    <TableCell align="center">Price</TableCell>
-                    <TableCell align="center">Supplier</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {/* {groupedData[username].map((detail) => { */}
-                    {/* return ( */}
-                      <TableRow>
-                        <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>품목명</TableCell>
-                        <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>수량</TableCell>
-                        <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>가격</TableCell>
-                        <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>판매자</TableCell>
-                        {/* <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.itemName}</TableCell>
-                        <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.quantity}</TableCell>
-                        <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>
-                          {formatPrice(detail.price, detail.quantity, detail.unit)}
-                        </TableCell>
-                        <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none' }}>{detail.SuplierName}</TableCell> */}
-                      </TableRow>
-                    {/* ); */}
-                  {/* })} */}
-                </TableBody>
-              </Table>
-            </div>
-            {/* <div className='flex justify-between p-2'>
-              <h2>
-               총 주문 금액 : {getFormattedCardTotal(orderdate)}
-              </h2>
-              <h2 className='text-[#FFCC6F] font-semibold'>
-                예상 리드타임 : {getLongestCheckedLeadTime(orderdate)}
-              </h2>
-            </div> */}
-          </Collapse>
+    //////////////////////
+    //  카드 확장 함수   //
+    //////////////////////
+
+    const handleExpandClick = (orderId) => () => {
+        setExpanded({
+            ...expanded,
+            [orderId]: !expanded[orderId],
+        });
+    };
+
+    //////////////////////
+    //  발주 현황 함수   //
+    //////////////////////
+
+    const setColor = (state) => {
+        switch (state) {
+            case '발주 예정': return <h1 className='text-[#5BF4FF]'>발주 예정</h1>;
+            case '발주 진행': return <h1 className='text-[#FFBA07]'>발주 진행</h1>;
+            case '발주 완료': return <h1 className='text-[#A0A0A0]'>발주 완료</h1>;
+        }
+    }
+
+    //////////////////////
+    //  통화 단위 함수   //
+    //////////////////////
+
+    // 수량에 맞춰 가격 계산 + 단위 붙이기
+    const formatPrice = (price, quantity, unit) => {
+        const totalPrice = price * quantity;
+        switch (unit) {
+            case 'KRW': return `₩ ${totalPrice.toLocaleString()}`;
+            case 'USD': return `$ ${totalPrice.toLocaleString()}`;
+            case 'JPY': return `¥ ${totalPrice.toLocaleString()}`;
+            case 'EUR': return `€ ${totalPrice.toLocaleString()}`;
+            default: return totalPrice.toLocaleString();
+        }
+    };
+
+    return (
+        <div className="flex-col text-white MyOrderList">
+            <h4 className="m-2">구매 요청 내역</h4>
+            {updateListdata.map((order, index) => (
+                <div key={order.orderId} className="text-white rounded-xl m-5 bg-[#2f2e38] card">
+                    <Box sx={{ display: 'flex', alignItems: 'center', padding: '16px' }}>
+                        <div className='w-full flex justify-between items-center'>
+                            <div className='flex items-center'>
+                                <h3 className='text-lg font-bold'>{index + 1}. {order["order.orderdate"]}</h3>
+                                <h3 className='m-1.5 text-sm text-[#5BF4FF] font-semibold'>({order.orderDetailscount}건)</h3>
+                            </div>
+                            <h1 className='text-lg font-semibold'>{setColor(order.orderstate)}</h1>
+                        </div>
+                        <IconButton
+                            onClick={handleExpandClick(order.orderId)}
+                            aria-expanded={expanded[order.orderId] || false}
+                            aria-label="show more"
+                            className={`transition-transform ${expanded[order.orderId] ? 'rotate-180' : ''}`}
+                            sx={{ color: 'white', marginLeft: 'auto' }}
+                        >
+                            <ArrowDropDownIcon fontSize='large' />
+                        </IconButton>
+                    </Box>
+                    <Collapse in={expanded[order.orderId]} timeout="auto" unmountOnExit>
+                        <div className="w-full p-4">
+                            <Table>
+                                <TableHead>
+                                    <TableRow
+                                        sx={{
+                                            'th, td': {
+                                                bgcolor: '#47454F',
+                                                color: 'white',
+                                                fontWeight: 'bold',
+                                                border: 'none',
+                                            },
+                                        }}
+                                    >
+                                        <TableCell align="center">Item Name</TableCell>
+                                        <TableCell align="center">Quantity</TableCell>
+                                        <TableCell align="center">Price</TableCell>
+                                        <TableCell align="center">Supplier</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {order.orderDetails.map((detail) => (
+                                        <TableRow key={detail.orderDetailId}>
+                                            {order.orderstate !== '발주 완료' ? (
+                                                <>
+                                                    <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', borderColor: '#4C4B54', bgcolor: '#67666E' }}>{detail.itemName}</TableCell>
+                                                    <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', borderColor: '#4C4B54', bgcolor: '#67666E' }}>-</TableCell>
+                                                    <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', borderColor: '#4C4B54', bgcolor: '#67666E' }}>-</TableCell>
+                                                    <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', borderColor: '#4C4B54', bgcolor: '#67666E' }}>-</TableCell>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', borderColor: '#4C4B54', bgcolor: '#67666E' }}>{detail.itemName}</TableCell>
+                                                    <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', borderColor: '#4C4B54', bgcolor: '#67666E' }}>{detail.quantity}</TableCell>
+                                                    <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', borderColor: '#4C4B54', bgcolor: '#67666E' }}>{formatPrice(detail.price, detail.quantity, detail.unit)}</TableCell>
+                                                    <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', borderColor: '#4C4B54', bgcolor: '#67666E' }}>{detail.username}</TableCell>
+                                                </>
+                                            )}
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                            <div className='mt-5'>
+                                <h1>비고</h1>
+                                <div className='mt-2 p-5 rounded-md bg-[#3C3A44] border-[#6C6A70] border'>
+                                    {order.memo}
+                                </div>
+                            </div>
+                        </div>
+                    </Collapse>
+                </div>
+            ))}
         </div>
-      {/* ))} */}
-    </div>
-  )
+    );
 }
