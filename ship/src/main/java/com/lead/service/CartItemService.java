@@ -45,6 +45,7 @@ public class CartItemService {
                     item.getCategory3().getCategory3Name(),
                     item.getItemsId(),
                     item.getItemName(),
+                    item.getPart1(),
                     cartItem.getQuantity(),
                     item.getPrice(),
                     item.getUnit(),

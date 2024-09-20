@@ -1,32 +1,103 @@
 package com.lead.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lead.dto.OrderDetailDTO;
+import com.lead.dto.ManagerOrderDTO;
+import com.lead.dto.OrderDetailUpdateDTO;
+import com.lead.dto.OrdersDTO;
+import com.lead.dto.UserOrderDTO;
 import com.lead.service.OrderDetailService;
+import com.lead.service.OrdersService;
 
 @RestController
 public class OrdersController {
 
+   @Autowired
+    private OrdersService ordersService;
+	   
 	@Autowired
 	private OrderDetailService orderDetailService;
 
-	// orderDetail 업데이트
-	@PutMapping("/orderUpdate")
-	public ResponseEntity<OrderDetailDTO> updateOrderDetail(@RequestParam Integer orderDetailId,
-			@RequestParam Integer newQuantity, @RequestParam Integer newItemId) {
-		OrderDetailDTO updatedOrderDetail = orderDetailService.updateOrderDetail(orderDetailId, newQuantity,
-				newItemId);
-		return ResponseEntity.ok(updatedOrderDetail);
+	// orderDetail 업데이트--수정 예정
+//	@PutMapping("/orderUpdate")
+//	public ResponseEntity<OrderDetailDTO> updateOrderDetail(@RequestParam Integer orderDetailId,
+//			@RequestParam Integer newQuantity, @RequestParam Integer newItemId) {
+//		OrderDetailDTO updatedOrderDetail = orderDetailService.updateOrderDetail(orderDetailId, newQuantity,
+//				newItemId);
+//		return ResponseEntity.ok(updatedOrderDetail);
+//	}
+	
+	@GetMapping("/getOrderDetail/{orderId}")
+	public ResponseEntity<?> getOrderById(@PathVariable Integer orderId){
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    
+		try {
+			System.out.println("===========================발주 요청 내역 조회 한다");
+			OrdersDTO orderDetails = ordersService.getOrderDetailsByOrderId(orderId, authentication);
+	        return ResponseEntity.ok(orderDetails);
+			
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("발주 요청 내역 조회 중 오류 발생: " + e.getMessage());
+		}
 	}
 
+	@PutMapping("/orderUpdate")
+	public ResponseEntity<String> updateOrderDetails(@RequestBody List<OrderDetailUpdateDTO> updateRequest, Authentication authentication) {
+		 Authentication authentication1 = SecurityContextHolder.getContext().getAuthentication();
+		
+		try {
+			System.out.println("===========================발주 처리 한다");
+			orderDetailService.updateOrderDetails(updateRequest, authentication1);
+			return ResponseEntity.ok("성공적으로 업데이트 되었습니다.");
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("발주 처리 중 오류 발생: " + e.getMessage());
+		}
+	}
+	
+	// orderId로 OrderDetails 조회 및 orderDate로 그룹화
+    @GetMapping("/details/{orderId}")
+    public ResponseEntity<?> getOrderDetailsByOrderId(@PathVariable Integer orderId, Authentication authentication) {
+    	
+    	 Authentication authentication2 = SecurityContextHolder.getContext().getAuthentication();
+    	 
+        try {
+        	System.out.println("===========================발주 확인 한다");
+        	ManagerOrderDTO orderDetails = ordersService.getOrderDetailsGroupedByOrderId(orderId, authentication2);
+            return ResponseEntity.ok(orderDetails);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류 발생: " + e.getMessage());
+        }
+    }
+
+    // ROLE_USER가 본인의 발주 요청 내역을 조회하는 엔드포인트
+    @GetMapping("/userOrders")
+    public ResponseEntity<?> getUserOrders(Authentication authentication) {
+        try {
+        	
+        	System.out.println("===========================주문내역 확인 한다");
+            List<UserOrderDTO> userOrders = ordersService.getUserOrders(authentication);
+
+            return ResponseEntity.ok(userOrders);
+        } catch (Exception e) {
+            // 에러 발생 시 에러 메시지 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("주문 내역을 조회하는 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+    
 //	@Autowired
 //	private OrdersService ordersService;
-//
+//  
 //	// 주문 생성
 //	@PostMapping("/newOrder")
 //	public ResponseEntity<OrdersDTO> createOrder(@RequestBody OrderRequestDTO orderRequest) {

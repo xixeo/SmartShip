@@ -33,8 +33,8 @@ public class Orders {
     @Column(name = "best_order_date", nullable = true)
     private LocalDate bestOrderDate;
     
-    @Column(name = "order_date", nullable = true)
-    private LocalDate orderDate;
+    @Column(name = "request_date", nullable = true)
+    private LocalDate requestDate;
     
     @Column(name = "memo", nullable = true)
     private String memo;

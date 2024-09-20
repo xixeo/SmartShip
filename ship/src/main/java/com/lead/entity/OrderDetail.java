@@ -1,5 +1,7 @@
 package com.lead.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,4 +38,7 @@ public class OrderDetail {
     
     @Column(name = "ordering", nullable = false)
     private boolean ordering; 
+    
+    @Column(name = "order_date", nullable = true)
+    private LocalDate orderDate;
 }

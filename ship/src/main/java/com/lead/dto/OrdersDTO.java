@@ -9,13 +9,12 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class OrdersDTO {
-
 	private Integer orderId;
 	private String username;
 	private String alias;
 	private LocalDate releaseDate;
 	private LocalDate bestOrderDate;
-	private LocalDate orderDate;
+	private LocalDate requestDate;
 	private String memo;
 	private List<OrderDetailDTO> orderDetails;
 }

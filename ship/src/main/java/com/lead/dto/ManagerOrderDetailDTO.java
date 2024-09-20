@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor 
-public class UserOrderDetailDTO {
+public class ManagerOrderDetailDTO {
 	private Integer orderDetailId;
     private Integer itemsId;
     private String itemName;

@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CartRequestDTO {
-    private List<CartItemRequestDTO> cartItems;
+    private List<CartItemRequestDTO> items;
+    String memo;
 }
