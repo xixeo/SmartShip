@@ -1,0 +1,35 @@
+.BasicDatePicker {
+  *, ::after, ::before {
+    border-color: #9D9B9B !important; // Match the border color
+  }
+
+  .css-18pjc51-MuiFormLabel-root-MuiInputLabel-root {
+    color: #fff !important; // Label color
+  }
+
+  .css-lxfshk-MuiInputBase-root-MuiOutlinedInput-root {
+    color: #fff !important; // Input text color
+    height: 40px; // Set height
+    & fieldset {
+      border-color: #9D9B9B !important; // Border color
+    }
+
+    &:hover fieldset {
+      border-color: #9D9B9B !important; // Border color on hover
+    }
+
+    &.Mui-focused fieldset {
+      border-color: #9D9B9B !important; // Border color when focused
+    }
+  }
+
+  .css-1a7z5rc-MuiButtonBase-root-MuiIconButton-root {
+    color:#69686F !important;
+    }
+
+  .MuiInputBase-input {
+    height: 100%;
+    color: white;
+    font-size: 16px;
+  }  
+}

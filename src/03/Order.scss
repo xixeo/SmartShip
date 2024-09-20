@@ -48,4 +48,60 @@
       }
     }
 
+    .memo-textfield {
+      height: auto; // 자동으로 높이 조절
+      width: 100%;
+      background-color: transparent;
+    
+      .MuiInputBase-input {
+        color: white;
+        height: auto; // 입력 내용에 따라 높이 조절
+        overflow-y: auto; // 스크롤 생성을 위해 추가
+      }
+    
+      .MuiOutlinedInput-root {
+        height: auto; // 자동으로 높이 조절
+    
+        & fieldset {
+          border-color: #9D9B9B !important;
+        }
+    
+        &:hover fieldset {
+          border-color: #9D9B9B !important;
+        }
+    
+        &.Mui-focused fieldset {
+          border-color: #9D9B9B !important;
+        }
+      }
+    }
+
+    .custom-orderquantity {
+      height: 40px;
+      width: 90px !important;
+      background-color: transparent;
+      
+      .MuiInputBase-input {
+        color: white;
+        height: 100%;
+        font-size: 14px;
+        text-align: center;
+      }
+  
+      .MuiOutlinedInput-root {
+        height: 40px;
+  
+        & fieldset {
+          border-color: #9D9B9B !important;
+        }
+  
+        &:hover fieldset {
+          border-color: #9D9B9B !important;
+        }
+  
+        &.Mui-focused fieldset {
+          border-color: #9D9B9B !important;
+        }
+      }
+    }
   }
