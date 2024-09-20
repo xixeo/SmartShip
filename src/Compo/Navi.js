@@ -43,7 +43,12 @@ const Navi = () => {
         </li>
         <li className="menu-item" onClick={() => navigate('/MyOrderList')}> 
           <FaShoppingCart className="icon" />
-          {!isCollapsed && <span>주문목록</span>}
+          {!isCollapsed && <span>구매요청 내역</span>}
+          {!isCollapsed && <FaChevronRight className="right-arrow" />}
+        </li>
+        <li className="menu-item" onClick={() => navigate('/PurchaseRequest')}> 
+          <FaShoppingCart className="icon" />
+          {!isCollapsed && <span>구매요청</span>}
           {!isCollapsed && <FaChevronRight className="right-arrow" />}
         </li>
       </ul>

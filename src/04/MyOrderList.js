@@ -5,7 +5,7 @@ import IconButton from '@mui/material/IconButton';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Table, TableBody, TableHead, TableRow, TableCell } from '@mui/material';
 import Box from '@mui/material/Box';
-import Input from '@mui/joy/Input';
+import Loading from '../Compo/Loading';
 
 //////////////////////
 //    확장 아이콘    //
@@ -25,7 +25,7 @@ export default function MyOrderList() {
     const [expanded, setExpanded] = useState({});
     const [listdata, setListdata] = useState([]);
     const token = localStorage.getItem('token');
-    // const orderdate = '2024-09-16';
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchMyorderdata = async () => {
@@ -35,8 +35,8 @@ export default function MyOrderList() {
                     "username": "AWS선박",
                     "alias": "유승호",
                     "releaseDate": "2024-05-04",
-                    "bestorder.orderdate": "2024-01-21",
-                    "order.orderdate": "2024-09-06",
+                    "bestOrderDate": "2024-01-21",
+                    "requestDate": "2024-09-06",
                     "memo": "테스트",
                     "orderstate": "발주 완료",
                     "orderDetails": [
@@ -89,8 +89,8 @@ export default function MyOrderList() {
                     "username": "AWS선박",
                     "alias": "유승호",
                     "releaseDate": "2024-09-25",
-                    "bestorder.orderdate": "2024-09-18",
-                    "order.orderdate": "2024-09-18",
+                    "bestOrderDate": "2024-09-18",
+                    "requestDate": "2024-09-18",
                     "memo": "다시 테스트",
                     "orderstate": "발주 예정",
                     "orderDetails": [
@@ -157,8 +157,8 @@ export default function MyOrderList() {
                     "username": "민주샵",
                     "alias": "minjoo",
                     "releaseDate": "2024-09-25",
-                    "bestorder.orderdate": "2024-09-18",
-                    "order.orderdate": "2024-09-09",
+                    "bestOrderDate": "2024-09-18",
+                    "requestDate": "2024-09-09",
                     "memo": "질러볼까",
                     "orderstate": "발주 예정",
                     "orderDetails": [
@@ -197,8 +197,8 @@ export default function MyOrderList() {
                     "username": "minju",
                     "alias": "minju",
                     "releaseDate": "2024-10-01",
-                    "bestorder.orderdate": "2024-09-10",
-                    "order.orderdate": "2024-09-10",
+                    "bestOrderDate": "2024-09-10",
+                    "requestDate": "2024-09-10",
                     "memo": null,
                     "orderstate": "발주 진행",
                     "orderDetails": [
@@ -261,6 +261,7 @@ export default function MyOrderList() {
                     ]
                 },
             ];
+            setLoading(true);
             try {
                 // const response = await fetch(`scheduleAll`,
                 //    {
@@ -273,8 +274,9 @@ export default function MyOrderList() {
                 //     throw new Error('myorderlist response was not ok');
                 //   };
                 // const myorderlist = await response.json();
-                const sortdata = myorderlist.sort((a, b) => new Date(b['order.orderdate']) - new Date(a['order.orderdate']))
+                const sortdata = myorderlist.sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate))
                 setListdata(sortdata);
+                setLoading(false)
             } catch (e) {
                 console.log('Failed to fetch getMyOrderList', e)
             }
@@ -336,14 +338,17 @@ export default function MyOrderList() {
     };
 
     return (
+        <div>
+            {/* Loading이 true면 컴포넌트를 띄우고, false면 null(빈 값)처리 하여 컴포넌트 숨김 */}
+            {loading ? <Loading /> : null}  
         <div className="flex-col text-white MyOrderList">
-            <h4 className="m-2">구매 요청 내역</h4>
+            <h2 className='text-2xl font-semibold text-white mb-10 ml-5'>구매요청 내역</h2>
             {updateListdata.map((order, index) => (
                 <div key={order.orderId} className="text-white rounded-xl m-5 bg-[#2f2e38] card">
                     <Box sx={{ display: 'flex', alignItems: 'center', padding: '16px' }}>
                         <div className='w-full flex justify-between items-center'>
                             <div className='flex items-center'>
-                                <h3 className='text-lg font-bold'>{index + 1}. {order["order.orderdate"]}</h3>
+                                <h3 className='text-lg font-bold'>{index + 1}. {order.requestDate}</h3>
                                 <h3 className='m-1.5 text-sm text-[#5BF4FF] font-semibold'>({order.orderDetailscount}건)</h3>
                             </div>
                             <h1 className='text-lg font-semibold'>{setColor(order.orderstate)}</h1>
@@ -410,6 +415,7 @@ export default function MyOrderList() {
                     </Collapse>
                 </div>
             ))}
+        </div>
         </div>
     );
 }

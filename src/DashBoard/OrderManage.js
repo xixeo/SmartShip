@@ -11,12 +11,10 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Button from '@mui/material/Button';
 import './Order.scss';
-import BasicDatePicker from './BasicDatePicker';
+import BasicDatePicker from '../03/BasicDatePicker';
 import dayjs from 'dayjs';
 import Modal from '@mui/material/Modal'
-import { isYesterday } from 'date-fns';
-import { json } from 'react-router-dom';
-import { Visibility } from '@mui/icons-material';
+import Loading from '../Compo/Loading';
 
 //////////////////////
 //    확장 아이콘    //
@@ -75,6 +73,7 @@ export default function OrderTest() {
   );
   const [deleteopen, setDeleteOpen] = useState(false);
   const [perchasopen, setPerchasOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
 
   const token = localStorage.getItem('token');
@@ -197,6 +196,7 @@ export default function OrderTest() {
       //     }
       //   }
     ];
+    setLoading(true);
     try {
       const response = await fetch(`getCart/${selectedDate}`,
         {
@@ -219,6 +219,7 @@ export default function OrderTest() {
         const lists = Addbestdate([basket], selectedDate);
         setListdatas(lists);
       }
+      setLoading(false)
     } catch (error) {
       console.error('Failed to fetch orderbasket:', error);
     }
@@ -707,6 +708,10 @@ export default function OrderTest() {
   }
 
   return (
+    <div>
+    <div>
+      {loading ? <Loading/> : null}
+    </div>
     <div className="flex-col text-white OrderBasket">
       <div className="bg-[#2F2E38] m-5 p-5 rounded-lg">
         <div className='flex m-2'>
@@ -955,6 +960,7 @@ export default function OrderTest() {
           </div>
         </div>
       </div>:null}
+    </div>
     </div>
   );
 }
