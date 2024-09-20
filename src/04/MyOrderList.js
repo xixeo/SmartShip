@@ -340,14 +340,14 @@ export default function MyOrderList() {
     return (
         <div>
             {/* Loading이 true면 컴포넌트를 띄우고, false면 null(빈 값)처리 하여 컴포넌트 숨김 */}
-            {loading ? <Loading /> : null}  
+            {loading ? (<Loading />) : (  
         <div className="flex-col text-white MyOrderList">
             <h2 className='text-2xl font-semibold text-white mb-10 ml-5'>구매요청 내역</h2>
             {updateListdata.map((order, index) => (
-                <div key={order.orderId} className="text-white rounded-xl m-5 bg-[#2f2e38] card">
+                <div key={order.orderId} className="text-white rounded-lg m-5 bg-[#2f2e38]">
                     <Box sx={{ display: 'flex', alignItems: 'center', padding: '16px' }}>
                         <div className='w-full flex justify-between items-center'>
-                            <div className='flex items-center'>
+                            <div className='flex items-center'>   
                                 <h3 className='text-lg font-bold'>{index + 1}. {order.requestDate}</h3>
                                 <h3 className='m-1.5 text-sm text-[#5BF4FF] font-semibold'>({order.orderDetailscount}건)</h3>
                             </div>
@@ -407,7 +407,7 @@ export default function MyOrderList() {
                             </Table>
                             <div className='mt-5'>
                                 <h1>비고</h1>
-                                <div className='mt-2 p-5 rounded-md bg-[#3C3A44] border-[#6C6A70] border'>
+                                <div className='mt-2 p-5 rounded-lg bg-[#3C3A44] border-[#6C6A70] border'>
                                     {order.memo}
                                 </div>
                             </div>
@@ -416,6 +416,7 @@ export default function MyOrderList() {
                 </div>
             ))}
         </div>
+            )}
         </div>
     );
 }
