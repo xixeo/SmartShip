@@ -154,18 +154,20 @@
 
   .custom-quantity {
     height: 40px;
-    flex-grow: 1;
+    width: 60% !important; 
     max-width: 300px;
     background-color: transparent;
-
+    
     .MuiInputBase-input {
       color: white;
       height: 100%;
       font-size: 14px;
+      text-align: center;
     }
 
     .MuiOutlinedInput-root {
       height: 40px;
+      width: 100%;
 
       & fieldset {
         border-color: #9D9B9B !important;

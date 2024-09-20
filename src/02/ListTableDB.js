@@ -1,5 +1,4 @@
-//part1,2 추가
-
+// 페이지네이션 수정해야함 (페이지당 항목수가 5일때 5개항목으로 걸러진 경우 -> 페이지 2까지 나옴)
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox,
@@ -15,13 +14,13 @@ import Modal from '../Compo/Modal';
 
 // 테이블 헤더 정의
 const headCells = [
-  { id: 'category1Name', label: 'Category 1', width: '14%' },
-  { id: 'category2Name', label: 'Category 2', width: '14%' },
-  { id: 'category3Name', label: 'Category 3', width: '14%' },
-  { id: 'itemName', label: '물품명', width: '15%' },
-  { id: 'part1', label: 'part 1', width: '14%' },
-  { id: 'part2', label: 'part 2', width: '14%' },
-  { id: 'quantity', label: '수량', width: '10%' }
+  { id: 'no', label: 'No.', width: '2%' },
+  { id: 'category1Name', label: 'Category 1', width: '16%' },
+  { id: 'category2Name', label: 'Category 2', width: '16%' },
+  { id: 'category3Name', label: 'Category 3', width: '16%' },
+  { id: 'itemName', label: '물품명', width: '17%' },
+  { id: 'part1', label: 'part 1', width: '16%' },
+  { id: 'quantity', label: '수량', width: '12%' }
 ];
 
 // null값 처리 & 가격 단위 구분 함수
@@ -73,19 +72,19 @@ function ListTableDB() {
   const [page, setPage] = useState(1); // 현재 페이지
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState('');
+  const [appliedSearchQuery, setAppliedSearchQuery] = useState('');
   const [category1Name, setCategoryName] = useState('');
   const [category2Name, setCategory2Name] = useState('');
   const [category3Name, setCategory3Name] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false); // 장바구니로 이동 물어보기 모달상태
-  const [showSelected, setShowSelected] = useState(false);
 
    // 사용자 이름을 로컬 스토리지에서 가져옴
    const username = localStorage.getItem('username') || 'Guest';
    const token = localStorage.getItem('token');
 
    const generateKey = (row) => {
-    return `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.part1}-${row.part2}-${row.itemName}`;
+    return `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.part1}-${row.itemName}`;
   };
 
   useEffect(() => {
@@ -133,20 +132,20 @@ function ListTableDB() {
       const matchesCategory1 = category1Name ? row.category1Name === category1Name : true;
       const matchesCategory2 = category2Name ? row.category2Name === category2Name : true;
       const matchesCategory3 = category3Name ? row.category3Name === category3Name : true;
-      const matchesSearchQuery = searchQuery ?
-        row.itemName.toLowerCase().includes(searchQuery.toLowerCase()) : true;
+      const matchesSearchQuery = appliedSearchQuery ?
+        row.itemName.toLowerCase().includes(appliedSearchQuery.toLowerCase()) : true;
       return matchesCategory1 && matchesCategory2 && matchesCategory3 && matchesSearchQuery;
     });
-  }, [rows, category1Name, category2Name, category3Name, searchQuery, showSelected]);
-
+  }, [rows, category1Name, category2Name, category3Name, appliedSearchQuery]);
+  
   const filteredRowsBySelection = useMemo(() => {
-    return showSelected ? filteredRows.filter(row => selected.has(row.itemId)) : filteredRows;
-  }, [filteredRows, showSelected, selected]);
+    return filteredRows;
+  }, [filteredRows, selected]);
 
   const uniqueRows = useMemo(() => {
     const seen = new Set();
     return filteredRowsBySelection.filter(row => {
-      const key = `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.part1}-${row.part2}-${row.itemName}`;
+      const key = `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.part1}-${row.itemName}`;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
@@ -155,7 +154,7 @@ function ListTableDB() {
 
   useEffect(() => {
     setPage(1);
-  }, [searchQuery, category1Name, category2Name, category3Name, rowsPerPage, showSelected]);
+  }, [searchQuery, category1Name, category2Name, category3Name, rowsPerPage]);
   
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
@@ -218,15 +217,15 @@ function ListTableDB() {
 
   // 빈 행 계산
   const emptyRows = useMemo(() => {
-    const rowsCount = showSelected ? filteredRowsBySelection.length : filteredRows.length;
+    const rowsCount = filteredRows.length;
     return page > 1 ? Math.max(0, (page - 1) * rowsPerPage + rowsPerPage - rowsCount) : 0;
-  }, [page, rowsPerPage, filteredRows.length, filteredRowsBySelection.length, showSelected]);
+  }, [page, rowsPerPage, filteredRows.length]);
 
   // 총 페이지 수 계산
   const totalPages = useMemo(() => {
-    const rowsCount = showSelected ? filteredRowsBySelection.length : filteredRows.length;
-    return Math.ceil(rowsCount / rowsPerPage);
-  }, [filteredRows.length, filteredRowsBySelection.length, rowsPerPage, showSelected]);
+    const rowsCount = filteredRows.length;
+    return Math.max(1, Math.ceil(rowsCount / rowsPerPage));  // 최소 1페이지가 있어야 함
+  }, [filteredRows.length, rowsPerPage]);
 
   const allRowsSelected = useMemo(() => {
     return uniqueRows.length > 0 && uniqueRows.every(row => selected.has(row.itemId));
@@ -236,12 +235,14 @@ function ListTableDB() {
 
   const handleSearchReset = () => {
     setSearchQuery('');
-    setRows(initialRows);
+    setAppliedSearchQuery('');
+    setRows(initialRows); 
+    setPage(1);
   };
 
   const handleSearchButtonClick = () => {
-    setRows(filteredRows);
-    setPage(1);
+    setAppliedSearchQuery(searchQuery); 
+    setPage(1); 
   };
 
   // 공통 데이터 조회 함수
@@ -252,7 +253,6 @@ function ListTableDB() {
         r.category2Name === row.category2Name &&
         r.category3Name === row.category3Name &&
         r.part1 === row.part1 &&
-        r.part2 === row.part2 &&
         r.itemName === row.itemName
     ) || {};
   };
@@ -293,7 +293,7 @@ function ListTableDB() {
   // 모달의 '장바구니로 이동' 버튼 클릭 시 동작
   const handleNavigateToCart = () => {
     setIsModalOpen(false);
-    navigate('/order');
+    navigate('/ordertest');
   };
 
   return (
@@ -369,11 +369,6 @@ function ListTableDB() {
           검색
         </Button>
         </div>
-          <FormControlLabel
-            control={<Switch checked={showSelected} onChange={() => setShowSelected(!showSelected)} />}
-            label={showSelected ? '선택 품목 보기' : '전체 품목 보기'}
-            className="custom-toggle"
-          />
       </div>
 
       <div className="bg-custom">
@@ -386,25 +381,26 @@ function ListTableDB() {
               allRowsSelected={allRowsSelected}
             />
             <TableBody>
-              {uniqueRows.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row) => (
+              {uniqueRows.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row, index) => (
                 <TableRow
                 key={generateKey(row)}
                 hover
+                tabIndex={-1}
                 selected={selected.has(row.itemId)}
               >
-                <TableCell padding="checkbox" style={{ width: '5%' }}>
+                <TableCell padding="checkbox" style={{ width: '5%'}}>
                   <Checkbox
                     checked={selected.has(row.itemId)}
                     inputProps={{ 'aria-labelledby': row.itemId }}
                     onChange={() => handleClick(null, row.itemId)} // 체크박스를 클릭할 때만 처리
                   />
                 </TableCell>
+                  <TableCell align="center" className="item-cell">{(page - 1) * rowsPerPage + index + 1}</TableCell>
                   <TableCell align="center" className="item-cell">{formatCellValue(row.category1Name)}</TableCell>
                   <TableCell align="center" className="item-cell">{formatCellValue(row.category2Name)}</TableCell>
                   <TableCell align="center" className="item-cell">{formatCellValue(row.category3Name)}</TableCell>
                   <TableCell align="center" className="item-cell">{formatCellValue(row.itemName)}</TableCell>
                   <TableCell align="center" className="item-cell">{formatCellValue(row.part1)}</TableCell>
-                  <TableCell align="center" className="item-cell">{formatCellValue(row.part2)}</TableCell>
                   <TableCell align="center" className="item-cell">
                     <TextField
                       className="custom-quantity"
@@ -427,8 +423,8 @@ function ListTableDB() {
         </TableContainer>
       </div>
       <div className="pagination-container">
-      <Pagination
-          count={totalPages}
+        <Pagination
+          count={totalPages > 0 ? totalPages : 1}  // 최소 1페이지 표시
           page={page}
           onChange={handleChangePage}
           variant="outlined"
