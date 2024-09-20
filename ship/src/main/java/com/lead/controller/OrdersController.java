@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lead.dto.ManagerOrderDTO;
+import com.lead.dto.OrderDetailDTO;
 import com.lead.dto.OrderDetailUpdateDTO;
 import com.lead.dto.OrdersDTO;
 import com.lead.dto.UserOrderDTO;
@@ -29,14 +31,20 @@ public class OrdersController {
 	@Autowired
 	private OrderDetailService orderDetailService;
 
-	// orderDetail 업데이트--수정 예정
-//	@PutMapping("/orderUpdate")
-//	public ResponseEntity<OrderDetailDTO> updateOrderDetail(@RequestParam Integer orderDetailId,
-//			@RequestParam Integer newQuantity, @RequestParam Integer newItemId) {
-//		OrderDetailDTO updatedOrderDetail = orderDetailService.updateOrderDetail(orderDetailId, newQuantity,
-//				newItemId);
-//		return ResponseEntity.ok(updatedOrderDetail);
-//	}
+	// 추천 아이템으로 업데이트
+    @PutMapping("/updateItem")
+    public ResponseEntity<?> updateOrderDetailItem(
+        @RequestParam Integer orderDetailId, // 주문 상세 항목 ID
+        @RequestParam Integer newItemId      // 새로운 아이템 ID
+    ) {
+        try {
+        	System.out.println("===========================대체 상품 들어간다");
+            OrderDetailDTO updatedOrderDetail = orderDetailService.updateOrderDetail(orderDetailId, newItemId);
+            return ResponseEntity.ok(updatedOrderDetail);
+        } catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("대체상품 입력 중 오류 발생: " + e.getMessage());
+        }
+    }
 	
 	@GetMapping("/getOrderDetail/{orderId}")
 	public ResponseEntity<?> getOrderById(@PathVariable Integer orderId){

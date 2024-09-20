@@ -83,30 +83,9 @@ public class CartController {
     ) {
         try {
             LocalDate parsedReleaseDate = LocalDate.parse(releaseDate);
-            
-            // parsedReleaseDate가 null인지 확인
-            if (parsedReleaseDate == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("요청 날짜가 비어 있습니다.");
-            }
-
-            
-            // cartRequestDTO가 null인지 확인
-            if (cartRequestDTO == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("요청 본문이 비어 있습니다. 주문 정보를 제공해야 합니다.");
-            }
-
-            // cartRequestDTO.getItems()가 null인지 확인
-            if (cartRequestDTO.getItems() == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("주문 항목 리스트가 없습니다.");
-            }
-
-            // cartRequestDTO.getItems()가 비어 있는지 확인
-            if (cartRequestDTO.getItems().isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("주문 항목이 비어 있습니다.");
-            }
-            
+                        
             // CartItemRequestDTO -> CartItemDTO 변환
-            List<CartItemDTO> cartItems = cartRequestDTO.getItems().stream()
+            List<CartItemDTO> cartItems = cartRequestDTO.getCartItems().stream()
                 .map(cartItemRequest -> CartItemDTO.builder()
                     .itemsId(cartItemRequest.getItemsId())
                     .quantity(cartItemRequest.getQuantity())

@@ -96,7 +96,7 @@ public class OrderDetailService {
     	}
     }
     
- // bestOrderDate 계산 
+    // bestOrderDate 계산 
     public LocalDate calculateBestOrderDate(List<OrderDetail> orderDetails, LocalDate releaseDate) {
         return orderDetails.stream()
             .map(orderDetail -> {
@@ -109,41 +109,41 @@ public class OrderDetailService {
     }
 
 
-    // OrderDetail update---수정할거야
-//  public OrderDetailDTO updateOrderDetail(Integer orderDetailId, Integer newQuantity, Integer newItemId) {
-//      // orderDetailId로 주문 상세 항목을 조회
-//      OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId)
-//          .orElseThrow(() -> new RuntimeException("OrderDetail 정보를 찾을 수 없습니다."));
-//
-//      // 새로운 Item을 itemId로 조회
-//      Items newItem = itemsRepo.findById(newItemId)
-//          .orElseThrow(() -> new RuntimeException("Items 정보를 찾을 수 없습니다."));
-//
-//      // 새로운 값으로 업데이트
-//      orderDetail.setQuantity(newQuantity);
-//      orderDetail.setItem(newItem); // 새로운 Items를 OrderDetail에 설정
-//      orderDetail.setOrdering(true); // ordering 컬럼 true로 설정
-//
-//      // 변경 사항 저장
-//      orderDetailRepo.save(orderDetail);
-//
-//      // DTO로 변환하여 반환
-//      return new OrderDetailDTO(
-//          orderDetail.getOrderDetailId(),
-//          newItem.getCategory3().getCategory2().getCategory1().getCategoryName(),
-//          newItem.getCategory3().getCategory2().getCategory2Name(),
-//          newItem.getCategory3().getCategory3Name(),
-//          newItem.getItemsId(),
-//          newItem.getItemName(),
-//          orderDetail.getQuantity(),
-//          newItem.getPrice(),
-//          newItem.getUnit(),
-//          newItem.getMember().getUsername(),
-//          null,
-//          orderDetail.isOrdering()
-//      );
-//  }
-//
+    // OrderDetail 대체상품으로 update
+    public OrderDetailDTO updateOrderDetail(Integer orderDetailId, Integer newItemId) {
+      // orderDetailId로 주문 상세 항목을 조회
+      OrderDetail orderDetail = orderDetailRepo.findById(orderDetailId)
+          .orElseThrow(() -> new RuntimeException("OrderDetail 정보를 찾을 수 없습니다."));
+
+      // 새로운 Item을 itemId로 조회
+      Items newItem = itemsRepo.findById(newItemId)
+          .orElseThrow(() -> new RuntimeException("Items 정보를 찾을 수 없습니다."));
+
+      // 새로운 값으로 업데이트
+      orderDetail.setItem(newItem); // 새로운 Items를 OrderDetail에 설정
+
+      // 변경 사항 저장
+      orderDetailRepo.save(orderDetail);
+
+      // DTO로 변환하여 반환
+      return new OrderDetailDTO(
+          orderDetail.getOrderDetailId(),
+          newItem.getCategory3().getCategory2().getCategory1().getCategoryName(),
+          newItem.getCategory3().getCategory2().getCategory2Name(),
+          newItem.getCategory3().getCategory3Name(),
+          newItem.getItemsId(),
+          newItem.getItemName(),
+          newItem.getPart1(),
+          orderDetail.getQuantity(),
+          newItem.getPrice(),
+          newItem.getUnit(),
+          newItem.getMember().getUsername(),
+          null,
+          orderDetail.isOrdering(),
+          orderDetail.getOrderDate()
+      );
+  }
+
 
     
 }
