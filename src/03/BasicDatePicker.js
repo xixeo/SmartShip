@@ -48,7 +48,7 @@ export default function BasicDatePicker({ onDateAccept }) {
             actions: ['clear', 'accept'], // clear와 accept 버튼만 표시
             sx: {
               '& .MuiButton-root': {
-                color: '#6f7173',
+                color: '#454CFF', // clear와 accept 버튼 색상
                 '&:hover': {
                   backgroundColor: '#F0F4FB', 
                 },

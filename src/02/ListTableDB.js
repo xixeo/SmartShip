@@ -427,7 +427,6 @@ function ListTableDB() {
           count={totalPages > 0 ? totalPages : 1}  // 최소 1페이지 표시
           page={page}
           onChange={handleChangePage}
-          variant="outlined"
           shape="rounded"
         />
       </div>
