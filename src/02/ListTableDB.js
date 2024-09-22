@@ -10,7 +10,7 @@ import Pagination from '@mui/material/Pagination';
 import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
 import './ListTable.scss';
-import Modal from '../Compo/Modal';
+import Modal2 from '../Compo/Modal2';
 
 // 테이블 헤더 정의
 const headCells = [
@@ -79,11 +79,11 @@ function ListTableDB() {
   const [modalOpen, setModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false); // 장바구니로 이동 물어보기 모달상태
 
-   // 사용자 이름을 로컬 스토리지에서 가져옴
-   const username = localStorage.getItem('username') || 'Guest';
-   const token = localStorage.getItem('token');
+  // 사용자 이름을 로컬 스토리지에서 가져옴
+  const username = localStorage.getItem('username') || 'Guest';
+  const token = localStorage.getItem('token');
 
-   const generateKey = (row) => {
+  const generateKey = (row) => {
     return `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.part1}-${row.itemName}`;
   };
 
@@ -91,17 +91,17 @@ function ListTableDB() {
     const fetchData = async () => {
       try {
         const response = await fetch('/finditem',
-        {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        }
-        }
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            }
+          }
         );
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-      
+
         const processedData = data.map(item => ({
           ...item,
           quantity: 1,
@@ -113,12 +113,12 @@ function ListTableDB() {
         console.error('데이터 로딩 중 오류 발생:', error);
       }
     };
-  
+
     fetchData();
   }, []);
 
   const category1Options = [...new Set(rows.map((row) => row.category1Name))];
-  
+
   const category2Options = useMemo(() => {
     return [...new Set(rows.filter((row) => row.category1Name === category1Name).map((row) => row.category2Name))];
   }, [category1Name, rows]);
@@ -137,7 +137,7 @@ function ListTableDB() {
       return matchesCategory1 && matchesCategory2 && matchesCategory3 && matchesSearchQuery;
     });
   }, [rows, category1Name, category2Name, category3Name, appliedSearchQuery]);
-  
+
   const filteredRowsBySelection = useMemo(() => {
     return filteredRows;
   }, [filteredRows, selected]);
@@ -155,7 +155,7 @@ function ListTableDB() {
   useEffect(() => {
     setPage(1);
   }, [searchQuery, category1Name, category2Name, category3Name, rowsPerPage]);
-  
+
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
       const newSelected = new Set(uniqueRows.map((row) => row.itemId));
@@ -217,15 +217,15 @@ function ListTableDB() {
 
   // 빈 행 계산
   const emptyRows = useMemo(() => {
-    const rowsCount = filteredRows.length;
+    const rowsCount = uniqueRows.length;
     return page > 1 ? Math.max(0, (page - 1) * rowsPerPage + rowsPerPage - rowsCount) : 0;
-  }, [page, rowsPerPage, filteredRows.length]);
+  }, [page, rowsPerPage, uniqueRows.length]);
+
+
 
   // 총 페이지 수 계산
-  const totalPages = useMemo(() => {
-    const rowsCount = filteredRows.length;
-    return Math.max(1, Math.ceil(rowsCount / rowsPerPage));  // 최소 1페이지가 있어야 함
-  }, [filteredRows.length, rowsPerPage]);
+  const totalPages = Math.ceil(uniqueRows.length / rowsPerPage);
+
 
   const allRowsSelected = useMemo(() => {
     return uniqueRows.length > 0 && uniqueRows.every(row => selected.has(row.itemId));
@@ -236,13 +236,13 @@ function ListTableDB() {
   const handleSearchReset = () => {
     setSearchQuery('');
     setAppliedSearchQuery('');
-    setRows(initialRows); 
+    setRows(initialRows);
     setPage(1);
   };
 
   const handleSearchButtonClick = () => {
-    setAppliedSearchQuery(searchQuery); 
-    setPage(1); 
+    setAppliedSearchQuery(searchQuery);
+    setPage(1);
   };
 
   // 공통 데이터 조회 함수
@@ -361,13 +361,13 @@ function ListTableDB() {
             }}
             className='custom-textfield'
           />
-        <Button
-          onClick={handleSearchButtonClick}
-          variant="contained"
-          className="bluebutton"
-        >
-          검색
-        </Button>
+          <Button
+            onClick={handleSearchButtonClick}
+            variant="contained"
+            className="bluebutton"
+          >
+            검색
+          </Button>
         </div>
       </div>
 
@@ -383,18 +383,18 @@ function ListTableDB() {
             <TableBody>
               {uniqueRows.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row, index) => (
                 <TableRow
-                key={generateKey(row)}
-                hover
-                tabIndex={-1}
-                selected={selected.has(row.itemId)}
-              >
-                <TableCell padding="checkbox" style={{ width: '5%'}}>
-                  <Checkbox
-                    checked={selected.has(row.itemId)}
-                    inputProps={{ 'aria-labelledby': row.itemId }}
-                    onChange={() => handleClick(null, row.itemId)} // 체크박스를 클릭할 때만 처리
-                  />
-                </TableCell>
+                  key={generateKey(row)}
+                  hover
+                  tabIndex={-1}
+                  selected={selected.has(row.itemId)}
+                >
+                  <TableCell padding="checkbox" style={{ width: '5%' }}>
+                    <Checkbox
+                      checked={selected.has(row.itemId)}
+                      inputProps={{ 'aria-labelledby': row.itemId }}
+                      onChange={() => handleClick(null, row.itemId)} // 체크박스를 클릭할 때만 처리
+                    />
+                  </TableCell>
                   <TableCell align="center" className="item-cell">{(page - 1) * rowsPerPage + index + 1}</TableCell>
                   <TableCell align="center" className="item-cell">{formatCellValue(row.category1Name)}</TableCell>
                   <TableCell align="center" className="item-cell">{formatCellValue(row.category2Name)}</TableCell>
@@ -424,7 +424,7 @@ function ListTableDB() {
       </div>
       <div className="pagination-container">
         <Pagination
-          count={totalPages > 0 ? totalPages : 1}  // 최소 1페이지 표시
+          count={totalPages}
           page={page}
           onChange={handleChangePage}
           shape="rounded"
@@ -446,37 +446,17 @@ function ListTableDB() {
           </Select>
         </div>
         <div className="flex gap-4">
-          {/* 장바구니 담기 버튼 */}
           <Button
             className='bluebutton2'
             onClick={handleAddToCart}>
             장바구니 담기
           </Button>
-
-          {/* 모달 컴포넌트 */}
-<Modal
-  open={isModalOpen}
-  setOpen={setIsModalOpen}
-  title="장바구니 추가 성공"
-  footer={
-    <div className="flex justify-center space-x-2">
-      <button
-        onClick={handleNavigateToCart}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-      >
-        장바구니로 이동
-      </button>
-      <button
-        onClick={() => setIsModalOpen(false)}
-        className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
-      >
-        닫기
-      </button>
-    </div>
-  }
->
-  장바구니에 아이템이 추가되었습니다. 장바구니로 이동하시겠습니까?
-</Modal>
+          <Modal2
+            open={isModalOpen}
+            setOpen={setIsModalOpen}
+            title="장바구니로 이동하시겠습니까?"
+            onConfirm={handleNavigateToCart}
+          />
         </div>
       </div>
     </div>

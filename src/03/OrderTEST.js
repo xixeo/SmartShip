@@ -150,7 +150,6 @@ export default function OrderTest() {
   //////////////////////
 
   // 검색 처리 함수
-
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState(listdatas);
 
@@ -213,6 +212,7 @@ export default function OrderTest() {
 
       setSelectedItems(new Set()); // 선택된 항목 초기화
       setDeleteOpen(false);
+
       // 데이터 다시 가져오기
       fetchorderlist(selectedDate.format('YYYY-MM-DD'));
     } catch (error) {
@@ -333,8 +333,8 @@ export default function OrderTest() {
                 <Button onClick={handleSearch} variant="contained" className="bluebutton items-center">검색</Button>
               </div>
             </div>
-            <div className='flex justify-between m-2 p-2'>
-              <Button className='bluebutton' onClick={() => setDeleteOpen(true)} >선택삭제</Button>
+            <div className='flex justify-between'>
+              <Button className='bluebutton items-end' onClick={() => setDeleteOpen(true)} >선택삭제</Button>
               <Modal2
                 open={deleteopen}
                 setOpen={setDeleteOpen}
@@ -438,7 +438,7 @@ export default function OrderTest() {
               onChange={(e) => setMemo(e.target.value)}
             />
           </div>
-          <div className='flex justify-end m-2 p-2'>
+          <div className='flex justify-end m-5'>
             <Button className='bluebutton2' onClick={() => setPerchasOpen(true)}>구매신청</Button>
             <Modal2
               open={perchasopen}
