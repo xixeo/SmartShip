@@ -62,4 +62,14 @@ public class FileService {
 
         return fileName;  // 저장된 파일 이름 반환
     }
+    
+    //////////////////////////////////////////////////////////파일 삭제
+    public void deleteFile(String fileName) {
+        try {
+            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+            Files.deleteIfExists(filePath);  // 파일이 존재하면 삭제
+        } catch (IOException e) {
+            throw new RuntimeException("파일을 삭제하는 중 오류가 발생했습니다: " + fileName, e);
+        }
+    }
 }

@@ -8,9 +8,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -88,21 +91,39 @@ public class NoticeController {
 	}
 
 	@PostMapping("/notice")
-	   public ResponseEntity<String> createNotice(
-	            @RequestParam("title") String title,
-	            @RequestParam("content") String content,
-	            @RequestParam(value = "file", required = false) MultipartFile[] files,
-	            Authentication authentication) {
-	        try {
-	            // 현재 로그인된 사용자 이름을 가져옴
-	            String username = authentication.getName();
-	            System.out.println("===========================공지 등록한다");
-	            // 공지사항 생성 로직
-	            noticeService.createNotice(title, content, files, username);  // author를 추가로 전달
-	            return ResponseEntity.ok("공지사항이 성공적으로 등록되었습니다.");
-	        } catch (Exception e) {
-	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                    .body("공지사항 등록 중 오류가 발생했습니다."  + e.getMessage());
-	        }
-	    }
+	public ResponseEntity<String> createNotice(@RequestParam("title") String title,
+			@RequestParam("content") String content,
+			@RequestParam(value = "file", required = false) MultipartFile[] files, Authentication authentication) {
+		try {
+			// 현재 로그인된 사용자 이름을 가져옴
+			String username = authentication.getName();
+			System.out.println("===========================공지 등록한다");
+			// 공지사항 생성 로직
+			noticeService.createNotice(title, content, files, username, authentication); // author를 추가로 전달
+			return ResponseEntity.ok("공지사항이 성공적으로 등록되었습니다.");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("공지사항 등록 중 오류가 발생했습니다." + e.getMessage());
+		}
+	}
+
+	// 공지사항 삭제
+	@DeleteMapping("/notice")
+	public ResponseEntity<String> deleteNotice(@RequestBody List<Integer> noticeIds) {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = authentication.getName(); // 토큰에서 username 추출
+
+		try {
+			// 공지사항 삭제 로직 호출
+			noticeService.deleteNotice(noticeIds, username);
+			System.out.println("===========================공지 삭제 한다");
+			
+			return ResponseEntity.ok("공지사항이 성공적으로 삭제되었습니다.");
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("공지사항을 찾을 수 없습니다: " + e.getMessage());
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("공지사항 삭제 중 오류가 발생했습니다." + e.getMessage());
+		}
+	}
 }

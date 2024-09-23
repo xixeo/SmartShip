@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,7 +18,7 @@ import com.lead.repository.NoticeRepo;
 
 @Service
 public class NoticeService {
-	
+
 	@Autowired
 	private MemberRepo memberRepo;
 
@@ -69,33 +70,60 @@ public class NoticeService {
 	}
 
 	/////////////////////////////////////////////////////////// notice 등록
-    public void createNotice(String title, String content, MultipartFile[] files, String username) throws IOException {
-    	 List<String> fileNames = new ArrayList<>();
-    	 
-         if (files != null) {
-        	 for(MultipartFile file : files) {
-        		 if(!file.isEmpty()) {
-        			 String fileName = fileService.storeFile(file);
-        			 fileNames.add(fileName);        		 
-        		 }           
-        	 }
-         }
+	public void createNotice(String title, String content, MultipartFile[] files, String username, Authentication authentication) throws IOException {
+		List<String> fileNames = new ArrayList<>();
 
-         // 작성자 정보 가져오기
-         Member author = memberRepo.findByUsername(username)
-                 .orElseThrow(() -> new RuntimeException("작성자를 찾을 수 없습니다."));
+		// 현재 사용자의 권한이 ROLE_ADMIN이 아닌 경우 예외 발생
+	    if (authentication.getAuthorities().stream()
+	            .noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))) {
+	        throw new RuntimeException("공지사항 등록 권한이 없습니다.");
+	    }
 
-        // Notice 엔티티 생성
-        Notice notice = Notice.builder()
-                .title(title)
-                .content(content)
-                .author(author)
-                .status(true)
-                .views(0)
-                .attachment(String.join(",", fileNames))  // 파일 이름 저장
-                .build();
+		if (files != null) {
+			for (MultipartFile file : files) {
+				if (!file.isEmpty()) {
+					String fileName = fileService.storeFile(file);
+					fileNames.add(fileName);
+				}
+			}
+		}
 
-        // 공지사항 저장
-        noticeRepo.save(notice);
-    }
+		// 작성자 정보 가져오기
+		Member author = memberRepo.findByUsername(username).orElseThrow(() -> new RuntimeException("작성자를 찾을 수 없습니다."));
+
+		// Notice 엔티티 생성
+		Notice notice = Notice.builder().title(title).content(content).author(author).status(true).views(0)
+				.attachment(String.join(",", fileNames)) // 파일 이름 저장
+				.build();
+
+		// 공지사항 저장
+		noticeRepo.save(notice);
+	}
+
+	/////////////////////////////////////////////////////////// notice 삭제
+	public void deleteNotice(List<Integer> noticeIds, String username) {
+
+		for (Integer noticeId : noticeIds) {
+
+			// 공지사항 조회
+			Notice notice = noticeRepo.findById(noticeId)
+					.orElseThrow(() -> new RuntimeException("공지사항을 찾을 수 없습니다. ID: " + noticeId));
+
+			// 현재 사용자(공급자)가 이 물품의 소유자인지 확인
+			if (!notice.getAuthor().getUsername().equals(username)) {
+				throw new RuntimeException("해당 물품을 수정할 권한이 없습니다.");
+			}
+
+			// 첨부파일 삭제 (필요할 경우)
+			if (notice.getAttachment() != null) {
+				String[] fileNames = notice.getAttachment().split(",");
+				for (String fileName : fileNames) {
+					fileService.deleteFile(fileName); // 파일 삭제
+				}
+			}
+
+			// 공지사항 삭제
+			noticeRepo.delete(notice);
+		}
+	}
 }
