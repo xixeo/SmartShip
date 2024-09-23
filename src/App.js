@@ -14,7 +14,6 @@ import ListSupplier2 from './02/ListSupplier2';
 import Order from './03/Order';
 import OrderTEST from './03/OrderTEST'; 
 import BasicDatePicker from './03/BasicDatePicker'; 
-import CategoryDropdown from './02/ListSupplierTest';
 import MyOrderList from './04/MyOrderList';
 import PurchaseRequest from './DashBoard/PurchaseRequest';
 import OrderManage from './DashBoard/OrderManage';
@@ -59,8 +58,7 @@ function App() {
                   <Route path="/ordertest" element={<OrderTEST />} />
                   <Route path="/ordertest2" element={<BasicDatePicker />} />
                   <Route path="/signstate" element={<SignState />} />  
-                  <Route path="/Board" element={<Board />} />  
-                  <Route path="/CategoryDropdown" element={<CategoryDropdown />} />  
+                  <Route path="/Board" element={<Board />} />   
                   <Route path="/MyOrderList" element={<MyOrderList />} />  
                   <Route path="/PurchaseRequest" element={<PurchaseRequest />} />  
                   <Route path="/getOrderDetail/:orderId" element={<OrderManage />} />  

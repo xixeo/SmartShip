@@ -1,80 +1,73 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import {
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox,
-    Button, Paper, TextField, InputAdornment, Select, MenuItem, Box, FormControlLabel,
-    Switch, IconButton, FormControl, InputLabel
-} from '@mui/material';
+ import React, { useState, useMemo, useEffect } from 'react';
+import { Checkbox, Select, Switch, MenuItem, Button, IconButton, TextField, InputAdornment, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import Pagination from '@mui/material/Pagination';
-import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
-import './ListTable.scss';
-import Modal from '../Compo/Modal';
 
-// 테이블 헤더 정의
-const headCells = [
-  { id: 'no', label: 'No.', width: '2%' },
-  { id: 'category1Name', label: 'Category 1', width: '12%' },
-  { id: 'category2Name', label: 'Category 2', width: '12%' },
-  { id: 'category3Name', label: 'Category 3', width: '12%' },
-  { id: 'itemName', label: '물품명', width: '10%' },
-  { id: 'part1', label: 'part 1', width: '10%' },
-  { id: 'part2', label: 'part 2', width: '10%' },
-  { id: 'totalPrice', label: '가격', width: '10%' },
-  { id: 'supplierName', label: '화폐단위', width: '7%' },
-  { id: 'saleStatus', label: '판매여부', width: '10%' },
-]; 
+const username = localStorage.getItem('username') || 'Guest';
+const alias = localStorage.getItem('alias') || 'Guest';
+const token = localStorage.getItem('token');
 
-// 테이블 헤더 컴포넌트
-function EnhancedTableHead({ onSelectAllClick, numSelected, rowCount, allRowsSelected }) {
-  return (
-    <TableHead
-      sx={{
-        backgroundColor: '#47464F', '& th': { fontWeight: 'bold', color: '#fff' }
-      }}>
-      <TableRow>
-        <TableCell padding="checkbox" style={{ width: '5%' }}>
-          <Checkbox
-            color="default"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={allRowsSelected}
-            onChange={onSelectAllClick}
-          />
-        </TableCell>
-        {headCells.map((headCell) => (
-          <TableCell
-            key={headCell.id}
-            align="center"
-            padding='normal'
-            style={{ width: headCell.width }}
-            className="cursor-pointer"
-          >
-            {headCell.label}
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
-}
+const ListSupplier2 = () => {
 
-// 메인 테이블 컴포넌트
-function ListTableDB() {
-  const navigate = useNavigate();
-  const [initialRows, setInitialRows] = useState([]);
-  const [rows, setRows] = useState([]);
-  const [selected, setSelected] = useState(new Set());
-  const [page, setPage] = useState(1); // 현재 페이지
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  // 각 행의 카테고리 선택
+  const [category1Map, setCategory1Map] = useState([]);
+  const [category2Map, setCategory2Map] = useState(new Map());
+  const [category3Map, setCategory3Map] = useState(new Map());
+
+  // 검색
   const [searchQuery, setSearchQuery] = useState('');
-  const [category1Name, setCategoryName] = useState('');
-  const [category2Name, setCategory2Name] = useState('');
-  const [category3Name, setCategory3Name] = useState('');
+  const [appliedSearchQuery, setAppliedSearchQuery] = useState('');
+  const [initialRows, setInitialRows] = useState([]);
 
-  const [showSelected, setShowSelected] = useState(false);
-  const [selectedSupplier, setSelectedSupplier] = useState({}); // 선택된 공급업체 상태
-  const [saleStatus, setSaleStatus] = useState({}); // 판매여부 상태를 관리할 객체
-  const currencyDisplayNames = { USD: '달러', EUR: '유로', JPY: '엔화', KRW: '원화' };
+  ////////////////////////////////
+  // 공급업체의 아이템만 가져오기 //
+  ////////////////////////////////
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/finditem', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        });
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+
+        console.log('Fetched data:', data);
+
+        const processedData = data.map(item => ({
+          ...item
+        }));
+        setRows(processedData);
+
+        // 각 행의 카테고리 값을 초기화
+        const initialSelectedCategories = processedData.reduce((acc, item) => {
+          const category1Id = category1Map.find(cat => cat.category1Name === item.category1Name)?.category1Id || '';
+
+          const category2Id = category2Map.get(category1Id)?.find(cat => cat.category2Name === item.category2Name)?.category2Id || '';
+
+          const category3Id = category3Map.get(category2Id)?.find(cat => cat.category3Name === item.category3Name)?.category3Id || '';
+
+          acc[item.itemId] = {
+            category1: category1Id,
+            category2: category2Id,
+            category3: category3Id,
+          };
+
+          return acc;
+        }, {});
+
+        setSelectedCategories(initialSelectedCategories);
+      } catch (error) {
+        console.error('데이터 로딩 중 오류 발생:', error);
+      }
+    };
+
+    fetchData();
+  }, [category1Map, category2Map, category3Map]);
+
+  const [rows, setRows] = useState([]);
   const [selectCategory1, setSelectCategory1] = useState('');
   const [selectCategory2, setSelectCategory2] = useState('');
   const [selectCategory3, setSelectCategory3] = useState('');
@@ -88,208 +81,217 @@ function ListTableDB() {
     return [...new Set(rows.filter((row) => row.category2Name === selectCategory2).map((row) => row.category3Name))];
   }, [selectCategory2, rows]);
 
-   // 사용자 이름을 로컬 스토리지에서 가져옴
-   const username = localStorage.getItem('username') || 'Guest';
-   const alias = localStorage.getItem('alias') || 'Guest';
-   const token = localStorage.getItem('token');
+  ///////////////////////////////////////////////
+  // 전체 카테고리 목록 가져오기 (각 행에서 변경) //
+  ///////////////////////////////////////////////
 
-   const generateKey = (row) => {
-    return `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.part1}-${row.part2}-${row.itemName}`;
+  const fetchCategories = async (url) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    } catch (error) {
+      console.error('Fetch error:', error);
+      return [];
+    }
   };
 
-  // 데이터 로딩
+  // 드롭다운에서 각 카테고리 선택
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('/finditem', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+    const loadCategories = async () => {
+      const [data1, data2, data3] = await Promise.all([
+        fetchCategories('/category1'),
+        fetchCategories('/category2'),
+        fetchCategories('/category3'),
+      ]);
+
+      const category2Map = new Map();
+      data2.forEach((item) => {
+        const { category1, category2Id, category2Name } = item;
+        const { category1Id } = category1;
+        if (!category2Map.has(category1Id)) {
+          category2Map.set(category1Id, []);
         }
-        const data = await response.json();
-
-        const processedData = data.map(item => ({
-          ...item,
-          quantity: 1,
-          leadtime: 1
-        }));
-        setInitialRows(processedData);
-        setRows(processedData);
-      } catch (error) {
-        console.error('데이터 로딩 중 오류 발생:', error);
-      }
-    };
-
-    fetchData();
-  }, [token]);
-
-  const filteredRows = useMemo(() => {
-    return rows.filter((row) => {
-      const matchesCategory1 = category1Name ? row.category1Name === category1Name : true;
-      const matchesCategory2 = category2Name ? row.category2Name === category2Name : true;
-      const matchesCategory3 = category3Name ? row.category3Name === category3Name : true;
-      const matchesSearchQuery = searchQuery ?
-        row.itemName.toLowerCase().includes(searchQuery.toLowerCase()) : true;
-      return matchesCategory1 && matchesCategory2 && matchesCategory3 && matchesSearchQuery;
-    });
-  }, [rows, category1Name, category2Name, category3Name, searchQuery, showSelected]);
-
-  const filteredRowsBySelection = useMemo(() => {
-    return showSelected ? filteredRows.filter(row => selected.has(row.itemId)) : filteredRows;
-  }, [filteredRows, showSelected, selected]);
-
-  const uniqueRows = useMemo(() => {
-    const seen = new Set();
-    return filteredRowsBySelection.filter(row => {
-      const key = `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.part1}-${row.part2}-${row.itemName}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-  }, [filteredRowsBySelection]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [searchQuery, category1Name, category2Name, category3Name, rowsPerPage, showSelected]);
-
-  useEffect(() => {
-    const autoSelectSingleSupplier = () => {
-      // 모든 품목에 대해 카테고리와 품목이 일치하는 항목을 찾음
-      const updatedRows = rows.map(row => {
-        // 현재 품목에 대한 공급업체 목록을 추출
-        const suppliers = [...new Set(rows
-          .filter(r =>
-            r.category1Name === row.category1Name &&
-            r.category2Name === row.category2Name &&
-            r.category3Name === row.category3Name &&
-            r.part1 === row.part1 &&
-            r.part2 === row.part2 &&
-            r.itemName === row.itemName
-          )
-          .map(r => r.supplierName))];
-        
-        // 공급업체가 하나인 경우 자동으로 선택
-        if (suppliers.length === 1) {
-          setSelectedSupplier(prev => ({
-            ...prev,
-            [row.itemId]: suppliers[0]  // 공급업체가 하나면 자동으로 설정
-          }));
-        }
-  
-        return row;
+        category2Map.get(category1Id).push({ category2Id, category2Name });
       });
-  
-      setRows(updatedRows);  // 상태 업데이트
+
+      const category3Map = new Map();
+      data3.forEach((item) => {
+        const { category2, category3Id, category3Name } = item;
+        const { category2Id } = category2;
+        if (!category3Map.has(category2Id)) {
+          category3Map.set(category2Id, []);
+        }
+        category3Map.get(category2Id).push({ category3Id, category3Name });
+      });
+
+      setCategory1Map(data1);
+      setCategory2Map(category2Map);
+      setCategory3Map(category3Map);
     };
+
+    loadCategories();
+  }, []);
+
+  const handleCategoryChange = (itemId, categoryLevel, value) => {
+    const newSelectedCategories = { ...selectedCategories };
   
-    autoSelectSingleSupplier();
-  }, [rows]);
+    if (!newSelectedCategories[itemId]) {
+      newSelectedCategories[itemId] = { category1: '', category2: '', category3: '' };
+    }
   
-  const handleSelectAllClick = (event) => {
+    if (categoryLevel === 1) {
+      newSelectedCategories[itemId].category1 = value;
+      newSelectedCategories[itemId].category2 = '';
+      newSelectedCategories[itemId].category3 = '';
+    } else if (categoryLevel === 2) {
+      newSelectedCategories[itemId].category2 = value;
+      newSelectedCategories[itemId].category3 = ''; // Reset category 3
+    } else {
+      newSelectedCategories[itemId].category3 = value;
+    }
+  
+    setSelectedCategories(newSelectedCategories);
+  };
+
+  //////////////////
+  // 판매상태 제어 //
+  //////////////////
+
+  const currencyDisplayNames = { USD: '달러', EUR: '유로', JPY: '엔화', KRW: '원화' };
+
+  const handlePriceChange = (itemId, event) => {
+    const newPrice = parseFloat(event.target.value) || 0;
+    setRows(rows.map(row =>
+      row.itemId === itemId ? { ...row, price: newPrice } : row
+    ));
+  };
+
+  const handleCurrencyChange = (itemId, event) => {
+    const newCurrency = event.target.value;
+    setRows(rows.map(row =>
+      row.itemId === itemId ? { ...row, unit: newCurrency } : row
+    ));
+  };
+
+  const handleSaleStatusChange = (itemId, event) => {
+    const newSaleStatus = event.target.checked;
+    setRows(rows.map(row =>
+      row.itemId === itemId ? { ...row, saleStatus: newSaleStatus } : row
+    ));
+  };
+
+  //////////////////
+  // 체크박스 관리 //
+  //////////////////
+
+  // 체크박스 상태 관리
+  const [selectedItems, setSelectedItems] = useState(new Set());
+
+  // 전체 선택 핸들러
+  const handleSelectAll = (event) => {
     if (event.target.checked) {
-      const newSelected = new Set(uniqueRows.map((row) => row.itemId));
-      setSelected((prevSelected) => new Set([...prevSelected, ...newSelected]));
+      const allSelected = new Set(rows.map(row => row.itemId));
+      setSelectedItems(allSelected);
     } else {
-      setSelected((prevSelected) => {
-        const newSelected = new Set(
-          [...prevSelected].filter(item => !uniqueRows.some(row => row.itemId === item))
-        );
-        return newSelected;
-      });
+      setSelectedItems(new Set());
     }
   };
 
-  const handleClick = (event, itemName) => {
-    const newSelected = new Set(selected);
-    if (newSelected.has(itemName)) {
-      newSelected.delete(itemName);
+  // 각 행의 체크박스 핸들러
+  const handleRowSelect = (itemId) => {
+    const newSelectedItems = new Set(selectedItems);
+    if (newSelectedItems.has(itemId)) {
+      newSelectedItems.delete(itemId);
     } else {
-      newSelected.add(itemName);
+      newSelectedItems.add(itemId);
     }
-    setSelected(newSelected);
+    setSelectedItems(newSelectedItems);
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(1);
-  };
-
-  const handleCategory1Change = (event) => {
-    setCategoryName(event.target.value);
-    setCategory2Name('');
-    setCategory3Name('');
-  };
-
-  const handleCategory2Change = (event) => {
-    setCategory2Name(event.target.value);
-    setCategory3Name('');
-  };
-
-  const handleCategory3Change = (event) => {
-    setCategory3Name(event.target.value);
-  };
+  ////////////////
+  // 물품명 검색 //
+  ////////////////
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
 
-  const handleQuantityChange = (itemId, event) => {
-    const newQuantity = Math.max(1, parseInt(event.target.value, 10));
-    setRows(rows.map(row =>
-      row.itemId === itemId ? { ...row, quantity: newQuantity } : row
-    ));
-  };
-
-  // 빈 행 계산
-  const emptyRows = useMemo(() => {
-    const rowsCount = showSelected ? filteredRowsBySelection.length : filteredRows.length;
-    return page > 1 ? Math.max(0, (page - 1) * rowsPerPage + rowsPerPage - rowsCount) : 0;
-  }, [page, rowsPerPage, filteredRows.length, filteredRowsBySelection.length, showSelected]);
-
-  // 총 페이지 수 계산
-  const totalPages = useMemo(() => {
-    const rowsCount = showSelected ? filteredRowsBySelection.length : filteredRows.length;
-    return Math.ceil(rowsCount / rowsPerPage);
-  }, [filteredRows.length, filteredRowsBySelection.length, rowsPerPage, showSelected]);
-
-  const allRowsSelected = useMemo(() => {
-    return uniqueRows.length > 0 && uniqueRows.every(row => selected.has(row.itemId));
-  }, [uniqueRows, selected]);
-
   const handleSearchReset = () => {
     setSearchQuery('');
+    setAppliedSearchQuery('');
     setRows(initialRows);
   };
 
   const handleSearchButtonClick = () => {
-    setRows(filteredRows);
-    setPage(1);
+    setAppliedSearchQuery(searchQuery);
+    // setPage(1);
   };
 
-  // 공통 데이터 조회 함수
-  const getRowData = (row) => {
-    return rows.find(
-      r =>
-        r.category1Name === row.category1Name &&
-        r.category2Name === row.category2Name &&
-        r.category3Name === row.category3Name &&
-        r.part1 === row.part1 &&
-        r.part2 === row.part2 &&
-        r.itemName === row.itemName
-    ) || {};
+  const filteredRows = useMemo(() => {
+    if (!appliedSearchQuery) return rows;
+    return rows.filter(row => row.itemName.includes(appliedSearchQuery));
+  }, [appliedSearchQuery, rows]);
+  
+  // 각 행에서 카테고리 수정(저장) 핸들러 //
+  const handleSave = async () => {
+    try {
+      console.log('selectedCategories:', selectedCategories);
+  
+      // selectedCategories가 객체 형태일 경우 배열로 변환
+      const selectedCategoriesArray = Object.values(selectedCategories);
+  
+      const dataToSave = selectedCategoriesArray.map(cat => {
+        const row = rows.find(r => r.itemId === cat.itemId);
+        if (!row) {
+          console.warn(`Item with ID ${cat.itemId} not found.`);
+          return null; // 존재하지 않는 경우 null 반환
+        }
+        return {
+          itemId: row.itemId,
+          category1Name: cat.category1,
+          category2Name: cat.category2,
+          category3Name: cat.category3,
+          itemName: row.itemName,
+          part1: row.part1,
+          part2: row.part2,
+          price: row.price,
+          unit: row.unit,
+          purchaseCount: row.purchaseCount,
+          supplierName: row.supplierName,
+          alias: row.alias,
+          leadtime: row.leadtime,
+          forSale: row.forSale,
+        };
+      }).filter(item => item !== null); // null 값을 필터링하여 제거
+  
+      if (dataToSave.length === 0) {
+        throw new Error('저장할 데이터가 없습니다.');
+      }
+  
+      console.log('Data to save:', JSON.stringify(dataToSave, null, 2));
+  
+      await fetch('/supplier/items', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSave),
+      });
+  
+      alert('Saved successfully!');
+    } catch (error) {
+      console.error('Error saving data:', error);
+      alert(`저장 중 오류가 발생했습니다: ${error.message}`);
+    }
   };
-
-  const isItemSelected = (itemId) => selected.has(itemId);
-
+  
   return (
     <div className="list-table-root flex flex-col p-6">
+      {/* 공급업체의 아이템 중 <Select> */}
       <div className="text-xl font-semibold text-white mb-4">{`[ ${alias} ] 물품 관리`}</div>
       <div className="flex items-center justify-between gap-4 mb-4">
         <div className="flex items-center gap-4">
@@ -300,8 +302,8 @@ function ListTableDB() {
             className="select-custom"
           >
             <MenuItem value=""><div>Categories 1</div></MenuItem>
-            {category1Options.map(option => (
-            <MenuItem key={option} value={option}>{option}</MenuItem>
+            {category1Options.map((option) => (
+              <MenuItem key={option} value={option}>{option}</MenuItem>
             ))}
           </Select>
           <Select
@@ -355,137 +357,163 @@ function ListTableDB() {
           />
         </div>
         <div className='flex space-x-3'>
-        <Button
-          onClick={handleSearchButtonClick}
-          variant="contained"
-          className="bluebutton"
-        >
-          검색
-        </Button>
-        <Button
-        //   onClick={handleSearchButtonClick}
-          variant="contained"
-          className="bluebutton"
-        >
-          등록
-        </Button>
-        <Button
-        //   onClick={handleSearchButtonClick}
-          variant="contained"
-          className="bluebutton"
-        >
-          삭제
-        </Button>
-        <Button
-        //   onClick={handleSearchButtonClick}
-          variant="contained"
-          className="bluebutton"
-        >
-          저장
-        </Button>
-        </div>
-      </div>
-      <div className="bg-custom">
-        <TableContainer component={Paper} sx={{ minHeight: '400px', width: '100%' }}>
-          <Table>
-            <EnhancedTableHead
-              onSelectAllClick={handleSelectAllClick}
-              numSelected={selected.size}
-              rowCount={uniqueRows.length}
-              allRowsSelected={allRowsSelected}
-            />
-            <TableBody>
-              {uniqueRows.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row, index) => (
-                <TableRow
-                hover
-                role="checkbox"
-                aria-checked={isItemSelected(row.itemId)}
-                tabIndex={-1}
-                key={row.itemId}
-                selected={isItemSelected(row.itemId)}
-                >
-                <TableCell padding="checkbox">
-                    <Checkbox
-                    color="default"
-                    checked={isItemSelected(row.itemId)}
-                    onChange={(event) => handleClick(event, row.itemId)}
-                    />
-                </TableCell>
-                  <TableCell align="center" className="item-cell">{(page - 1) * rowsPerPage + index + 1}</TableCell>
-                  <TableCell align="center" className="item-cell">{row.category1Name}</TableCell>
-                  <TableCell align="center" className="item-cell">{row.category2Name}</TableCell>
-                  <TableCell align="center" className="item-cell">{row.category3Name}</TableCell>
-                  <TableCell align="center" className="item-cell">{row.itemName}</TableCell>
-                  <TableCell align="center" className="item-cell">{row.part1}</TableCell>
-                  <TableCell align="center" className="item-cell">{row.part2}</TableCell>
-                  <TableCell align="center" className="item-cell">
-                    <TextField
-                      className="custom-quantity"
-                      type="number"
-                      value={row.quantity}
-                      onChange={(event) => handleQuantityChange(row.itemId, event)}
-                      inputProps={{ min: 1 }}
-                      size="small"
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  {/* 공급업체에 대한 가격 */}
-                  <TableCell 
-                    align="center" 
-                    className={`price-cell ${!selectedSupplier[row.itemId] ? 'price-cell-no-price' : ''}`}
-                  >
-                    {(() => {
-                      // 현재 선택된 공급업체의 데이터 찾기
-                      const supplierName = selectedSupplier[row.itemId];
-                      const data = rows.find(r =>
-                        r.category1Name === row.category1Name &&
-                        r.category2Name === row.category2Name &&
-                        r.category3Name === row.category3Name &&
-                        r.part1 === row.part1 &&
-                        r.part2 === row.part2 &&
-                        r.itemName === row.itemName &&
-                        r.supplierName === supplierName
-                      ) || {};
-
-                    })()}
-                  </TableCell>
-                </TableRow>
-              ))}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 53 * emptyRows }}>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
-      <div className="pagination-container">
-      <Pagination
-          count={totalPages}
-          page={page}
-          onChange={handleChangePage}
-          variant="outlined"
-          shape="rounded"
-        />
-      </div>
-      <div className='flex justify-between items-center mt-6'>
-        <div className="flex gap-4">
-          {/* 페이지당 항목 수 선택 */}
-          <Select
-            value={rowsPerPage}
-            onChange={handleChangeRowsPerPage}
-            className="select-custom"
+          <Button
+            onClick={handleSearchButtonClick}
+            variant="contained"
+            className="bluebutton"
           >
-            {[5, 10, 15].map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
+            검색
+          </Button>
+          <Button
+            //   onClick={handleSearchButtonClick}
+            variant="contained"
+            className="bluebutton"
+          >
+            등록
+          </Button>
+          <Button
+            //   onClick={handleSearchButtonClick}
+            variant="contained"
+            className="bluebutton"
+          >
+            삭제
+          </Button>
+          <Button
+            onClick={handleSave}
+            variant="contained"
+            className="bluebutton"
+          >
+            저장
+          </Button>
         </div>
       </div>
+
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead
+            sx={{
+              backgroundColor: '#47464F',
+              '& th': {
+                fontWeight: 'bold',
+                color: '#fff',
+              },
+            }}
+          >
+            <TableRow>
+              <TableCell padding="checkbox" style={{ width: '5%' }}>
+                <Checkbox
+                  color="default"
+                  checked={selectedItems.size === rows.length && rows.length > 0}
+                  onChange={handleSelectAll}
+                />
+              </TableCell>
+              <TableCell sx={{ width: '2%', textAlign: 'center' }}>No.</TableCell>
+              <TableCell sx={{ width: '13%', textAlign: 'center' }}>Category 1</TableCell>
+              <TableCell sx={{ width: '13%', textAlign: 'center' }}>Category 2</TableCell>
+              <TableCell sx={{ width: '13%', textAlign: 'center' }}>Category 3</TableCell>
+              <TableCell sx={{ width: '13%', textAlign: 'center' }}>물품명</TableCell>
+              <TableCell sx={{ width: '13%', textAlign: 'center' }}>part 1</TableCell>
+              <TableCell sx={{ width: '16%', textAlign: 'center' }}>가격</TableCell>
+              <TableCell sx={{ width: '6%', textAlign: 'center' }}>화폐단위</TableCell>
+              <TableCell sx={{ width: '6%', textAlign: 'center' }}>판매여부</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody className="items-center">
+            {rows.map((row, index) => (
+              <TableRow key={row.id}>
+                <TableCell padding="checkbox"  style={{ width: '5%' }}>
+                  <Checkbox
+                    color="default"
+                    checked={selectedItems.has(row.itemId)}
+                    onChange={() => handleRowSelect(row.itemId)}
+                  />
+                </TableCell>
+                <TableCell className="item-cell" sx={{ width: '2%' }}>{index + 1}</TableCell>
+                {/* 전체 카테고리 목록 중 <Select> */}
+                <TableCell sx={{ width: '13%' }}>
+                  <Select
+                    className="select-supplier items-center"
+                    value={selectedCategories[row.itemId]?.category1 || ''}
+                    onChange={(e) => handleCategoryChange(row.itemId, 1, e.target.value)}
+                  >
+                    <MenuItem value=""><em>Select Category1</em></MenuItem>
+                    {category1Map.map((cat) => (
+                      <MenuItem key={cat.category1Id} value={cat.category1Id}>
+                        {cat.category1Name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </TableCell>
+                <TableCell sx={{ width: '13%' }}>
+                  <Select
+                    className="select-supplier items-center"
+                    value={selectedCategories[row.itemId]?.category2 || ''}
+                    onChange={(e) => handleCategoryChange(row.itemId, 2, e.target.value)}
+                    disabled={!selectedCategories[row.itemId]?.category1}
+                  >
+                    <MenuItem value=""><em>Select Category2</em></MenuItem>
+                    {(category2Map.get(selectedCategories[row.itemId]?.category1) || []).map((cat) => (
+                      <MenuItem key={cat.category2Id} value={cat.category2Id}>
+                        {cat.category2Name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </TableCell>
+                <TableCell sx={{ width: '13%' }}>
+                  <Select
+                    className="select-supplier items-center"
+                    value={selectedCategories[row.itemId]?.category3 || ''}
+                    onChange={(e) => handleCategoryChange(row.itemId, 3, e.target.value)}
+                    disabled={!selectedCategories[row.itemId]?.category2}
+                  >
+                    <MenuItem value=""><em>Select Category3</em></MenuItem>
+                    {(category3Map.get(selectedCategories[row.itemId]?.category2) || []).map((cat) => (
+                      <MenuItem key={cat.category3Id} value={cat.category3Id}>
+                        {cat.category3Name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </TableCell>
+                <TableCell sx={{ width: '13%' }} align="center" className="item-cell">{row.itemName}</TableCell>
+                <TableCell sx={{ width: '13%' }} align="center" className="item-cell">{row.part1}</TableCell>
+                <TableCell align="center">
+                  <TextField
+                    sx={{ width: '16%' }}
+                    className="custom-quantity"
+                    type="number"
+                    value={row.price}
+                    onChange={(event) => handlePriceChange(row.itemId, event)}
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell align="center">
+                  <Select
+                    sx={{ width: '6%' }}
+                    className="select-supplier"
+                    value={row.unit || ''} // unit이 빈 문자열일 경우를 대비
+                    onChange={(event) => handleCurrencyChange(row.itemId, event)}
+                    fullWidth
+                  >
+                    {Object.entries(currencyDisplayNames).map(([code, displayName]) => (
+                      <MenuItem key={code} value={code}>
+                        {displayName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </TableCell>
+                <TableCell  sx={{ width: '6%' }} align="center">
+                  <Switch
+                    checked={row.forSale}
+                    onChange={(event) => handleSaleStatusChange(row.itemId, event)}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
   );
-}
+};
 
-export default ListTableDB;
+export default ListSupplier2;
