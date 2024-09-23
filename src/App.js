@@ -45,7 +45,7 @@ function App() {
         ) : (
           <div className="flex flex-1">
             <Navi />
-            <div className="flex flex-col flex-1 bg-gradient-to-b from-black to-[#1a1b41]">
+            <div className="flex flex-col flex-1 bg-gradient-to-b from-black to-[#1a1b41] min-w-[1000px]">
             <SignState/>
               <main className="flex-1 p-4">
                 <Routes>
