@@ -40,7 +40,7 @@ public class ItemsService {
 
 	@Autowired
 	private LeadtimeRepo leadtimeRepo;
-	
+
 	@Autowired
 	private MemberRepo memberRepo;
 
@@ -161,14 +161,14 @@ public class ItemsService {
 				|| itemsDTO.getCategory3Name() == null || itemsDTO.getItemName() == null || itemsDTO.getPart1() == null
 				|| itemsDTO.getPrice() == null || itemsDTO.getUnit() == null || itemsDTO.getLeadtime() == null) {
 			throw new RuntimeException("필수 입력값을 모두 입력해 주세요.");
-		}		
+		}
 
-        // supplierName 설정
-        itemsDTO.setSupplierName(username);
+		// supplierName 설정
+		itemsDTO.setSupplierName(username);
 
-        // Member 조회 (supplierName을 통해)
-        Member member = memberRepo.findByUsername(itemsDTO.getSupplierName())
-                .orElseThrow(() -> new RuntimeException("해당 공급자를 찾을 수 없습니다."));
+		// Member 조회 (supplierName을 통해)
+		Member member = memberRepo.findByUsername(itemsDTO.getSupplierName())
+				.orElseThrow(() -> new RuntimeException("해당 공급자를 찾을 수 없습니다."));
 
 		// Category3 조회
 		Category3 category3 = category3Repo.findByCategory3Name(itemsDTO.getCategory3Name())
@@ -187,24 +187,31 @@ public class ItemsService {
 		newItem.setForSale(true);
 
 		// 물품 저장
-		//itemsRepo.save(newItem);
-		
-		 // 물품 저장
-	    Items savedItem = itemsRepo.save(newItem);
+		// itemsRepo.save(newItem);
 
-	    // Leadtime 저장
-	    Leadtime leadtime = new Leadtime();
-	    leadtime.setItems(savedItem);
-	    leadtime.setLeadtime(itemsDTO.getLeadtime());
+		// 물품 저장
+		Items savedItem = itemsRepo.save(newItem);
 
-	    leadtimeRepo.save(leadtime);
+		// Leadtime 저장
+		Leadtime leadtime = new Leadtime();
+		leadtime.setItems(savedItem);
+		leadtime.setLeadtime(itemsDTO.getLeadtime());
+
+		leadtimeRepo.save(leadtime);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////// 상품
 	/////////////////////////////////////////////////////////////////////////////////// 수정
 	@Transactional
-	public ItemsDTO updateItem(Integer itemId, ItemsDTO updatedItemDto, String username) {
+	public void updateMultipleItems(List<ItemsDTO> itemsDTOList, String username) {
+		// 여러 아이템을 순차적으로 업데이트
+		for (ItemsDTO itemsDTO : itemsDTOList) {
+			updateItem(itemsDTO.getItemId(), itemsDTO, username);
+		}
+	}
 
+	@Transactional
+	public ItemsDTO updateItem(Integer itemId, ItemsDTO updatedItemDto, String username) {
 		// 수정할 아이템 찾기
 		Items item = itemsRepo.findById(itemId).orElseThrow(() -> new RuntimeException("해당 물품을 찾지 못했습니다."));
 
@@ -233,15 +240,13 @@ public class ItemsService {
 		return convertToDto(item);
 	}
 
-	// Entity를 DTO로 변환하는 메소드
 	private ItemsDTO convertToDto(Items item) {
-		return ItemsDTO.builder().category1Name(item.getCategory3().getCategory2().getCategory1().getCategoryName()) // Category1
-																														// 이름
-																														// 설정
-				.category2Name(item.getCategory3().getCategory2().getCategory2Name()) // Category2 이름 설정
-				.category3Name(item.getCategory3().getCategory3Name()) // Category3 이름 설정
-				.itemId(item.getItemsId()).itemName(item.getItemName()).part1(item.getPart1()).part2(item.getPart2())
-				.price(item.getPrice()).unit(item.getUnit()).forSale(item.isForSale()).build();
+		// 엔티티를 DTO로 변환하는 로직
+		return ItemsDTO.builder().itemId(item.getItemsId()).itemName(item.getItemName()).part1(item.getPart1())
+				.part2(item.getPart2()).price(item.getPrice()).unit(item.getUnit()).forSale(item.isForSale())
+				.category1Name(item.getCategory3().getCategory2().getCategory1().getCategoryName())
+				.category2Name(item.getCategory3().getCategory2().getCategory2Name())
+				.category3Name(item.getCategory3().getCategory3Name()).build();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////// 상품

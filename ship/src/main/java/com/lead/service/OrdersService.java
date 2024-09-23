@@ -3,6 +3,7 @@ package com.lead.service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,35 +100,47 @@ public class OrdersService {
 	// 날짜별로 orderDetail 묶어서 발주 완료 내역 조회 - ROLE_MANAGER
 	public ManagerOrderDTO getOrderDetailsGroupedByOrderId(Integer orderId, Authentication authentication) {
 
-		// 현재 사용자가 manager인지 확인
-		if (authentication.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_MANAGER"))) {
-			throw new RuntimeException("발주 내역 조회 권한이 없습니다.");
-		}
+	    // 현재 사용자가 manager인지 확인
+	    if (authentication.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_MANAGER"))) {
+	        throw new RuntimeException("발주 내역 조회 권한이 없습니다.");
+	    }
 
-		// orderId를 기반으로 Orders 조회
-		Orders order = ordersRepo.findById(orderId)
-				.orElseThrow(() -> new RuntimeException("해당 주문을 찾을 수 없습니다: " + orderId));
+	    // orderId를 기반으로 Orders 조회
+	    Orders order = ordersRepo.findById(orderId)
+	            .orElseThrow(() -> new RuntimeException("해당 주문을 찾을 수 없습니다: " + orderId));
 
-		// orderId를 기반으로 OrderDetail 조회
-		List<OrderDetail> orderDetails = orderDetailRepo.findByOrderOrderId(orderId);
+	    // orderId를 기반으로 OrderDetail 조회
+	    List<OrderDetail> orderDetails = orderDetailRepo.findByOrderOrderId(orderId);
 
-		// OrderDetail을 OrderDetailDTO로 변환하고, orderDate로 그룹화
-		Map<LocalDate, List<ManagerOrderDetailDTO>> groupedOrderDetails = orderDetails.stream()
-				.map(orderDetail -> new ManagerOrderDetailDTO(orderDetail.getOrderDetailId(),
-						orderDetail.getItem().getItemsId(), orderDetail.getItem().getItemName(),
-						orderDetail.getItem().getPart1(), orderDetail.getItem().getPrice(),
-						orderDetail.getItem().getUnit(), orderDetail.getQuantity(),
-						orderDetail.getItem().getMember().getUsername(), orderDetail.getOrderDate())) // orderDate를 포함한
-																										// UserOrderDetailDTO로
-																										// 변환
-				.collect(Collectors.groupingBy(ManagerOrderDetailDTO::getOrderDate)); // orderDate로 그룹화
+	    // OrderDetail을 OrderDetailDTO로 변환하고, orderDate로 그룹화
+	    Map<LocalDate, List<ManagerOrderDetailDTO>> groupedOrderDetails = orderDetails.stream()
+	            .map(orderDetail -> {
+	            
+	                // OrderDetailDTO로 변환
+	                return new ManagerOrderDetailDTO(
+	                        orderDetail.getOrderDetailId(),
+	                        orderDetail.getItem().getItemsId(),
+	                        orderDetail.getItem().getItemName(),
+	                        orderDetail.getItem().getPart1(),
+	                        orderDetail.getItem().getPrice(),
+	                        orderDetail.getItem().getUnit(),
+	                        orderDetail.getQuantity(),
+	                        orderDetail.getItem().getMember().getUsername(),
+	                        orderDetail.getOrderDate()
+	                );
+	            })
+	            .collect(Collectors.groupingBy(ManagerOrderDetailDTO::getOrderDate)); // orderDate로 그룹화
 
-		// UserOrderDTO 반환
-		return new ManagerOrderDTO(order.getOrderId(), order.getMember().getUsername(), order.getMember().getAlias(),
-				order.getRequestDate(), order.getReleaseDate(), order.getMemo(), groupedOrderDetails // 그룹화된
-																										// OrderDetails
-																										// 반환
-		);
+	    // UserOrderDTO 반환
+	    return new ManagerOrderDTO(
+	            order.getOrderId(),
+	            order.getMember().getUsername(),
+	            order.getMember().getAlias(),
+	            order.getRequestDate(),
+	            order.getReleaseDate(),
+	            order.getMemo(),
+	            groupedOrderDetails // 그룹화된 OrderDetails 반환
+	    );
 	}
 
 	// 발주 신청 내역 조회 - ROLE_USER
@@ -212,6 +225,7 @@ public class OrdersService {
 	private List<OrderDetailDTO> convertOrderDetailToDTO(List<OrderDetail> orderDetails, LocalDate releaseDate) {
 		return orderDetails.stream().map(orderDetail -> {
 			var item = orderDetail.getItem();
+			
 
 			// Leadtime 객체에서 leadtime 값을 가져오기
 			Leadtime leadtimeEntity = leadtimeRepo.findByItems_ItemsId(item.getItemsId())
@@ -231,7 +245,9 @@ public class OrdersService {
 					item.getItemsId(), item.getItemName(), 
 					item.getPart1(), orderDetail.getQuantity(), 
 					item.getPrice(),
-					item.getUnit(), item.getMember().getUsername(), 
+					item.getUnit(), 
+					leadtime,
+					item.getMember().getUsername(), 
 					recommendedOrderDate, orderDetail.isOrdering(),
 					orderDetail.getOrderDate());
 		}).collect(Collectors.toList());

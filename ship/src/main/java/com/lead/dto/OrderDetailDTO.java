@@ -21,6 +21,7 @@ public class OrderDetailDTO {
     private Integer quantity;
     private BigDecimal price;
     private String unit;
+    private Integer leadtime;
     private String username;
     private LocalDate recommendedOrderDate;
     private boolean ordering;

@@ -89,22 +89,22 @@ public class ItemsController {
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////// 수정
-	@PutMapping("/supplier/items/{itemId}")
-	public ResponseEntity<String> updateItem(@PathVariable Integer itemId, @RequestBody ItemsDTO itemsDTO) {
+	@PutMapping("/supplier/items")
+	public ResponseEntity<String> updateItems(@RequestBody List<ItemsDTO> itemsDTOList) {
 	    // JWT 토큰에서 사용자 정보 추출
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    String username = authentication.getName(); // 토큰에서 username 추출
-	    System.out.println("Username from JWT: " + username);
+
 	    try {
-	        itemsService.updateItem(itemId, itemsDTO, username);
-	        System.out.println("===========================물품정보 수정 한다");
-	        return ResponseEntity.ok("물품이 성공적으로 수정되었습니다.");
+	    	 System.out.println("===========================물품정보 수정 한다");
+	        // 여러 아이템 수정 로직 호출
+	        itemsService.updateMultipleItems(itemsDTOList, username);
+	        return ResponseEntity.ok("물품들이 성공적으로 수정되었습니다.");
 	    } catch (Exception e) {
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류 발생: " + e.getMessage());
 	    }
 	}
-
-
+	
 	/////////////////////////////////////////////////////////////////////////////// 삭제
 	@DeleteMapping("supplier/{itemId}")
 	public ResponseEntity<String> deleteItem(@PathVariable Integer itemId) {
