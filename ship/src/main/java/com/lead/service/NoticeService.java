@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.lead.dto.NoticeDTO;
@@ -125,5 +126,34 @@ public class NoticeService {
 			// 공지사항 삭제
 			noticeRepo.delete(notice);
 		}
+	}
+
+	/////////////////////////////////////////////////////////// notice 수정
+	@Transactional
+	public void updateNotice(Integer noticeId, String title, String content, MultipartFile file, String username) {
+	    // noticeId로 공지사항 조회
+	    Notice notice = noticeRepo.findById(noticeId)
+	            .orElseThrow(() -> new RuntimeException("해당 공지사항을 찾을 수 없습니다."));
+
+	    // 현재 사용자가 작성자인지 확인
+	    if (!notice.getAuthor().getUsername().equals(username)) {
+	        throw new RuntimeException("공지사항을 수정할 권한이 없습니다.");
+	    }
+
+	    // 제목 및 내용 업데이트
+	    notice.setTitle(title);
+	    notice.setContent(content);
+
+	    // 파일이 있을 경우 파일 저장 및 업데이트
+	    if (file != null && !file.isEmpty()) {
+	        try {
+	            String fileName = fileService.storeFile(file);  // IOException 처리
+	            notice.setAttachment(fileName);
+	        } catch (IOException e) {
+	            throw new RuntimeException("파일 저장 중 오류가 발생했습니다.", e);
+	        }
+	    }
+
+	    noticeRepo.save(notice);
 	}
 }

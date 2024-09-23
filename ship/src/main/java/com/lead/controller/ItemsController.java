@@ -11,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -106,14 +105,14 @@ public class ItemsController {
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////// 삭제
-	@DeleteMapping("supplier/{itemId}")
-	public ResponseEntity<String> deleteItem(@PathVariable Integer itemId) {
+	@DeleteMapping("/supplier/delete")
+	public ResponseEntity<String> deleteItems(@RequestBody List<Integer> itemIds) {
         // JWT 토큰에서 사용자 정보 추출 (SecurityContextHolder)
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName(); // 토큰에서 username 추출
 
         try {
-            itemsService.deleteItem(itemId, username);
+            itemsService.deleteItems(itemIds, username);
             
             System.out.println("===========================물품 삭제 한다");
             

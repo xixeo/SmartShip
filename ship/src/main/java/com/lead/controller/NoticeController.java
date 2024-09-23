@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -125,5 +126,25 @@ public class NoticeController {
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("공지사항 삭제 중 오류가 발생했습니다." + e.getMessage());
 		}
+	}
+	
+	//공지사항 수정
+	@PutMapping("/notice/{noticeId}")
+	public ResponseEntity<String> updateNotice(@PathVariable Integer noticeId,
+	                                           @RequestParam("title") String title,
+	                                           @RequestParam("content") String content,
+	                                           @RequestParam(value = "file", required = false) MultipartFile file,
+	                                           Authentication authentication) {
+	    String username = authentication.getName(); // 토큰에서 사용자 이름 가져오기
+
+	    try {
+	        // 공지사항 수정 로직 호출
+	        noticeService.updateNotice(noticeId, title, content, file, username);
+	        return ResponseEntity.ok("공지사항이 성공적으로 수정되었습니다.");
+	    } catch (RuntimeException e) {
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("공지사항 수정 중 오류가 발생했습니다." + e.getMessage());
+	    }
 	}
 }

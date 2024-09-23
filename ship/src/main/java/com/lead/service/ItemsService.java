@@ -241,7 +241,7 @@ public class ItemsService {
 	}
 
 	private ItemsDTO convertToDto(Items item) {
-		// 엔티티를 DTO로 변환하는 로직
+		// 엔티티 DTO로 변환
 		return ItemsDTO.builder().itemId(item.getItemsId()).itemName(item.getItemName()).part1(item.getPart1())
 				.part2(item.getPart2()).price(item.getPrice()).unit(item.getUnit()).forSale(item.isForSale())
 				.category1Name(item.getCategory3().getCategory2().getCategory1().getCategoryName())
@@ -252,19 +252,23 @@ public class ItemsService {
 	/////////////////////////////////////////////////////////////////////////////////// 상품
 	/////////////////////////////////////////////////////////////////////////////////// 삭제
 	@Transactional
-	public void deleteItem(Integer itemId, String username) {
+	public void deleteItems(List<Integer> itemIds, String username) {
 
-		// itemId로 물품 조회
-		Items item = itemsRepo.findById(itemId).orElseThrow(() -> new RuntimeException("해당 물품을 찾을 수 없습니다."));
+	    // 여러 개의 itemId를 순차적으로 처리
+	    for (Integer itemId : itemIds) {
+	        // itemId로 물품 조회
+	        Items item = itemsRepo.findById(itemId)
+	                .orElseThrow(() -> new RuntimeException("해당 물품을 찾을 수 없습니다. ID: " + itemId));
 
-		// 현재 사용자(공급자)가 이 물품의 소유자인지 확인
-		if (!item.getMember().getUsername().equals(username)) {
-			throw new RuntimeException("해당 물품을 수정할 권한이 없습니다.");
-		}
+	        // 현재 사용자(공급자)가 이 물품의 소유자인지 확인
+	        if (!item.getMember().getUsername().equals(username)) {
+	            throw new RuntimeException("해당 물품을 삭제할 권한이 없습니다. ID: " + itemId);
+	        }
 
-		// 물품을 비활성화 처리 (enabled = 0)
-		item.setEnabled(false); // boolean 값을 설정하면 DB에서 TINYINT로 처리
-		itemsRepo.save(item);
+	        // 물품을 비활성화 처리 (enabled = 0)
+	        item.setEnabled(false); // boolean 값을 설정하면 DB에서 TINYINT로 처리
+	        itemsRepo.save(item);
+	    }
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////// 대체
