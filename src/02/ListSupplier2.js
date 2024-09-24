@@ -1,7 +1,9 @@
- import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Checkbox, Select, Switch, MenuItem, Button, IconButton, TextField, InputAdornment, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
+import Modal3 from '../Compo/Modal3';
+import Pagination from '@mui/material/Pagination';
 
 const username = localStorage.getItem('username') || 'Guest';
 const alias = localStorage.getItem('alias') || 'Guest';
@@ -14,14 +16,23 @@ const ListSupplier2 = () => {
   const [category2Map, setCategory2Map] = useState(new Map());
   const [category3Map, setCategory3Map] = useState(new Map());
 
-  // 검색
-  const [searchQuery, setSearchQuery] = useState('');
-  const [appliedSearchQuery, setAppliedSearchQuery] = useState('');
-  const [initialRows, setInitialRows] = useState([]);
-
   ////////////////////////////////
   // 공급업체의 아이템만 가져오기 //
   ////////////////////////////////
+
+  const fetchLeadTime = async (itemId) => {
+    try {
+      const response = await fetch(`/finditem/${itemId}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      return data.leadtime || null; // leadtime을 가져옵니다.
+    } catch (error) {
+      console.error('Failed to fetch lead time:', error);
+      return null; // 오류 발생 시 null 반환
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,22 +48,23 @@ const ListSupplier2 = () => {
         console.log('Fetched data:', data);
 
         const processedData = data.map(item => ({
-          ...item
+          ...item,
+          forSale: item.forSale ?? false,
         }));
         setRows(processedData);
 
         // 각 행의 카테고리 값을 초기화
         const initialSelectedCategories = processedData.reduce((acc, item) => {
-          const category1Id = category1Map.find(cat => cat.category1Name === item.category1Name)?.category1Id || '';
+          const category1Name = category1Map.find(cat => cat.category1Name === item.category1Name)?.category1Name || '';
 
-          const category2Id = category2Map.get(category1Id)?.find(cat => cat.category2Name === item.category2Name)?.category2Id || '';
+          const category2Name = category2Map.get(category1Name)?.find(cat => cat.category2Name === item.category2Name)?.category2Name || '';
 
-          const category3Id = category3Map.get(category2Id)?.find(cat => cat.category3Name === item.category3Name)?.category3Id || '';
+          const category3Name = category3Map.get(category2Name)?.find(cat => cat.category3Name === item.category3Name)?.category3Name || '';
 
           acc[item.itemId] = {
-            category1: category1Id,
-            category2: category2Id,
-            category3: category3Id,
+            category1: category1Name,
+            category2: category2Name,
+            category3: category3Name,
           };
 
           return acc;
@@ -67,10 +79,17 @@ const ListSupplier2 = () => {
     fetchData();
   }, [category1Map, category2Map, category3Map]);
 
-  const [rows, setRows] = useState([]);
+  ////////////////////////////
+  // 카테고리선택, 물품명검색 //
+  ////////////////////////////
+
+  const [rows, setRows] = useState([]); // 이미 받아온 데이터가 들어가는 상태
+  const [filteredRows, setFilteredRows] = useState([]); // 필터링된 데이터를 담는 상태
   const [selectCategory1, setSelectCategory1] = useState('');
   const [selectCategory2, setSelectCategory2] = useState('');
   const [selectCategory3, setSelectCategory3] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [appliedSearchQuery, setAppliedSearchQuery] = useState('');
 
   // 선택된 카테고리 이름
   const category1Options = [...new Set(rows.map((row) => row.category1Name))];
@@ -80,6 +99,53 @@ const ListSupplier2 = () => {
   const category3Options = useMemo(() => {
     return [...new Set(rows.filter((row) => row.category2Name === selectCategory2).map((row) => row.category3Name))];
   }, [selectCategory2, rows]);
+
+  // 카테고리 선택 변경 시 필터링 함수
+  const applyCategoryFilter = () => {
+    console.log('All Rows:', rows);
+    console.log('Selected Categories:', {
+      selectCategory1,
+      selectCategory2,
+      selectCategory3,
+    });
+
+    // 카테고리 선택 해제 로직 추가
+    if (!selectCategory1) {
+      setSelectCategory2(''); // 카테고리1이 선택되지 않으면 카테고리2 해제
+      setSelectCategory3(''); // 카테고리1이 선택되지 않으면 카테고리3 해제
+    } else if (!selectCategory2) {
+      setSelectCategory3(''); // 카테고리2가 선택되지 않으면 카테고리3 해제
+    }
+
+    const updatedRows = rows.filter(row => {
+      const category1 = row.category1Name.trim();
+      const category2 = row.category2Name.trim();
+      const category3 = row.category3Name.trim();
+
+      const matchesCategory1 = selectCategory1 ? category1 === selectCategory1 : true;
+      const matchesCategory2 = selectCategory2 ? category2 === selectCategory2 : true;
+      const matchesCategory3 = selectCategory3 ? category3 === selectCategory3 : true;
+
+      return matchesCategory1 && matchesCategory2 && matchesCategory3;
+    });
+
+    console.log('Filtered Rows (before search):', updatedRows);
+    setFilteredRows(updatedRows);
+  };
+
+  // 검색어가 적용된 경우 필터링
+  useEffect(() => {
+    // 카테고리 필터 적용
+    applyCategoryFilter();
+    
+    // 검색어 필터링 적용
+    if (appliedSearchQuery) {
+      const finalFilteredRows = filteredRows.filter(row =>
+        row.itemName.toLowerCase().includes(appliedSearchQuery.toLowerCase())
+      );
+      setFilteredRows(finalFilteredRows);
+    }
+  }, [rows, selectCategory1, selectCategory2, selectCategory3, appliedSearchQuery]);
 
   ///////////////////////////////////////////////
   // 전체 카테고리 목록 가져오기 (각 행에서 변경) //
@@ -109,22 +175,23 @@ const ListSupplier2 = () => {
 
       const category2Map = new Map();
       data2.forEach((item) => {
-        const { category1, category2Id, category2Name } = item;
-        const { category1Id } = category1;
-        if (!category2Map.has(category1Id)) {
-          category2Map.set(category1Id, []);
+        const { category1, category2Name } = item;
+        const { category1Name } = category1; // category1Id는 유지
+        // category2Map에 category2Name 추가
+        if (!category2Map.has(category1Name)) {
+            category2Map.set(category1Name, []);
         }
-        category2Map.get(category1Id).push({ category2Id, category2Name });
-      });
-
+        category2Map.get(category1Name).push({ category2Name });
+    });
+    
       const category3Map = new Map();
       data3.forEach((item) => {
-        const { category2, category3Id, category3Name } = item;
-        const { category2Id } = category2;
-        if (!category3Map.has(category2Id)) {
-          category3Map.set(category2Id, []);
+        const { category2, category3Name } = item;
+        const { category2Name } = category2;
+        if (!category3Map.has(category2Name)) {
+          category3Map.set(category2Name, []);
         }
-        category3Map.get(category2Id).push({ category3Id, category3Name });
+        category3Map.get(category2Name).push({ category3Name });
       });
 
       setCategory1Map(data1);
@@ -135,13 +202,14 @@ const ListSupplier2 = () => {
     loadCategories();
   }, []);
 
+  // 각 테이블 행에서 카테고리 변경 시 (리셋)
   const handleCategoryChange = (itemId, categoryLevel, value) => {
     const newSelectedCategories = { ...selectedCategories };
-  
+
     if (!newSelectedCategories[itemId]) {
       newSelectedCategories[itemId] = { category1: '', category2: '', category3: '' };
     }
-  
+
     if (categoryLevel === 1) {
       newSelectedCategories[itemId].category1 = value;
       newSelectedCategories[itemId].category2 = '';
@@ -152,8 +220,26 @@ const ListSupplier2 = () => {
     } else {
       newSelectedCategories[itemId].category3 = value;
     }
-  
+
     setSelectedCategories(newSelectedCategories);
+  };
+
+  ///////////////////////
+  // 물품명, part1 변경 //
+  ///////////////////////
+
+  const handleItemNameChange = (itemId, event) => {
+    const newItemName = event.target.value;
+    setRows(rows.map(row =>
+      row.itemId === itemId ? { ...row, itemName: newItemName } : row
+    ));
+  };
+
+  const handlePart1Change = (itemId, event) => {
+    const newPart1 = event.target.value;
+    setRows(rows.map(row =>
+      row.itemId === itemId ? { ...row, part1: newPart1 } : row
+    ));
   };
 
   //////////////////
@@ -176,10 +262,10 @@ const ListSupplier2 = () => {
     ));
   };
 
-  const handleSaleStatusChange = (itemId, event) => {
-    const newSaleStatus = event.target.checked;
+  const handleforSaleChange = (itemId, event) => {
+    const newforSale = event.target.checked;
     setRows(rows.map(row =>
-      row.itemId === itemId ? { ...row, saleStatus: newSaleStatus } : row
+      row.itemId === itemId ? { ...row, forSale: newforSale } : row
     ));
   };
 
@@ -190,13 +276,16 @@ const ListSupplier2 = () => {
   // 체크박스 상태 관리
   const [selectedItems, setSelectedItems] = useState(new Set());
 
+  // 전체 선택 체크박스 상태 관리
+  const isAllSelected = filteredRows.length > 0 && filteredRows.every(row => selectedItems.has(row.itemId));
+
   // 전체 선택 핸들러
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      const allSelected = new Set(rows.map(row => row.itemId));
-      setSelectedItems(allSelected);
+      const allSelected = new Set(filteredRows.map(row => row.itemId)); // 필터링된 목록에서 전체 선택
+      setSelectedItems(prevSelected => new Set([...prevSelected, ...allSelected]));
     } else {
-      setSelectedItems(new Set());
+      setSelectedItems(new Set()); // 전체 선택 해제 ??
     }
   };
 
@@ -221,8 +310,8 @@ const ListSupplier2 = () => {
 
   const handleSearchReset = () => {
     setSearchQuery('');
-    setAppliedSearchQuery('');
-    setRows(initialRows);
+    setAppliedSearchQuery(''); 
+    // setRows(initialRows);
   };
 
   const handleSearchButtonClick = () => {
@@ -230,65 +319,156 @@ const ListSupplier2 = () => {
     // setPage(1);
   };
 
-  const filteredRows = useMemo(() => {
-    if (!appliedSearchQuery) return rows;
-    return rows.filter(row => row.itemName.includes(appliedSearchQuery));
-  }, [appliedSearchQuery, rows]);
-  
-  // 각 행에서 카테고리 수정(저장) 핸들러 //
-  const handleSave = async () => {
+  ////////////////////
+  // 삭제버튼 핸들러 //
+  ////////////////////
+
+  const handleDelete = async () => {
     try {
-      console.log('selectedCategories:', selectedCategories);
-  
-      // selectedCategories가 객체 형태일 경우 배열로 변환
-      const selectedCategoriesArray = Object.values(selectedCategories);
-  
-      const dataToSave = selectedCategoriesArray.map(cat => {
-        const row = rows.find(r => r.itemId === cat.itemId);
-        if (!row) {
-          console.warn(`Item with ID ${cat.itemId} not found.`);
-          return null; // 존재하지 않는 경우 null 반환
-        }
-        return {
-          itemId: row.itemId,
-          category1Name: cat.category1,
-          category2Name: cat.category2,
-          category3Name: cat.category3,
-          itemName: row.itemName,
-          part1: row.part1,
-          part2: row.part2,
-          price: row.price,
-          unit: row.unit,
-          purchaseCount: row.purchaseCount,
-          supplierName: row.supplierName,
-          alias: row.alias,
-          leadtime: row.leadtime,
-          forSale: row.forSale,
-        };
-      }).filter(item => item !== null); // null 값을 필터링하여 제거
-  
-      if (dataToSave.length === 0) {
-        throw new Error('저장할 데이터가 없습니다.');
+      // 선택된 itemId 모음
+      const itemIdsToDelete = Array.from(selectedItems);
+
+      if (itemIdsToDelete.length === 0) {
+        alert('삭제할 항목을 선택하세요.');
+        return;
       }
-  
-      console.log('Data to save:', JSON.stringify(dataToSave, null, 2));
-  
-      await fetch('/supplier/items', {
-        method: 'POST',
+
+      const username = localStorage.getItem('username') || 'Guest'; // localStorage에서 가져온 username 사용
+
+      const response = await fetch('/supplier/delete', {
+        method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(dataToSave),
+        // JSON 형식을 itemIds 배열만 포함하도록 수정
+        body: JSON.stringify(itemIdsToDelete), // itemIds 배열만 전달
       });
-  
-      alert('Saved successfully!');
+
+      if (response.ok) {  // 응답이 200번대인지 확인
+        alert('Deleted successfully!');
+        // 삭제 후 테이블 갱신
+        setRows(rows.filter(row => !selectedItems.has(row.itemId)));
+        setSelectedItems(new Set());  // 선택 초기화
+      } else {
+        const errorMessage = await response.text();
+        alert(`삭제 실패: ${errorMessage}`);
+      }
+
     } catch (error) {
-      console.error('Error saving data:', error);
-      alert(`저장 중 오류가 발생했습니다: ${error.message}`);
+      console.error('Error deleting items:', error);
+      alert(`삭제 중 오류가 발생했습니다: ${error.message}`);
+    }
+  };
+
+  ////////////////////
+  // 저장버튼 핸들러 //
+  ////////////////////
+
+  const handleSave = async () => {
+    try {
+      const itemsToSave = Array.from(selectedItems).map(itemId => {
+        const row = rows.find(row => row.itemId === itemId);
+        const selectedCategory = selectedCategories[itemId] || {};
+        return {
+          itemId: row.itemId,
+          category1Name: selectedCategory.category1 || null,
+          category2Name: selectedCategory.category2 || null,
+          category3Name: selectedCategory.category3 || null,
+          itemName: row.itemName || null,
+          part1: row.part1 || null,
+          part2: row.part2 || null,
+          price: row.price || null,
+          unit: row.unit || null,
+          forSale: row.forSale || null,
+        };
+      });
+
+      if (itemsToSave.length === 0) {
+        alert('저장할 항목을 선택하세요.');
+        return;
+      }
+
+      const response = await fetch('/supplier/items', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(itemsToSave),
+      });
+
+      if (response.ok) {
+        alert('Items saved successfully!');
+
+        // 성공적으로 저장된 후 로컬 상태에서 rows 업데이트
+        const updatedRows = rows.map(row => {
+          const savedItem = itemsToSave.find(item => item.itemId === row.itemId);
+          return savedItem ? { ...row, ...savedItem } : row;
+        });
+
+        setRows(updatedRows); // 상태 업데이트 후 화면 재랜더링
+      } else {
+        const errorMessage = await response.text();
+        alert(`Failed to save items: ${errorMessage}`);
+      }
+    } catch (error) {
+      console.error('Error saving items:', error);
+      alert(`Error while saving: ${error.message}`);
     }
   };
   
+  /////////////////////////////
+  // 새 상품 등록 및 모달 관리 //
+  /////////////////////////////
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleRegisterButtonClick = () => {
+    setIsModalOpen(true); // 버튼 클릭 시 모달 열기
+  };
+
+  // // 데이터를 다시 가져오는 함수
+  // const fetchUpdatedData = async () => {
+  //   try {
+  //     const response = await fetch('/supplier/items', {
+  //       headers: {
+  //         'Authorization': `Bearer ${token}`,
+  //       },
+  //     });
+
+  //     if (response.ok) {
+  //       const updatedRows = await response.json();
+  //       setRows(updatedRows); // 새로운 데이터를 상태에 저장하여 화면 재랜더링
+  //     } else {
+  //       alert('Failed to fetch updated data');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching updated data:', error);
+  //   }
+  // };
+
+
+  /////////////////////////////
+  //  페이지네이션 관련 함수   //
+  /////////////////////////////
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // 현재 페이지에 따라 표시할 데이터의 인덱스를 계산하는 함수
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredRows.slice(indexOfFirstItem, indexOfLastItem);
+
+  // 페이지네이션 버튼함수
+  const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+
+
   return (
     <div className="list-table-root flex flex-col p-6">
       {/* 공급업체의 아이템 중 <Select> */}
@@ -365,14 +545,19 @@ const ListSupplier2 = () => {
             검색
           </Button>
           <Button
-            //   onClick={handleSearchButtonClick}
+            onClick={handleRegisterButtonClick}
             variant="contained"
             className="bluebutton"
           >
             등록
           </Button>
+          <Modal3
+            open={isModalOpen}
+            setOpen={setIsModalOpen}
+            title="신규 상품 등록"
+          />
           <Button
-            //   onClick={handleSearchButtonClick}
+            onClick={handleDelete}
             variant="contained"
             className="bluebutton"
           >
@@ -391,6 +576,7 @@ const ListSupplier2 = () => {
       <TableContainer component={Paper}>
         <Table>
           <TableHead
+            isAllSelected={isAllSelected}
             sx={{
               backgroundColor: '#47464F',
               '& th': {
@@ -403,7 +589,7 @@ const ListSupplier2 = () => {
               <TableCell padding="checkbox" style={{ width: '5%' }}>
                 <Checkbox
                   color="default"
-                  checked={selectedItems.size === rows.length && rows.length > 0}
+                  checked={isAllSelected}
                   onChange={handleSelectAll}
                 />
               </TableCell>
@@ -419,9 +605,9 @@ const ListSupplier2 = () => {
             </TableRow>
           </TableHead>
           <TableBody className="items-center">
-            {rows.map((row, index) => (
+            {currentItems.map((row, index) => (
               <TableRow key={row.id}>
-                <TableCell padding="checkbox"  style={{ width: '5%' }}>
+                <TableCell padding="checkbox" style={{ width: '5%' }}>
                   <Checkbox
                     color="default"
                     checked={selectedItems.has(row.itemId)}
@@ -438,7 +624,7 @@ const ListSupplier2 = () => {
                   >
                     <MenuItem value=""><em>Select Category1</em></MenuItem>
                     {category1Map.map((cat) => (
-                      <MenuItem key={cat.category1Id} value={cat.category1Id}>
+                      <MenuItem key={cat.category1Name} value={cat.category1Name}>
                         {cat.category1Name}
                       </MenuItem>
                     ))}
@@ -453,7 +639,7 @@ const ListSupplier2 = () => {
                   >
                     <MenuItem value=""><em>Select Category2</em></MenuItem>
                     {(category2Map.get(selectedCategories[row.itemId]?.category1) || []).map((cat) => (
-                      <MenuItem key={cat.category2Id} value={cat.category2Id}>
+                      <MenuItem key={cat.category2Name} value={cat.category2Name}>
                         {cat.category2Name}
                       </MenuItem>
                     ))}
@@ -468,14 +654,28 @@ const ListSupplier2 = () => {
                   >
                     <MenuItem value=""><em>Select Category3</em></MenuItem>
                     {(category3Map.get(selectedCategories[row.itemId]?.category2) || []).map((cat) => (
-                      <MenuItem key={cat.category3Id} value={cat.category3Id}>
+                      <MenuItem key={cat.category3Name} value={cat.category3Name}>
                         {cat.category3Name}
                       </MenuItem>
                     ))}
                   </Select>
                 </TableCell>
-                <TableCell sx={{ width: '13%' }} align="center" className="item-cell">{row.itemName}</TableCell>
-                <TableCell sx={{ width: '13%' }} align="center" className="item-cell">{row.part1}</TableCell>
+                <TableCell sx={{ width: '16%' }} align="center" className="item-cell">
+                  <TextField
+                    className="custom-quantity"
+                    value={row.itemName || ''}
+                    onChange={(event) => handleItemNameChange(row.itemId, event)}
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell sx={{ width: '13%' }} align="center" className="item-cell">
+                  <TextField
+                    className="custom-quantity"
+                    value={row.part1 || ''} 
+                    onChange={(event) => handlePart1Change(row.itemId, event)}
+                    fullWidth
+                  />
+                </TableCell>
                 <TableCell align="center">
                   <TextField
                     sx={{ width: '16%' }}
@@ -501,10 +701,10 @@ const ListSupplier2 = () => {
                     ))}
                   </Select>
                 </TableCell>
-                <TableCell  sx={{ width: '6%' }} align="center">
+                <TableCell sx={{ width: '6%' }} align="center">
                   <Switch
-                    checked={row.forSale}
-                    onChange={(event) => handleSaleStatusChange(row.itemId, event)}
+                    checked={row.forSale ?? false}
+                    onChange={(event) => handleforSaleChange(row.itemId, event)}
                   />
                 </TableCell>
               </TableRow>
@@ -512,7 +712,32 @@ const ListSupplier2 = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <div className="pagination-container">
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              shape="rounded"
+            />
+          </div>
+          <div>
+            <Select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="select-custom ml-5"
+            >
+              {[5, 10, 15].map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select></div>
     </div>
+
+    
   );
 };
 
