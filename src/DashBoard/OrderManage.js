@@ -12,8 +12,10 @@ import './OrderManage.scss';
 export default function OrderTest() {
   const { orderId } = useParams(); // URL에서 orderId 가져오기
   const [purDetails, setPurDetails] = useState([]);
+  const [quantityState, setQuantityState] = useState({});
   const [pastleadopen, setPastleadOpen] = useState(false);
   const [preleadopen, setPreleadOpen] = useState(false);
+  const [perchasopen, setPerchasopen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selrow, setSelrow] = useState([]);
   const [totalAmounts, setTotalAmounts] = useState({});
@@ -83,111 +85,9 @@ export default function OrderTest() {
         //         "quantity": 10,
         //         "price": 38800.00,
         //         "unit": "KRW",
-        //         "username": "쿠팡",
+        //         "username": "민주샵",
         //         "leadtime": 16,
         //         "recommendedOrderDate": "2024-09-15",
-        //         "ordering": false,
-        //         "orderDate": null
-        //       },
-        //       {
-        //         "orderDetailId": 9,
-        //         "category1Name": "패션의류",
-        //         "category2Name": "캐주얼/유니섹스",
-        //         "category3Name": "팬츠",
-        //         "itemsId": 9,
-        //         "itemName": "청바지",
-        //         "part1": "중청",
-        //         "quantity": 10,
-        //         "price": 38800.00,
-        //         "unit": "KRW",
-        //         "username": "쿠팡",
-        //         "leadtime": 16,
-        //         "recommendedOrderDate": "2024-09-15",
-        //         "ordering": false,
-        //         "orderDate": null
-        //       },
-        //       {
-        //         "orderDetailId": 5,
-        //         "category1Name": "패션의류",
-        //         "category2Name": "캐주얼/유니섹스",
-        //         "category3Name": "팬츠",
-        //         "itemsId": 8,
-        //         "itemName": "청바지",
-        //         "part1": "중청",
-        //         "quantity": 10,
-        //         "price": 38800.00,
-        //         "unit": "KRW",
-        //         "username": "쿠팡",
-        //         "leadtime": 16,
-        //         "recommendedOrderDate": "2024-09-15",
-        //         "ordering": false,
-        //         "orderDate": null
-        //       },
-        //       {
-        //         "orderDetailId": 2,
-        //         "category1Name": "패션의류",
-        //         "category2Name": "캐주얼/유니섹스",
-        //         "category3Name": "팬츠",
-        //         "itemsId": 7,
-        //         "itemName": "청바지",
-        //         "part1": "중청",
-        //         "quantity": 10,
-        //         "price": 38800.00,
-        //         "unit": "KRW",
-        //         "username": "쿠팡",
-        //         "leadtime": 16,
-        //         "recommendedOrderDate": "2024-09-15",
-        //         "ordering": false,
-        //         "orderDate": null
-        //       },
-        //       {
-        //         "orderDetailId": 1,
-        //         "category1Name": "패션의류",
-        //         "category2Name": "캐주얼/유니섹스",
-        //         "category3Name": "팬츠",
-        //         "itemsId": 6,
-        //         "itemName": "청바지",
-        //         "part1": "중청",
-        //         "quantity": 10,
-        //         "price": 38800.00,
-        //         "unit": "EUR",
-        //         "username": "쿠팡",
-        //         "leadtime": 1,
-        //         "recommendedOrderDate": "2024-09-30",
-        //         "ordering": false,
-        //         "orderDate": null
-        //       },
-        //       {
-        //         "orderDetailId": 7,
-        //         "category1Name": "패션의류",
-        //         "category2Name": "캐주얼/유니섹스",
-        //         "category3Name": "팬츠",
-        //         "itemsId": 13,
-        //         "itemName": "청바지",
-        //         "part1": "중청",
-        //         "quantity": 10,
-        //         "price": 38800.00,
-        //         "unit": "KRW",
-        //         "username": "쿠팡",
-        //         "leadtime": 16,
-        //         "recommendedOrderDate": "2024-09-15",
-        //         "ordering": false,
-        //         "orderDate": null
-        //       },
-        //       {
-        //         "orderDetailId": 3,
-        //         "category1Name": "패션의류",
-        //         "category2Name": "캐주얼/유니섹스",
-        //         "category3Name": "팬츠",
-        //         "itemsId": 10,
-        //         "itemName": "청바지",
-        //         "part1": "중청",
-        //         "quantity": 10,
-        //         "price": 38800.00,
-        //         "unit": "JPY",
-        //         "username": "쿠팡",
-        //         "leadtime": 6,
-        //         "recommendedOrderDate": "2024-09-25",
         //         "ordering": false,
         //         "orderDate": null
         //       },
@@ -201,10 +101,13 @@ export default function OrderTest() {
           throw new Error("Failed to fetch order details");
         }
         const details = await response.json();
-        console.log('od목록',details)
+        console.log('od목록', details)
         // 서버에서 받은 데이터를 rows 형식에 맞게 변환해서 저장
         const formattedData = (Array.isArray(details) ? details : [details]).flatMap((order) =>
           order.orderDetails.map((detail) => ({
+            username: order.username,
+            alias: order.alias,
+            tel: order.phone,
             releaseDate: order.releaseDate,
             orderdetailid: detail.orderDetailId,
             itemid: detail.itemsId,
@@ -223,8 +126,13 @@ export default function OrderTest() {
             leadtime: detail.leadtime,
           }))
         );
-        console.log('formattedData',formattedData)
+        console.log('formattedData', formattedData)
         setPurDetails(formattedData);
+        const initialQuantities = formattedData.reduce((acc, detail) => {
+          acc[detail.itemid] = detail.quantity;
+          return acc;
+        }, {});
+        setQuantityState(initialQuantities);
       } catch (e) {
         console.error('Error fetching order details:', e);
       } finally {
@@ -235,7 +143,7 @@ export default function OrderTest() {
     fetchOrderDetails();
   }, [orderId]);
 
-  console.log('purdetails',purDetails)
+  console.log('purdetails', purDetails)
 
   //////////////////////
   //  통화 단위 함수   //
@@ -281,6 +189,12 @@ export default function OrderTest() {
     setTotalAmounts(totals);
   };
 
+  useEffect(() => {
+    if (selrow.length > 0) {
+      calculateTotalAmount(selrow);
+    }
+  }, [purDetails, selrow]);
+
   console.log('total', totalAmounts)
 
   //////////////////////
@@ -307,12 +221,39 @@ export default function OrderTest() {
     { field: 'itemName', headerName: 'ItemName', width: 130 },
     { field: 'part1', headerName: 'Part 1', width: 130 },
     { field: 'unitprice', headerName: 'Unit Price', width: 130 },
-    { field: 'quantity', headerName: 'Quantity', width: 130 },
+    { field: 'quantity', headerName: 'Quantity', width: 80, renderCell: (params) => (<input type='number' value={quantityState[params.row.itemid]} onChange={(e) => handleQnt(e, params.row.itemid)} className='bg-[#67666E] text-white w-10' />), },
     { field: 'amount', headerName: 'amount', width: 130 },
     { field: 'BestOrderDate', headerName: 'BestOrderDate', width: 130 },
     { field: 'supplier', headerName: 'Supplier', width: 130 },
     { field: 'Pastlead', headerName: 'PastLeadTime', width: 130, renderCell: (params) => (<div onClick={(e) => { e.stopPropagation() }}><Button className='greenbutton'>과거리드타임</Button></div>), },
   ];
+
+  // 수량 변경 함수
+  const handleQnt = (e, itemid) => {
+    const newQuantity = e.target.value;
+
+    // quantityState 업데이트
+    setQuantityState((prevState) => ({
+      ...prevState,
+      [itemid]: newQuantity,
+    }));
+
+    // purDetails 업데이트
+    setPurDetails((prevDetails) =>
+      prevDetails.map((detail) => {
+        if (detail.itemid === itemid) {
+          // 새로운 수량을 기반으로 amount 재계산
+          const newAmount = formatPrice(detail.price, newQuantity, detail.unit);
+          return {
+            ...detail,
+            quantity: newQuantity, // 수량 업데이트
+            amount: newAmount,     // amount 업데이트
+          };
+        }
+        return detail;
+      })
+    );
+  };
 
   ///////////////////////
   //  선택행 처리 함수  //
@@ -323,7 +264,22 @@ export default function OrderTest() {
     // console.log('newsel', newSelection)
     setSelrow(newSelection);
     calculateTotalAmount(newSelection);
+    getDetaildata(newSelection);
   };
+
+  const getDetaildata = (selectedIds) =>{
+    
+    const selectedDetails = purDetails.filter(detail => selectedIds.includes(detail.itemid));
+    const orderdetailid = selectedDetails.map((detail) => detail.orderdetailid);
+    const itemid = selectedDetails.map((detail) => detail.itemid);
+    const qnt = selectedDetails.map((detail) => detail.quantity);
+    setSelectrowOrderid(orderdetailid);
+    setSelectrowqnt(qnt);
+    setSelectrowitemid(itemid)
+    console.log('체크박스orderid', selectrowOrderid)
+    console.log('체크박스itid', selectrowitemid)
+    console.log('체크박스qnt', selectrowqnt)
+  }
 
   // 선택 행 값 전달
   const handleRowclick = (clickrow, event) => {
@@ -337,22 +293,58 @@ export default function OrderTest() {
     // console.log('clickrow',clickrow)
 
     if (event.target.closest('input[type="checkbox"]') === null) {
-      const orderdetailid = clickrow.row.orderdetailid;
       const itemname = clickrow.row.itemName;
-      // console.log('행선택orderid', orderdetailid)
       // console.log('행선택itemname', typeof itemname)
-      setSelectrowOrderid(orderdetailid)
-      setSelectrowitemname(itemname);
     }
   };
+
+  //////////////////////
+  //  버튼 관련 함수   //
+  //////////////////////
+
+  //  ===============
+  // | 발주 하기 api |
+  //  ===============
+const handlePerchase = () => {
+  const id = selectrowOrderid;
+  const itid = selectrowitemid;
+  const qnt = selectrowqnt;
+  console.log('발주할 id',id)
+  console.log('발주할 itid',itid)
+  console.log('발주할 qnt',qnt)
+
+  const fetchOrdering = async () => {
+    const preordering = [];
+    console.log('peeeeeee',preordering)
+    try{
+      const response = await fetch(`orderUpdate`,{
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body:{
+          
+        },
+      })
+      if(!response.ok) {
+        throw new Error("Ordering response was not ok");
+      }
+    }catch(e){
+      console.error('Failed to fetch Ordering: ',e)
+    }
+  }
+  fetchOrdering()
+}
 
   // ======================
   // || 대체 추천 상품 시작 ||
   //  ======================
 
   const [disablerowcount, setDisablerowcount] = useState(0);
+  const [willrecommenditemid, setWillrecommenditemid] = useState({});
   const [selectrowitemid, setSelectrowitemid] = useState({});
-  const [selectrowOrderid, setSelectrowOrderid] = useState();
+  const [selectrowOrderid, setSelectrowOrderid] = useState([]);
+  const [selectrowqnt, setSelectrowqnt] = useState([]);
   const [selectrowitemname, setSelectrowitemname] = useState();
   const [recommendItem, setRecommendItem] = useState([]);
 
@@ -368,10 +360,19 @@ export default function OrderTest() {
 
   // console.log('dis', disablerowcount)
 
+  // 비활성화 행 감시
   useEffect(() => {
     countdisablerow(purDetails)
   }, [purDetails])
 
+  // 전화번호 - 표시
+  const formatPhoneNumber = (phoneNumber) => {
+    return phoneNumber.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
+  };
+
+  //  ==================
+  // | 추천 아이템 api |
+  // =================
 
   // 행선택 시 itemid 추출 후 추천아이템 가져오기
   const fetchRecommenditems = async (clickrow, event) => {
@@ -382,37 +383,37 @@ export default function OrderTest() {
     if (event.target.closest('input[type="checkbox"]') === null) {
       const itemid = clickrow.id
       console.log('행선택itemid', itemid)
-      setSelectrowitemid(itemid)
+      setWillrecommenditemid(itemid)
     }
-    setLoading(true)
+    // setLoading(true)
     try {
-      // const recoitems = [{
-      //   'itemsId': 2,
-      //   'itemName': '청바지',
-      //   'price': 40100.00,
-      //   'unit': 'KRW',
-      //   'supplierName': '수플린',
-      //   'leadtime': 20,
-      //   'recommendedOrderDate': '2024-10-10'
-      // },];
-            const response = await fetch(`/recommend?selectedItemId=${selectrowitemid}&releaseDate=${orderdate}`,
-              {
-                headers: {
-                  'Authorization': `Bearer ${token}`,
-                },
-              }
-            )
-            if (!response.ok) {
-              throw new Error('Recommend item response was not ok');
-            };
-            const recoitems = await response.json();
+      const recoitems = [{
+        'itemsId': 2,
+        'itemName': '청바지',
+        'price': 40100.00,
+        'unit': 'KRW',
+        'supplierName': '수플린',
+        'leadtime': 20,
+        'recommendedOrderDate': '2024-10-10'
+      },];
+      // const response = await fetch(`/recommend?selectedItemId=${willrecommenditemid}&releaseDate=${orderdate}`,
+      //   {
+      //     headers: {
+      //       'Authorization': `Bearer ${token}`,
+      //     },
+      //   }
+      // )
+      // if (!response.ok) {
+      //   throw new Error('Recommend item response was not ok');
+      // };
+      // const recoitems = await response.json();
       console.log('reco', recoitems);
       setRecommendItem(recoitems);
       // console.log('최종',recommenditem)
     } catch (error) {
       console.error('Failed to fetch recommend:', error);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
@@ -525,61 +526,59 @@ export default function OrderTest() {
                   </div>
                 </div>
                 <div>
-                  <Button className='bluebutton2'>발주</Button>
-                  {/* <Modal open={perchasopen} setOpen={() => setPerchasOpen}>
+                  <Button className='bluebutton2' onClick={()=> setPerchasopen(true)}>발주</Button>
+                  <Modal open={perchasopen} setOpen={() => setPerchasopen}>
+                    <Box
+                      className="modalContent"
+                      sx={{
+                        color: 'black',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'absolute', // 또는 'fixed'로 설정
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)', // 중앙 정렬
+                        width: '400px',  // 원하는 너비로 설정
+                        height: '200px', // 원하는 높이로 설정
+                        bgcolor: '#17161D', // 배경색 설정 (선택 사항)
+                        p: 3, // 패딩 설정 (선택 사항)
+                        borderRadius: 2, // 모서리 둥글기 (선택 사항)
+                        boxShadow: 24, // 그림자 (선택 사항)
+                      }}
+                    >
                       <Box
-                        className="modalContent"
                         sx={{
-                          color: 'black',
+                          marginBottom: 2,
+                          fontSize: 'large',
+                          fontWeight: 'bold',
+                          color: 'white',
                           display: 'flex',
                           flexDirection: 'column',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          position: 'absolute', // 또는 'fixed'로 설정
-                          top: '50%',
-                          left: '50%',
-                          transform: 'translate(-50%, -50%)', // 중앙 정렬
-                          width: '400px',  // 원하는 너비로 설정
-                          height: '200px', // 원하는 높이로 설정
-                          bgcolor: '#17161D', // 배경색 설정 (선택 사항)
-                          p: 3, // 패딩 설정 (선택 사항)
-                          borderRadius: 2, // 모서리 둥글기 (선택 사항)
-                          boxShadow: 24, // 그림자 (선택 사항)
-                          }}
-                          >
-                          <Box
-                          sx={{
-                            marginBottom: 2,
-                            fontSize: 'large',
-                            fontWeight: 'bold',
-                            color: 'white',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center', // 수평 중앙 정렬
-                            justifyContent: 'center', // 수직 중앙 정렬
-                            }}
-                            >
-                            주문하시겠습니까?
-                            <h4 className='text-sm'>창고 출고 예정일 : {orderdate}</h4>
-                            </Box>
-                            
-                            <Box sx={{ display: 'flex', gap: 2 }}>
-                            <Button sx={{ color: 'white', bgcolor: '#43C5FE' }}
-                            onClick={() => {
-                              setPerchasOpen(false);
-                              handlePerchase(orderdate);
-                              }}>
-                              확인
-                              </Button>
-                              <Button className='graybutton' sx={{ color: 'white', bgcolor: '#BFBFBF' }}
-                              onClick={() => {
-                                setPerchasOpen(false);
-                                }}>
-                                취소
-                                </Button>
-                                </Box>
-                                </Box>
-                                </Modal> */}
+                          alignItems: 'center', // 수평 중앙 정렬
+                          justifyContent: 'center', // 수직 중앙 정렬
+                        }}
+                      >
+                        발주하시겠습니까?
+                      </Box>
+                      <Box sx={{ display: 'flex', gap: 2 }}>
+                        <Button sx={{ color: 'white', bgcolor: '#43C5FE' }}
+                          onClick={() => {
+                            setPerchasopen(false);
+                            handlePerchase();
+                          }}>
+                          확인
+                        </Button>
+                        <Button className='graybutton' sx={{ color: 'white', bgcolor: '#BFBFBF' }}
+                          onClick={() => {
+                            setPerchasopen(false);
+                          }}>
+                          취소
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Modal>
                 </div>
               </div>
             </div>
@@ -596,19 +595,29 @@ export default function OrderTest() {
                 {selectrowitemname ? <h4 className='font-bold text-base ml-2'>대체 추천 상품</h4> : " "}
               </div>
               <div className='flex items-center justify-start'>
-                {recommendItem.map(detail => (
-                  <div key={detail.itemsId} className='bg-[#373640] border-[#373640] rounded-lg w-1/4 m-3 p-3'>
-                    <div className='text-xl font-bold m-2'>{detail.itemName}</div>
-                    <div className='flex justify-between items-center m-2'>
-                      <div className='text-lg font-bold'>{detail.supplierName}</div>
-                      <div className='text-base font-bold'>{getCurrencySymbol(detail.unit)} {detail.price}</div>
+                {Array.isArray(recommendItem) && recommendItem.length < 0 ? 
+                <div className='w-full'>
+                <div className='flex items-end'>
+                  <h1 className='mt-5 ml-5 text-rose-500 font-bold text-2xl'> 대체 가능한 상품이 없습니다.</h1>
+                  {/* <h1 className='ml-5 text-base font-bold text-rose-500'>담당자 연락 필</h1> */}
+                </div>
+                <h1 className='mt-2 ml-5 text-xl font-bold'>구매자 : {purDetails[0].username + ` (${purDetails[0].alias})`} {formatPhoneNumber(purDetails[0].tel)}</h1>
+              </div>
+              :
+                  recommendItem.map(detail => (
+                    <div key={detail.itemsId} className='bg-[#373640] border-[#373640] rounded-lg w-1/4 m-3 p-3'>
+                      <div className='text-xl font-bold m-2'>{detail.itemName}</div>
+                      <div className='flex justify-between items-center m-2'>
+                        <div className='text-lg font-bold'>{detail.supplierName}</div>
+                        <div className='text-base font-bold'>{getCurrencySymbol(detail.unit)} {detail.price}</div>
+                      </div>
+                      <div className='flex justify-between items-center m-2'>
+                        <div className='text-base font-bold'>{detail.recommendedOrderDate}</div>
+                        <div className='text-[#bebebe] text-sm'>(예상 리드타임 : {detail.leadtime}일)</div>
+                      </div>
                     </div>
-                    <div className='flex justify-between items-center m-2'>
-                      <div className='text-base font-bold'>{detail.recommendedOrderDate}</div>
-                      <div className='text-[#bebebe] text-sm'>(예상 리드타임 : {detail.leadtime}일)</div>
-                    </div>
-                  </div>
-                ))}
+                  )) 
+                }
               </div>
             </div>
           </div> : null}
