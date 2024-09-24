@@ -1,33 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import IconButton from '@mui/material/IconButton';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-import { Table, TableBody, TableHead, TableRow, TableCell } from '@mui/material';
 import Box from '@mui/material/Box';
-import { DataGrid, renderActionsCell } from '@mui/x-data-grid';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
-import './OrderManage.scss';
 import Modal from '@mui/material/Modal'
 import Loading from '../Compo/Loading';
 import { useParams } from 'react-router-dom';
-import { Category } from '@mui/icons-material';
+import './OrderManage.scss';
 
 export default function OrderTest() {
+  const { orderId } = useParams(); // URL에서 orderId 가져오기
   const [purDetails, setPurDetails] = useState([]);
-  const [checkedChildren, setCheckedChildren] = useState({}); // 자식 체크박스 상태
-  const [checkedGrandchildren, setCheckedGrandchildren] = useState([]); // 손자 체크박스 상태
   const [pastleadopen, setPastleadOpen] = useState(false);
   const [preleadopen, setPreleadOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selrow, setSelrow] = useState([]);
   const [totalAmounts, setTotalAmounts] = useState({});
-
-
-  const { orderId } = useParams(); // URL에서 orderId 가져오기
-
   const token = localStorage.getItem('token');
-  console.log('id', orderId);
+  // console.log('id', orderId);
 
   //  ==================
   // | 발주관리 get api |
@@ -37,182 +28,182 @@ export default function OrderTest() {
     const fetchOrderDetails = async () => {
       setLoading(true);
       try {
-        const details = [
-          {
-            "orderId": 19,
-            "username": "유승호",
-            "alias": "a해운선사",
-            "releaseDate": "2024-10-01",
-            "bestOrderDate": "2024-09-15",
-            "requestDate": "2024-09-20",
-            "memo": "민주야 잘되니?",
-            "orderDetails": [
-              {
-                "orderDetailId": 36,
-                "category1Name": "패션의류",
-                "category2Name": "남성패션",
-                "category3Name": "팬츠",
-                "itemsId": 3,
-                "itemName": "청바지",
-                "part1": "연청",
-                "quantity": 5,
-                "price": 39800.00,
-                "unit": "KRW",
-                "username": "민주샵",
-                "recommendedOrderDate": "2024-09-17",
-                "ordering": false,
-                "orderDate": null,
-                "leadtime": 14,
-              },
-              {
-                "orderDetailId": 37,
-                "category1Name": "패션의류",
-                "category2Name": "캐주얼/유니섹스",
-                "category3Name": "팬츠",
-                "itemsId": 4,
-                "itemName": "청바지",
-                "part1": "중청",
-                "quantity": 10,
-                "price": 38800.00,
-                "unit": "USD",
-                "username": "쿠팡",
-                "leadtime": 6,
-                "recommendedOrderDate": "2024-09-25",
-                "ordering": false,
-                "orderDate": null
-              },
-              {
-                "orderDetailId": 11,
-                "category1Name": "패션의류",
-                "category2Name": "캐주얼/유니섹스",
-                "category3Name": "팬츠",
-                "itemsId": 11,
-                "itemName": "청바지",
-                "part1": "중청",
-                "quantity": 10,
-                "price": 38800.00,
-                "unit": "KRW",
-                "username": "쿠팡",
-                "leadtime": 16,
-                "recommendedOrderDate": "2024-09-15",
-                "ordering": false,
-                "orderDate": null
-              },
-              {
-                "orderDetailId": 9,
-                "category1Name": "패션의류",
-                "category2Name": "캐주얼/유니섹스",
-                "category3Name": "팬츠",
-                "itemsId": 9,
-                "itemName": "청바지",
-                "part1": "중청",
-                "quantity": 10,
-                "price": 38800.00,
-                "unit": "KRW",
-                "username": "쿠팡",
-                "leadtime": 16,
-                "recommendedOrderDate": "2024-09-15",
-                "ordering": false,
-                "orderDate": null
-              },
-              {
-                "orderDetailId": 5,
-                "category1Name": "패션의류",
-                "category2Name": "캐주얼/유니섹스",
-                "category3Name": "팬츠",
-                "itemsId": 8,
-                "itemName": "청바지",
-                "part1": "중청",
-                "quantity": 10,
-                "price": 38800.00,
-                "unit": "KRW",
-                "username": "쿠팡",
-                "leadtime": 16,
-                "recommendedOrderDate": "2024-09-15",
-                "ordering": false,
-                "orderDate": null
-              },
-              {
-                "orderDetailId": 2,
-                "category1Name": "패션의류",
-                "category2Name": "캐주얼/유니섹스",
-                "category3Name": "팬츠",
-                "itemsId": 7,
-                "itemName": "청바지",
-                "part1": "중청",
-                "quantity": 10,
-                "price": 38800.00,
-                "unit": "KRW",
-                "username": "쿠팡",
-                "leadtime": 16,
-                "recommendedOrderDate": "2024-09-15",
-                "ordering": false,
-                "orderDate": null
-              },
-              {
-                "orderDetailId": 1,
-                "category1Name": "패션의류",
-                "category2Name": "캐주얼/유니섹스",
-                "category3Name": "팬츠",
-                "itemsId": 6,
-                "itemName": "청바지",
-                "part1": "중청",
-                "quantity": 10,
-                "price": 38800.00,
-                "unit": "EUR",
-                "username": "쿠팡",
-                "leadtime": 1,
-                "recommendedOrderDate": "2024-09-30",
-                "ordering": false,
-                "orderDate": null
-              },
-              {
-                "orderDetailId": 7,
-                "category1Name": "패션의류",
-                "category2Name": "캐주얼/유니섹스",
-                "category3Name": "팬츠",
-                "itemsId": 13,
-                "itemName": "청바지",
-                "part1": "중청",
-                "quantity": 10,
-                "price": 38800.00,
-                "unit": "KRW",
-                "username": "쿠팡",
-                "leadtime": 16,
-                "recommendedOrderDate": "2024-09-15",
-                "ordering": false,
-                "orderDate": null
-              },
-              {
-                "orderDetailId": 3,
-                "category1Name": "패션의류",
-                "category2Name": "캐주얼/유니섹스",
-                "category3Name": "팬츠",
-                "itemsId": 10,
-                "itemName": "청바지",
-                "part1": "중청",
-                "quantity": 10,
-                "price": 38800.00,
-                "unit": "JPY",
-                "username": "쿠팡",
-                "leadtime": 6,
-                "recommendedOrderDate": "2024-09-25",
-                "ordering": false,
-                "orderDate": null
-              },
-            ]
-          }
-        ];
-        // const response = await fetch(`/getOrderDetail/${orderId}`, {
-        //   headers: { 'Authorization': `Bearer ${token}` },
-        // });
-        // if (!response.ok) {
-        //   throw new Error("Failed to fetch order details");
-        // }
-        // const details = await response.json();
-
+        // const details = [
+        //   {
+        //     "orderId": 19,
+        //     "username": "유승호",
+        //     "alias": "a해운선사",
+        //     "releaseDate": "2024-10-01",
+        //     "bestOrderDate": "2024-09-15",
+        //     "requestDate": "2024-09-20",
+        //     "memo": "민주야 잘되니?",
+        //     "orderDetails": [
+        //       {
+        //         "orderDetailId": 36,
+        //         "category1Name": "패션의류",
+        //         "category2Name": "남성패션",
+        //         "category3Name": "팬츠",
+        //         "itemsId": 3,
+        //         "itemName": "청바지",
+        //         "part1": "연청",
+        //         "quantity": 5,
+        //         "price": 39800.00,
+        //         "unit": "KRW",
+        //         "username": "민주샵",
+        //         "recommendedOrderDate": "2024-09-17",
+        //         "ordering": false,
+        //         "orderDate": null,
+        //         "leadtime": 14,
+        //       },
+        //       {
+        //         "orderDetailId": 37,
+        //         "category1Name": "패션의류",
+        //         "category2Name": "캐주얼/유니섹스",
+        //         "category3Name": "팬츠",
+        //         "itemsId": 4,
+        //         "itemName": "청바지",
+        //         "part1": "중청",
+        //         "quantity": 10,
+        //         "price": 38800.00,
+        //         "unit": "USD",
+        //         "username": "쿠팡",
+        //         "leadtime": 6,
+        //         "recommendedOrderDate": "2024-09-25",
+        //         "ordering": false,
+        //         "orderDate": null
+        //       },
+        //       {
+        //         "orderDetailId": 11,
+        //         "category1Name": "패션의류",
+        //         "category2Name": "캐주얼/유니섹스",
+        //         "category3Name": "팬츠",
+        //         "itemsId": 11,
+        //         "itemName": "청바지",
+        //         "part1": "중청",
+        //         "quantity": 10,
+        //         "price": 38800.00,
+        //         "unit": "KRW",
+        //         "username": "쿠팡",
+        //         "leadtime": 16,
+        //         "recommendedOrderDate": "2024-09-15",
+        //         "ordering": false,
+        //         "orderDate": null
+        //       },
+        //       {
+        //         "orderDetailId": 9,
+        //         "category1Name": "패션의류",
+        //         "category2Name": "캐주얼/유니섹스",
+        //         "category3Name": "팬츠",
+        //         "itemsId": 9,
+        //         "itemName": "청바지",
+        //         "part1": "중청",
+        //         "quantity": 10,
+        //         "price": 38800.00,
+        //         "unit": "KRW",
+        //         "username": "쿠팡",
+        //         "leadtime": 16,
+        //         "recommendedOrderDate": "2024-09-15",
+        //         "ordering": false,
+        //         "orderDate": null
+        //       },
+        //       {
+        //         "orderDetailId": 5,
+        //         "category1Name": "패션의류",
+        //         "category2Name": "캐주얼/유니섹스",
+        //         "category3Name": "팬츠",
+        //         "itemsId": 8,
+        //         "itemName": "청바지",
+        //         "part1": "중청",
+        //         "quantity": 10,
+        //         "price": 38800.00,
+        //         "unit": "KRW",
+        //         "username": "쿠팡",
+        //         "leadtime": 16,
+        //         "recommendedOrderDate": "2024-09-15",
+        //         "ordering": false,
+        //         "orderDate": null
+        //       },
+        //       {
+        //         "orderDetailId": 2,
+        //         "category1Name": "패션의류",
+        //         "category2Name": "캐주얼/유니섹스",
+        //         "category3Name": "팬츠",
+        //         "itemsId": 7,
+        //         "itemName": "청바지",
+        //         "part1": "중청",
+        //         "quantity": 10,
+        //         "price": 38800.00,
+        //         "unit": "KRW",
+        //         "username": "쿠팡",
+        //         "leadtime": 16,
+        //         "recommendedOrderDate": "2024-09-15",
+        //         "ordering": false,
+        //         "orderDate": null
+        //       },
+        //       {
+        //         "orderDetailId": 1,
+        //         "category1Name": "패션의류",
+        //         "category2Name": "캐주얼/유니섹스",
+        //         "category3Name": "팬츠",
+        //         "itemsId": 6,
+        //         "itemName": "청바지",
+        //         "part1": "중청",
+        //         "quantity": 10,
+        //         "price": 38800.00,
+        //         "unit": "EUR",
+        //         "username": "쿠팡",
+        //         "leadtime": 1,
+        //         "recommendedOrderDate": "2024-09-30",
+        //         "ordering": false,
+        //         "orderDate": null
+        //       },
+        //       {
+        //         "orderDetailId": 7,
+        //         "category1Name": "패션의류",
+        //         "category2Name": "캐주얼/유니섹스",
+        //         "category3Name": "팬츠",
+        //         "itemsId": 13,
+        //         "itemName": "청바지",
+        //         "part1": "중청",
+        //         "quantity": 10,
+        //         "price": 38800.00,
+        //         "unit": "KRW",
+        //         "username": "쿠팡",
+        //         "leadtime": 16,
+        //         "recommendedOrderDate": "2024-09-15",
+        //         "ordering": false,
+        //         "orderDate": null
+        //       },
+        //       {
+        //         "orderDetailId": 3,
+        //         "category1Name": "패션의류",
+        //         "category2Name": "캐주얼/유니섹스",
+        //         "category3Name": "팬츠",
+        //         "itemsId": 10,
+        //         "itemName": "청바지",
+        //         "part1": "중청",
+        //         "quantity": 10,
+        //         "price": 38800.00,
+        //         "unit": "JPY",
+        //         "username": "쿠팡",
+        //         "leadtime": 6,
+        //         "recommendedOrderDate": "2024-09-25",
+        //         "ordering": false,
+        //         "orderDate": null
+        //       },
+        //     ]
+        //   }
+        // ];
+        const response = await fetch(`/getOrderDetail/${orderId}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!response.ok) {
+          throw new Error("Failed to fetch order details");
+        }
+        const details = await response.json();
+        console.log('od목록',details)
         // 서버에서 받은 데이터를 rows 형식에 맞게 변환해서 저장
-        const formattedData = details.flatMap((order) =>
+        const formattedData = (Array.isArray(details) ? details : [details]).flatMap((order) =>
           order.orderDetails.map((detail) => ({
             releaseDate: order.releaseDate,
             orderdetailid: detail.orderDetailId,
@@ -227,11 +218,12 @@ export default function OrderTest() {
             unitprice: getCurrencySymbol(detail.unit) + detail.price,
             amount: formatPrice(detail.price, detail.quantity, detail.unit),
             supplier: detail.username,
-            BestOrderDate: detail.recommendedOrderDate,
+            BestOrderDate: detail.recommendedOrderDate + `(${detail.leadtime}일)`,
             unit: detail.unit,
             leadtime: detail.leadtime,
           }))
         );
+        console.log('formattedData',formattedData)
         setPurDetails(formattedData);
       } catch (e) {
         console.error('Error fetching order details:', e);
@@ -243,7 +235,7 @@ export default function OrderTest() {
     fetchOrderDetails();
   }, [orderId]);
 
-  console.log(purDetails)
+  console.log('purdetails',purDetails)
 
   //////////////////////
   //  통화 단위 함수   //
@@ -289,17 +281,22 @@ export default function OrderTest() {
     setTotalAmounts(totals);
   };
 
-  console.log('total',totalAmounts)
+  console.log('total', totalAmounts)
 
+  //////////////////////
+  //  리드타임 함수   //
+  //////////////////////
+
+  // 선택된 행 중 리드타임 제일 긴 항목 추출
   const getLongestCheckedLeadTime = (selectedIds) => {
     const selectedDetails = purDetails.filter(detail => selectedIds.includes(detail.itemid));
-    const checkedLeadTimes = selectedDetails.map((detail)=>detail.leadtime)
-    
+    const checkedLeadTimes = selectedDetails.map((detail) => detail.leadtime)
+
     return Math.max(...checkedLeadTimes) + ' 일'; // 가장 긴 leadtime을 반환
   };
 
   //////////////////////
-  //   Table  함수   //
+  //   Table  설정   //
   /////////////////////
 
   // 열 설정
@@ -317,72 +314,109 @@ export default function OrderTest() {
     { field: 'Pastlead', headerName: 'PastLeadTime', width: 130, renderCell: (params) => (<div onClick={(e) => { e.stopPropagation() }}><Button className='greenbutton'>과거리드타임</Button></div>), },
   ];
 
-  // 선택된 행 배열값 전달
+  ///////////////////////
+  //  선택행 처리 함수  //
+  ///////////////////////
+
+  // 체크된 행 배열값 전달
   const handleSelectionChange = (newSelection) => {
-    console.log('newsel', newSelection)
+    // console.log('newsel', newSelection)
     setSelrow(newSelection);
     calculateTotalAmount(newSelection);
-    // getLongestCheckedLeadTime(newSelection);
-  }
+  };
 
-  console.log('selrow', selrow)
-  //   ======================
-  //   || 대체 추천 상품 시작 ||
-  //    ======================
+  // 선택 행 값 전달
+  const handleRowclick = (clickrow, event) => {
+    getOrderDetaildata(clickrow, event)
+    fetchRecommenditems(clickrow, event)
+  };
 
-  // // 비활성화된 손자체크박스 갯수
-  // const countDisabledGrandchildren = () => {
-  //   let disabledCount = 0;
+  // 선택 행 정보 추출 함수
+  const getOrderDetaildata = (clickrow, event) => {
+    event.preventDefault();
+    // console.log('clickrow',clickrow)
 
-  //   Object.keys(groupedData).forEach((username) => {
-  //     groupedData[username].forEach((detail) => {
-  //       const key = `${username}-${detail.cartItemId}`;
-  //       if (isCheckboxDisabled(username, detail.cartItemId)) {
-  //         disabledCount += 1;
-  //       }
-  //     });
-  //   });
+    if (event.target.closest('input[type="checkbox"]') === null) {
+      const orderdetailid = clickrow.row.orderdetailid;
+      const itemname = clickrow.row.itemName;
+      // console.log('행선택orderid', orderdetailid)
+      // console.log('행선택itemname', typeof itemname)
+      setSelectrowOrderid(orderdetailid)
+      setSelectrowitemname(itemname);
+    }
+  };
 
-  //   return disabledCount;
-  // };
+  // ======================
+  // || 대체 추천 상품 시작 ||
+  //  ======================
 
-  // const disabledCount = countDisabledGrandchildren();
-  // // console.log(`비활성화된 자손 체크박스의 개수: ${disabledCount}`);
-  // const [selectedRow, setSelectedRow] = useState(null);
-  // const [recommenditem, setRecommendItem] = useState([]);
+  const [disablerowcount, setDisablerowcount] = useState(0);
+  const [selectrowitemid, setSelectrowitemid] = useState({});
+  const [selectrowOrderid, setSelectrowOrderid] = useState();
+  const [selectrowitemname, setSelectrowitemname] = useState();
+  const [recommendItem, setRecommendItem] = useState([]);
 
-  // const handleClickrow = async (cartItemId, orderdate) => {
-  //   setSelectedRow(cartItemId);
-  //   const selectitem = getItemIds(cartItemId);
-  //   console.log(selectitem);
-  //   // const recoitems = [{
-  //   //   'itemsId': 2,
-  //   //   'itemName': '청바지',
-  //   //   'price': 40100.00,
-  //   //   'unit': 'KRW',
-  //   //   'supplierName': '수플린',
-  //   //   'leadtime': 20,
-  //   //   'recommendedOrderDate': '2024-10-10'
-  //   // },];
-  //   try {
-  //       const response = await fetch(`recommend?selectedItemId=${selectitem}&releaseDate=${orderdate}`,
-  //         {
-  //           headers: {
-  //             'Authorization': `Bearer ${token}`,
-  //           },
-  //         }
-  //       )
-  //       if (!response.ok) {
-  //         throw new Error('Recommend item response was not ok');
-  //       };
-  //       const recoitems = await response.json();
-  //     console.log('reco',recoitems);
-  //     setRecommendItem(recoitems);
-  //     console.log('최종',recommenditem)
-  //   } catch (error) {
-  //     console.error('Failed to fetch recommend:', error);
-  //   }
-  // }
+  // 비활성화된 행 갯수
+  const countdisablerow = (rows) => {
+    const currentDate = new Date();
+    const count = rows.filter(row => {
+      const bestOrderDate = new Date(row.BestOrderDate);
+      return bestOrderDate < currentDate;
+    }).length;
+    setDisablerowcount(count);
+  };
+
+  // console.log('dis', disablerowcount)
+
+  useEffect(() => {
+    countdisablerow(purDetails)
+  }, [purDetails])
+
+
+  // 행선택 시 itemid 추출 후 추천아이템 가져오기
+  const fetchRecommenditems = async (clickrow, event) => {
+    event.preventDefault();
+    console.log('clickrow', clickrow)
+    const orderdate = purDetails[0].releaseDate;
+
+    if (event.target.closest('input[type="checkbox"]') === null) {
+      const itemid = clickrow.id
+      console.log('행선택itemid', itemid)
+      setSelectrowitemid(itemid)
+    }
+    setLoading(true)
+    try {
+      // const recoitems = [{
+      //   'itemsId': 2,
+      //   'itemName': '청바지',
+      //   'price': 40100.00,
+      //   'unit': 'KRW',
+      //   'supplierName': '수플린',
+      //   'leadtime': 20,
+      //   'recommendedOrderDate': '2024-10-10'
+      // },];
+            const response = await fetch(`/recommend?selectedItemId=${selectrowitemid}&releaseDate=${orderdate}`,
+              {
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                },
+              }
+            )
+            if (!response.ok) {
+              throw new Error('Recommend item response was not ok');
+            };
+            const recoitems = await response.json();
+      console.log('reco', recoitems);
+      setRecommendItem(recoitems);
+      // console.log('최종',recommenditem)
+    } catch (error) {
+      console.error('Failed to fetch recommend:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  console.log('추천data', recommendItem)
 
   return (
     <div>
@@ -399,7 +433,7 @@ export default function OrderTest() {
               </div>
               <div className='flex justify-between m-2 p-2'>
                 <Button className='bluebutton' onClick={() => setPreleadOpen(true)} >차트보기</Button>
-                <Modal open={preleadopen} setOpen={() => setPreleadOpen}>
+                <Modal open={preleadopen} setOpen={() => setPreleadOpen} onClose={() => setPreleadOpen(false)}>
                   <Box
                     className="modalContent"
                     sx={{
@@ -433,6 +467,8 @@ export default function OrderTest() {
                 pageSizeOptions={[10, 25, 50, 100]}
                 checkboxSelection
                 onRowSelectionModelChange={handleSelectionChange}
+                onRowClick={handleRowclick}
+                disableRowSelectionOnClick
                 isRowSelectable={(purDetails) => {
                   const bestOrderDate = new Date(purDetails.row.BestOrderDate); // BestOrderDate를 Date 객체로 변환
                   const currentDate = new Date(); // 현재 날짜
@@ -447,9 +483,6 @@ export default function OrderTest() {
                   // BestOrderDate가 현재 날짜보다 이전인 경우 'overdate' 클래스 적용
                   return bestOrderDate < currentDate ? 'overdate' : '';
                 }}
-                // onRowSelected={(params, event) => {
-                //   event.stopPropagation(); // 행 선택 시 부모 이벤트 전파 방지
-                // }}
                 sx={{
                   color: 'white',
                   fontWeight: 'semi-bold',
@@ -486,7 +519,7 @@ export default function OrderTest() {
                   <div className='ml-2'>
                     {Object.entries(totalAmounts).map(([unit, amount]) => (
                       <div key={unit}>
-                        {getCurrencySymbol(unit)} {amount.toLocaleString()}
+                        {amount == null ? '-' : `${getCurrencySymbol(unit)} ${amount.toLocaleString()}`}
                       </div>
                     ))}
                   </div>
@@ -551,35 +584,34 @@ export default function OrderTest() {
               </div>
             </div>
           </div>
-          {/* ))} */}
           {/* 추천상품 시작 */}
-          {/* { disabledCount>0 ?<div>
-        <div className='flex items-center justify-center'>
-          <h2 className='font-bold'>창고 출고 예정일까지 수령 불가능한 상품이 있습니다.</h2>
-          <h2 className='ml-2 text-[#5BF4FF]'>({disabledCount}건)</h2>
-        </div>
-        <div className="bg-[#2F2E38] m-5 p-5 rounded-lg">
-          <div className='flex items-center ml-3'>
-            <h4 className='text-[#5BF4FF] text-xl font-bold'>{getItemName(selectedRow)}</h4>
-            <h4 className='font-bold text-base ml-2'>대체 추천 상품</h4>
-          </div>
-          <div className='flex items-center justify-start'>
-        {recommenditem.map(detail => (
-            <div key={detail.itemsId} className='bg-[#373640] border-[#373640] rounded-lg w-1/4 m-3 p-3'>
-              <div className='text-xl font-bold m-2'>{detail.itemName}</div>
-              <div className='flex justify-between items-center m-2'>
-                <div className='text-lg font-bold'>{detail.supplierName}</div>
-                <div className='text-base font-bold'>{getCurrencySymbol(detail.unit)} {detail.price}</div>
+          {disablerowcount > 0 ? <div>
+            <div className='flex items-center justify-center'>
+              <h2 className='font-bold'>창고 출고 예정일까지 수령 불가능한 상품이 있습니다.</h2>
+              <h2 className='ml-2 text-[#5BF4FF]'>({disablerowcount}건)</h2>
+            </div>
+            <div className="bg-[#162136] m-5 p-5 rounded-lg">
+              <div className='flex items-center ml-3'>
+                <h4 className='text-[#5BF4FF] text-xl font-bold'>{selectrowitemname || " "}</h4>
+                {selectrowitemname ? <h4 className='font-bold text-base ml-2'>대체 추천 상품</h4> : " "}
               </div>
-              <div className='flex justify-between items-center m-2'>
-                <div className='text-base font-bold'>{detail.recommendedOrderDate}</div>
-                <div className='text-[#bebebe] text-sm'>(예상 리드타임 : {detail.leadtime}일)</div>
+              <div className='flex items-center justify-start'>
+                {recommendItem.map(detail => (
+                  <div key={detail.itemsId} className='bg-[#373640] border-[#373640] rounded-lg w-1/4 m-3 p-3'>
+                    <div className='text-xl font-bold m-2'>{detail.itemName}</div>
+                    <div className='flex justify-between items-center m-2'>
+                      <div className='text-lg font-bold'>{detail.supplierName}</div>
+                      <div className='text-base font-bold'>{getCurrencySymbol(detail.unit)} {detail.price}</div>
+                    </div>
+                    <div className='flex justify-between items-center m-2'>
+                      <div className='text-base font-bold'>{detail.recommendedOrderDate}</div>
+                      <div className='text-[#bebebe] text-sm'>(예상 리드타임 : {detail.leadtime}일)</div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-            ))}
-          </div>
-        </div>
-      </div>:null} */}
+          </div> : null}
         </div>
       )}
     </div>
