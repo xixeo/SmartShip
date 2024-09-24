@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.lead.dto.OrderDetailDTO;
@@ -96,6 +97,29 @@ public class OrderDetailService {
     		orderDetailRepo.save(orderDetail);
     	}
     }
+    
+    // OrderDetail DELETE
+    public void deleteDetailItem(Integer itemId) {
+
+        // itemId로 아이템을 찾음
+        Items item = itemsRepo.findById(itemId)
+                  .orElseThrow(() -> new RuntimeException("해당 물품을 찾을 수 없습니다. ID: " + itemId));
+
+        // 현재 로그인한 사용자의 권한을 확인 (현재 사용자의 ROLE_MANAGER 권한 확인)
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // 사용자의 권한이 ROLE_MANAGER인지 확인
+        boolean isManager = authentication.getAuthorities().stream()
+            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_MANAGER"));
+
+        if (!isManager) {
+            throw new RuntimeException("해당 물품을 삭제할 권한이 없습니다.");
+        }
+
+        // 삭제 작업
+        itemsRepo.delete(item);  // 실제로 아이템을 삭제하는 로직
+    }
+
     
     // bestOrderDate 계산 
     public LocalDate calculateBestOrderDate(List<OrderDetail> orderDetails, LocalDate releaseDate) {

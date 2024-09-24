@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -103,6 +104,12 @@ public class OrdersController {
             // 에러 발생 시 에러 메시지 반환
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("주문 내역을 조회하는 중 오류가 발생했습니다: " + e.getMessage());
         }
+    }
+    
+    @DeleteMapping("/{itemId}")
+    public ResponseEntity<Void> deleteDetailItem(@PathVariable Integer itemId) {
+    	orderDetailService.deleteDetailItem(itemId);
+        return ResponseEntity.ok().build();
     }
     
 //	@Autowired
