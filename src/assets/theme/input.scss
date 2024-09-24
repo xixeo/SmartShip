@@ -1,0 +1,26 @@
+@import "../../App.scss";
+
+/** ✏️ INPUT CSS  */
+
+.textfield {
+  border: 1px solid $input-color;
+  color: #fff;
+  border-radius: 4px;
+  outline: 0 !important;
+  background: #ffffff00;
+  padding: 6px 10px;
+}
+
+.blue-btn {
+  border: 1px solid $blue-btn;
+  color: $blue-btn;
+  border-radius: 4px;
+  outline: 0 !important;
+  padding: 6px 16px;
+
+  &:hover {
+    background: $blue-btn;
+    color: #fff;
+    transition: all 0.3s;
+  }
+}

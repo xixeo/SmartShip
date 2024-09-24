@@ -1,19 +1,70 @@
 /* App.css */
-html, body {
+
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap");
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+/** ✏️ 공통 변수 CSS  */
+$mainfont: Pretendard;
+$subfont: "Montserrat", sans-serif;
+$header-height: 48px;
+$footer-height: 50px;
+$footer-bg: rgba(0, 0, 0, 0.2);
+$footer-color: #fff;
+$white-card: #ffffff20;
+$main-bg: #0c182e;
+$calendar-btn-border: #7d7c82;
+$input-color: #9d9b9b;
+$blue-btn: #43c5fe;
+
+html,
+body {
   height: 100%;
   margin: 0;
+  font-family: $mainfont;
 }
 
+/** ✏️ APP.JS LAYOUT CSS  */
 .app-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background: $main-bg;
 }
 
-main {
-  flex: 1;
+.sign-state-container {
+  height: $header-height;
 }
 
-footer {
-  flex-shrink: 0;
+.content-wrap:has(.collapsed) {
+  .main-wrap {
+    width: calc(100vw - 80px) !important;
+    transition: all 0.3s ease;
+    position: relative !important;
+    left: 80px !important;
+    box-sizing: border-box;
+  }
+}
+
+.content-wrap {
+  background: $main-bg;
+  .main-wrap {
+    width: calc(100vw - 255px) !important;
+    transition: all 0.3s ease;
+    position: relative !important;
+    left: 250px !important;
+    box-sizing: border-box;
+  }
+}
+
+.main {
+  height: calc(100vh - $header-height - $footer-height);
+  overflow: hidden;
+  // min-height: calc(100vh - $header-height - $footer-height);
+}
+.footer {
+  background-color: $footer-bg;
+  height: $footer-height;
+  color: $footer-color;
+  font-weight: 200;
+  font-size: 0.8rem;
 }
