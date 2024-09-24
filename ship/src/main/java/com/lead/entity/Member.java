@@ -1,5 +1,6 @@
 package com.lead.entity;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -34,11 +35,14 @@ public class Member {
     @Column(nullable = false)
     private boolean enabled;
     
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String phone;
     
     @Column(nullable = true)
     private String etc;
+    
+    @Column(name = "regdate", nullable = false)
+    private LocalDate regdate;
 
     @OneToMany(mappedBy = "member")
     private Set<Orders> orders;

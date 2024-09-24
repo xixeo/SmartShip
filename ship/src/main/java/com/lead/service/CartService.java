@@ -231,8 +231,7 @@ public class CartService {
 		}
 
 		return new OrdersDTO(savedOrder.getOrderId(), savedOrder.getMember().getUsername(),
-				savedOrder.getMember().getAlias(), savedOrder.getReleaseDate(), null, // bestOrderDate는 여전히 계산되지 않았으므로
-																						// null로 설정
+				savedOrder.getMember().getAlias(), savedOrder.getMember().getPhone(), savedOrder.getReleaseDate(), null, // bestOrderDate는 여전히 계산되지 않았으므로
 				savedOrder.getRequestDate(), savedOrder.getMemo(), // 저장된 memo 반환
 				null);
 	}

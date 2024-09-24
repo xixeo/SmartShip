@@ -13,5 +13,7 @@ public interface MemberRepo extends JpaRepository<Member, String>{
 	Optional<Member> findByUsername(String username); // JWTAuthenticationFilter에서 alias를 보내기 위해 repo작성
     // alias로 Member 찾기
     Optional<Member> findByAlias(String alias);
+    // phone으로 Member 찾기
+    Optional<Member> findByPhone(String phone);
 
 }

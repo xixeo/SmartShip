@@ -12,6 +12,7 @@ public class OrdersDTO {
 	private Integer orderId;
 	private String username;
 	private String alias;
+	private String phone;
 	private LocalDate releaseDate;
 	private LocalDate bestOrderDate;
 	private LocalDate requestDate;

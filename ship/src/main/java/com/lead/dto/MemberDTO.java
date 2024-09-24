@@ -1,5 +1,7 @@
 package com.lead.dto;
 
+import java.time.LocalDate;
+
 import com.lead.entity.Role;
 
 import lombok.AllArgsConstructor;
@@ -20,5 +22,6 @@ public class MemberDTO {
     private Role role;
     private String phone;
     private String etc;
+    private LocalDate regdate;
     private boolean enabled;
 }

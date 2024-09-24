@@ -40,7 +40,7 @@ public class OrdersService {
 		List<Orders> orders = ordersRepo.findAll();
 		return orders.stream()
 				.map(order -> new OrdersDTO(order.getOrderId(), order.getMember().getUsername(),
-						order.getMember().getAlias(), order.getReleaseDate(), order.getBestOrderDate(),
+						order.getMember().getAlias(), order.getMember().getPhone(), order.getReleaseDate(), order.getBestOrderDate(),
 						order.getRequestDate(), order.getMemo(), null // OrderDetail은 포함되지 않음
 				)).collect(Collectors.toList());
 	}
@@ -53,7 +53,7 @@ public class OrdersService {
 			List<OrderDetailDTO> orderDetailDTOs = convertOrderDetailToDTO(orderDetails, order.getReleaseDate());
 
 			return new OrdersDTO(order.getOrderId(), order.getMember().getUsername(), order.getMember().getAlias(),
-					order.getReleaseDate(), order.getBestOrderDate(), order.getRequestDate(), order.getMemo(),
+					order.getMember().getPhone(), order.getReleaseDate(), order.getBestOrderDate(), order.getRequestDate(), order.getMemo(),
 					orderDetailDTOs);
 		}).collect(Collectors.toList());
 	}
@@ -88,6 +88,7 @@ public class OrdersService {
 				order.getOrderId(), 
 				order.getMember().getUsername(), 
 				order.getMember().getAlias(),
+				order.getMember().getPhone(),
 				order.getReleaseDate(), 
 				bestOrderDate, // 계산된 bestOrderDate
 				order.getRequestDate(), 
