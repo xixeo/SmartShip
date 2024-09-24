@@ -183,6 +183,29 @@ export default function OrderTest() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
+
+  //////////////////
+  // currentItem2 //
+  //////////////////
+
+   // 동일한 category1Name, category2Name, category3Name, itemName, part1을 가진 항목 중 itemId가 작은 항목만 추출
+   const currentItem2 = currentItems.reduce((acc, item) => {
+    const key = `${item.category1Name}-${item.category2Name}-${item.category3Name}-${item.itemName}-${item.part1}`;
+    
+    // key에 해당하는 항목이 없다면 현재 item을 추가
+    if (!acc[key]) {
+      acc[key] = item;
+    } else if (item.itemId < acc[key].itemId) {
+      // 이미 저장된 항목보다 itemId가 작으면 업데이트
+      acc[key] = item;
+    }
+    
+    return acc;
+  }, {});
+
+  // currentItem2는 객체이므로 배열로 변환
+  const currentItem2Array = Object.values(currentItem2);
+
   // 페이지네이션 버튼함수
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const handlePageChange = (event, value) => {
@@ -371,7 +394,7 @@ export default function OrderTest() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {currentItems.map((detail) => {
+                {currentItem2Array.map((detail) => {
                   return (
                     <TableRow key={detail.itemsId}>
                       <TableCell padding='checkbox' sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none', width: '5%' }}>
