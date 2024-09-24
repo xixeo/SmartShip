@@ -1,12 +1,17 @@
 package com.lead.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.lead.dto.MemberDTO;
 import com.lead.entity.Member;
+import com.lead.entity.Role;
 import com.lead.repository.MemberRepo;
 
 import lombok.RequiredArgsConstructor;
@@ -54,6 +59,48 @@ public class MemberService {
 
         // 회원 탈퇴 완료 메시지 반환
         return username + " 회원탈퇴가 정상적으로 처리되었습니다.";
+    }
+
+    /////////////////////////////////////////////////////////회원 조회
+    public List<MemberDTO> getMemberAll(Authentication authentication){
+
+		// 현재 사용자가 ADMIN인지 확인
+		if (authentication.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+			throw new RuntimeException("회원 조회 권한이 없습니다.");
+		}
+		
+    	List<Member> members = memberRepo.findAll();
+    	return members.stream()
+    			.map(member -> new MemberDTO(
+    					member.getUsername(),
+    					member.getAlias(),
+    					member.getRole(),
+    					member.getPhone(),
+    					member.getEtc(),
+    					member.isEnabled()
+    					)).collect(Collectors.toList());
+    }
+
+    /////////////////////////////////////////////////////////회원 수정
+    public void updateMember(Authentication authentication, String username, String alias, Role role, String phone, Boolean enabled, String etc) {
+        // 현재 사용자가 ADMIN인지 확인
+        if (authentication.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+            throw new RuntimeException("회원 조회 권한이 없습니다.");
+        }
+
+        // URL로 전달된 username으로 회원 정보 조회
+        Member member = memberRepo.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
+
+        // 회원 정보 업데이트
+        member.setAlias(alias);
+        member.setRole(role);  // 받은 role 값을 설정
+        member.setPhone(phone);
+        member.setEnabled(enabled);  // 받은 enabled 값을 설정
+        member.setEtc(etc);
+
+        // 회원 정보 저장
+        memberRepo.save(member);
     }
 
 }

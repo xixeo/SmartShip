@@ -54,9 +54,6 @@ public class Notice {
 
     @Column(nullable = true)
     private String attachment;
-    
-    @Column(name = "file_name", nullable = true)
-    private String fileName;
 
     @PrePersist
     protected void onCreate() {

@@ -18,5 +18,7 @@ public class MemberDTO {
     private String username;
     private String alias;
     private Role role;
+    private String phone;
+    private String etc;
     private boolean enabled;
 }

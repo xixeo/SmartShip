@@ -35,19 +35,26 @@ public class NoticeService {
 		if ("ROLE_ADMIN".equals(role)) {
 			// ROLE_ADMIN인 경우 status 상관없이 모든 공지사항 조회
 			notices = noticeRepo.findAll();
+			return notices.stream().map(this::convertToDTOwithStatus).collect(Collectors.toList());
 		} else {
 			// ROLE_ADMIN이 아닌 경우 status가 1인 공지사항만 조회
 			notices = noticeRepo.findByStatusTrue();
+			return notices.stream().map(this::convertToDTOwithoutStatus).collect(Collectors.toList());
 		}
-
-		return notices.stream().map(this::convertToDTO).collect(Collectors.toList());
 	}
 
-	// Notice 엔티티를 NoticeDTO로 변환하는 메서드
-	private NoticeDTO convertToDTO(Notice notice) {
+	// ROLE_ADMIN용 NoticeDTO로 변환하는 메서드
+	private NoticeDTO convertToDTOwithStatus(Notice notice) {
 		return NoticeDTO.builder().noticeId(notice.getNoticeId()).title(notice.getTitle())
 				.author(notice.getAuthor().getUsername()).createdAt(notice.getCreatedAt().toLocalDate()) // 날짜만 반환
 				.views(notice.getViews()).status(notice.getStatus()).build();
+	}
+	
+	// 일반 사용자용 NoticeDTO로 변환하는 메서드
+	private NoticeDTO convertToDTOwithoutStatus(Notice notice) {
+		return NoticeDTO.builder().noticeId(notice.getNoticeId()).title(notice.getTitle())
+				.author(notice.getAuthor().getUsername()).createdAt(notice.getCreatedAt().toLocalDate()) // 날짜만 반환
+				.views(notice.getViews()).build();
 	}
 
 	/////////////////////////////////////////////////////////// noticeId에 따른 content
@@ -130,7 +137,7 @@ public class NoticeService {
 
 	/////////////////////////////////////////////////////////// notice 수정
 	@Transactional
-	public void updateNotice(Integer noticeId, String title, String content, MultipartFile file, String username) {
+	public void updateNotice(Integer noticeId, String title, String content, Boolean status, MultipartFile file, String username) {
 	    // noticeId로 공지사항 조회
 	    Notice notice = noticeRepo.findById(noticeId)
 	            .orElseThrow(() -> new RuntimeException("해당 공지사항을 찾을 수 없습니다."));
@@ -143,6 +150,7 @@ public class NoticeService {
 	    // 제목 및 내용 업데이트
 	    notice.setTitle(title);
 	    notice.setContent(content);
+	    notice.setStatus(status);
 
 	    // 파일이 있을 경우 파일 저장 및 업데이트
 	    if (file != null && !file.isEmpty()) {

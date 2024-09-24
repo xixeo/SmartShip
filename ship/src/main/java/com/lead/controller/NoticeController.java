@@ -133,13 +133,14 @@ public class NoticeController {
 	public ResponseEntity<String> updateNotice(@PathVariable Integer noticeId,
 	                                           @RequestParam("title") String title,
 	                                           @RequestParam("content") String content,
+	                                           @RequestParam("status") Boolean status,
 	                                           @RequestParam(value = "file", required = false) MultipartFile file,
 	                                           Authentication authentication) {
 	    String username = authentication.getName(); // 토큰에서 사용자 이름 가져오기
 
 	    try {
 	        // 공지사항 수정 로직 호출
-	        noticeService.updateNotice(noticeId, title, content, file, username);
+	        noticeService.updateNotice(noticeId, title, content, status, file, username);
 	        return ResponseEntity.ok("공지사항이 성공적으로 수정되었습니다.");
 	    } catch (RuntimeException e) {
 	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());

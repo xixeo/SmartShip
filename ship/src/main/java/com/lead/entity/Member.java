@@ -29,10 +29,16 @@ public class Member {
     private String alias;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role;    
 
     @Column(nullable = false)
     private boolean enabled;
+    
+    @Column(nullable = true)
+    private String phone;
+    
+    @Column(nullable = true)
+    private String etc;
 
     @OneToMany(mappedBy = "member")
     private Set<Orders> orders;
