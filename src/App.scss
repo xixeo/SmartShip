@@ -59,7 +59,7 @@ body {
 
 .main {
   height: calc(100vh - $header-height - $footer-height);
-  overflow: hidden;
+  // overflow: hidden;
   // min-height: calc(100vh - $header-height - $footer-height);
 }
 .footer {

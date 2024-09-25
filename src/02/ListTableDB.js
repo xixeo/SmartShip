@@ -137,81 +137,74 @@ function ListTableDB() {
         fetchData();
     }, []);
 
-    const category1Options = [...new Set(rows.map((row) => row.category1Name))];
+    // category1 필터링 (고정된 카테고리 옵션)
+const category1Options = useMemo(() => {
+    return [...new Set(rows.map((row) => row.category1Name))];
+  }, [rows]);
+  
+  // category2 필터링 (category1 선택에 따른 변경)
+  const category2Options = useMemo(() => {
+    if (!category1Name) return [];
+    return [
+      ...new Set(
+        rows
+          .filter((row) => row.category1Name === category1Name)
+          .map((row) => row.category2Name)
+      ),
+    ];
+  }, [category1Name, rows]);
+  
+  // category3 필터링 (category2 선택에 따른 변경)
+  const category3Options = useMemo(() => {
+    if (!category2Name) return [];
+    return [
+      ...new Set(
+        rows
+          .filter((row) => row.category2Name === category2Name)
+          .map((row) => row.category3Name)
+      ),
+    ];
+  }, [category2Name, rows]);
+  
 
-    const category2Options = useMemo(() => {
-        return [
-            ...new Set(
-                rows
-                    .filter((row) => row.category1Name === category1Name)
-                    .map((row) => row.category2Name)
-            ),
-        ];
-    }, [category1Name, rows]);
+  const uniqueRows = useMemo(() => {
+    const groupedItems = {};
 
-    const category3Options = useMemo(() => {
-        return [
-            ...new Set(
-                rows
-                    .filter((row) => row.category2Name === category2Name)
-                    .map((row) => row.category3Name)
-            ),
-        ];
-    }, [category2Name, rows]);
+    rows.forEach((row) => {
+        // 고유한 키로 중복 제거 (category1Name, category2Name, category3Name, part1, itemName)
+        const key = `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.part1}-${row.itemName}`;
 
-    const filteredRows = useMemo(() => {
-        return rows.filter((row) => {
-            const matchesCategory1 = category1Name
-                ? row.category1Name === category1Name
-                : true;
-            const matchesCategory2 = category2Name
-                ? row.category2Name === category2Name
-                : true;
-            const matchesCategory3 = category3Name
-                ? row.category3Name === category3Name
-                : true;
-            const matchesSearchQuery = appliedSearchQuery
-                ? row.itemName
-                      .toLowerCase()
-                      .includes(appliedSearchQuery.toLowerCase())
-                : true;
-            return (
-                matchesCategory1 &&
-                matchesCategory2 &&
-                matchesCategory3 &&
-                matchesSearchQuery
-            );
-        });
-    }, [rows, category1Name, category2Name, category3Name, appliedSearchQuery]);
+        // 이미 해당 key가 있는지 확인
+        if (!groupedItems[key]) {
+            groupedItems[key] = {
+                ...row, // row의 나머지 정보를 복사
+                itemIds: [row.itemId], // itemId를 배열로 설정
+                quantity: row.quantity, // quantity 값을 설정
+            };
+        } else {
+            // 이미 존재하는 key라면 itemId만 배열에 추가 (중복된 itemIds 추가)
+            groupedItems[key].itemIds.push(row.itemId);
+        }
+    });
 
-    const filteredRowsBySelection = useMemo(() => {
-        console.log(filteredRows, "fileteredRows");
-        return filteredRows;
-    }, [filteredRows, selected]);
+    // 중복 제거된 행들을 반환
+    return Object.values(groupedItems);
+}, [rows]);
 
-    const uniqueRows = useMemo(() => {
-        const groupedItems = {};
 
-        rows.forEach((row) => {
-            // 고유한 키로 중복 제거 (category1Name, category2Name, category3Name, part1, itemName)
-            const key = `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.part1}-${row.itemName}`;
+// 카테고리 필터링 적용
+const filteredUniqueRows = useMemo(() => {
+    return uniqueRows.filter((row) => {
+      const matchesCategory1 = category1Name ? row.category1Name === category1Name : true;
+      const matchesCategory2 = category2Name ? row.category2Name === category2Name : true;
+      const matchesCategory3 = category3Name ? row.category3Name === category3Name : true;
+      
+      return matchesCategory1 && matchesCategory2 && matchesCategory3;
+    });
+  }, [uniqueRows, category1Name, category2Name, category3Name]);
+  
+  
 
-            // 이미 해당 key가 있는지 확인
-            if (!groupedItems[key]) {
-                groupedItems[key] = {
-                    ...row, // row의 나머지 정보를 복사
-                    itemIds: [row.itemId], // itemId를 배열로 설정
-                    quantity: row.quantity, // quantity 값을 설정
-                };
-            } else {
-                // 이미 존재하는 key라면 itemId만 배열에 추가 (중복된 itemIds 추가)
-                groupedItems[key].itemIds.push(row.itemId);
-            }
-        });
-
-        // 중복 제거된 행들을 반환
-        return Object.values(groupedItems);
-    }, [rows]);
 
     useEffect(() => {
         setPage(1);
@@ -304,10 +297,10 @@ function ListTableDB() {
         return page > 1
             ? Math.max(0, (page - 1) * rowsPerPage + rowsPerPage - rowsCount)
             : 0;
-    }, [page, rowsPerPage, uniqueRows.length]);
+    }, [page, rowsPerPage, filteredUniqueRows.length]);
 
     // 총 페이지 수 계산
-    const totalPages = Math.ceil(uniqueRows.length / rowsPerPage);
+    const totalPages = Math.ceil(filteredUniqueRows.length / rowsPerPage);
 
     const allRowsSelected = useMemo(() => {
         return (
@@ -530,7 +523,7 @@ function ListTableDB() {
                             allRowsSelected={allRowsSelected}
                         />
                         <TableBody>
-                            {uniqueRows
+                            {filteredUniqueRows
                                 .slice(
                                     (page - 1) * rowsPerPage,
                                     page * rowsPerPage
