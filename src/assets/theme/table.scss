@@ -1,0 +1,30 @@
+@import "../../App.scss";
+
+/** ✏️ TABLE CSS  */
+.MuiTable-root {
+    font-family: $mainfont !important;
+
+    .css-195ujk9-MuiTableCell-root,
+    .css-1voojl0-MuiTableCell-root {
+        font-family: $mainfont !important;
+    }
+    th,
+    td {
+        color: #fff;
+        border-bottom: 1px solid #0c182e;
+    }
+
+    .css-1y5vrnu-MuiButtonBase-root-MuiCheckbox-root {
+        color: #fff;
+    }
+
+    // switch 동그라미
+    .MuiSwitch-root {
+        .Mui-checked {
+            color: #56b8e9 !important;
+        }
+        .MuiSwitch-track {
+            background-color: #4b7e98 !important;
+        }
+    }
+}

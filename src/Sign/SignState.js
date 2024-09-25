@@ -30,7 +30,7 @@ const SignState = () => {
     <div className="sign-state-container">
       <div className="user-info">
         <div className="flex items-center space-x-2 pt-4 text-white">
-          <Person width="26" height="26" />
+          <Person width="20" height="20" />
           <div className="flex items-center space-x-2">
             <h1 className="text-white">{alias || "alias"} </h1>
             <h1 className="font-semibold text-white">
