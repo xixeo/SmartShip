@@ -1,29 +1,10 @@
-// 페이지네이션 수정해야함 (페이지당 항목수가 5일때 5개항목으로 걸러진 경우 -> 페이지 2까지 나옴)
 import React, { useState, useMemo, useEffect } from "react";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Checkbox,
-    Button,
-    Paper,
-    TextField,
-    InputAdornment,
-    Select,
-    MenuItem,
-    FormControlLabel,
-    Switch,
-    IconButton,
-} from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Button, Paper, TextField, InputAdornment, Select, MenuItem,IconButton, Pagination } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import Pagination from "@mui/material/Pagination";
-import { useNavigate } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
-import "./ListTable.scss";
+import { useNavigate } from "react-router-dom";
 import Modal2 from "../Compo/Modal2";
+import "./ListTable.scss";
 
 // 테이블 헤더 정의
 const headCells = [
