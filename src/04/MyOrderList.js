@@ -316,7 +316,7 @@ export default function MyOrderList() {
     const setColor = (state) => {
         switch (state) {
             case 'ready': return <h1 className='text-[#5BF4FF]'>발주 예정</h1>;
-            case 'processing': return <h1 className='text-[#FFBA07]'>발주 진행</h1>;
+            case 'progressing': return <h1 className='text-[#FFBA07]'>발주 진행</h1>;
             case 'complete': return <h1 className='text-[#A0A0A0]'>발주 완료</h1>;
         }
     }
