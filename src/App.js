@@ -24,104 +24,159 @@ import AnnounceWrite from "./Admin/AnnounceWrite";
 import Announcement from "./Admin/Announcement";
 import Membership from "./Admin/Membership";
 import SupplierBoard from "./DashBoard/SupplierBoard";
-import { createTheme, ThemeProvider } from '@mui/material';
+import { createTheme, ThemeProvider } from "@mui/material";
+import { AlertProvider } from "./Compo/AlertContext";
 
 function App() {
-  const theme = createTheme({
-    typography: {
-        fontFamily: 'Pretendard',
-    },
-});
+    const theme = createTheme({
+        typography: {
+            fontFamily: "Pretendard",
+        },
+    });
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [redirectPath, setRedirectPath] = useState("/");
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [redirectPath, setRedirectPath] = useState("/");
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      setIsAuthenticated(true);
-    }
-  }, []);
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            setIsAuthenticated(true);
+        }
+    }, []);
 
-  const PrivateRoute = ({ element }) => {
-    return isAuthenticated ? element : <Navigate to="/signin" />;
-  };
+    const PrivateRoute = ({ element }) => {
+        return isAuthenticated ? element : <Navigate to="/signin" />;
+    };
 
-  return (
-    <ThemeProvider theme={theme}>
-    <BrowserRouter>
-      <div className="flex flex-col h-screen w-full">
-        {!isAuthenticated ? (
-          <Routes>
-            <Route
-              path="/signup"
-              element={<SignUp setIsAuthenticated={setIsAuthenticated} />}
-            />
-            <Route
-              path="/signin"
-              element={
-                <SignIn
-                  setIsAuthenticated={setIsAuthenticated}
-                  setRedirectPath={setRedirectPath}
-                />
-              }
-            />
-          </Routes>
-        ) : (
-          <div className="flex content-wrap w-full h-screen">
-            <Navi />
-            <div className="flex flex-col main-wrap">
-              {/* <div className="flex flex-col flex-1 bg-gradient-to-b from-black to-[#1a1b41] min-w-[1000px]"> */}
-              <SignState />
-              <main className="p-4 w-full main overflow-x-hidden">
-                {/* 여기 로딩넣기 */}
-                <Routes>
-                  <Route path="/" element={<MainApp />} />
-                  <Route path="/schedule" element={<Schedule />} />
-                  <Route path="/listtabledb" element={<ListTableDB />} />
-                  <Route path="/listsupplier" element={<ListSupplier />} />
-                  <Route path="/listsupplier2" element={<ListSupplier2 />} />
-                  <Route path="/order" element={<Order />} />
-                  <Route path="/ordertest" element={<OrderTEST />} />
-                  <Route path="/ordertest2" element={<BasicDatePicker />} />
-                  <Route path="/signstate" element={<SignState />} />
-                  <Route path="/Board" element={<Board />} />
-                  <Route path="/MyOrderList" element={<MyOrderList />} />
-                  <Route path="/AnnounceForEvery" element={<AnnounceForEvery />} />
-                  <Route path="/AnnounceWrite" element={<AnnounceWrite />} />
-                  <Route path="/Announcement" element={<Announcement />} />
-                  <Route path="/Membership" element={<Membership />} />
-                  <Route path="/SupplierBoard" element={<SupplierBoard />} />
-                  <Route
-                    path="/PurchaseRequest"
-                    element={<PurchaseRequest />}
-                  />
-                  <Route
-                    path="/getOrderDetail/:orderId"
-                    element={<OrderManage />}
-                  />
-                </Routes>
-              </main>
-              <Footer />
-            </div>
-          </div>
-        )}
-      </div>
-    </BrowserRouter>
-    </ThemeProvider>
-  );
+    return (
+        <ThemeProvider theme={theme}>
+            <BrowserRouter>
+                <div className="flex flex-col h-screen w-full">
+                    {!isAuthenticated ? (
+                        <Routes>
+                            <Route
+                                path="/signup"
+                                element={
+                                    <SignUp
+                                        setIsAuthenticated={setIsAuthenticated}
+                                    />
+                                }
+                            />
+                            <Route
+                                path="/signin"
+                                element={
+                                    <SignIn
+                                        setIsAuthenticated={setIsAuthenticated}
+                                        setRedirectPath={setRedirectPath}
+                                    />
+                                }
+                            />
+                        </Routes>
+                    ) : (
+                        <div className="flex content-wrap w-full h-screen">
+                            <Navi />
+                            <div className="flex flex-col main-wrap">
+                                {/* <div className="flex flex-col flex-1 bg-gradient-to-b from-black to-[#1a1b41] min-w-[1000px]"> */}
+                                <SignState />
+                                <main className="p-4 w-full main overflow-x-hidden">
+                                    <AlertProvider>
+                                        {/* 여기 로딩넣기 */}
+                                        <Routes>
+                                            <Route
+                                                path="/"
+                                                element={<MainApp />}
+                                            />
+                                            <Route
+                                                path="/schedule"
+                                                element={<Schedule />}
+                                            />
+                                            <Route
+                                                path="/listtabledb"
+                                                element={<ListTableDB />}
+                                            />
+                                            <Route
+                                                path="/listsupplier"
+                                                element={<ListSupplier />}
+                                            />
+                                            <Route
+                                                path="/listsupplier2"
+                                                element={<ListSupplier2 />}
+                                            />
+                                            <Route
+                                                path="/order"
+                                                element={<Order />}
+                                            />
+                                            <Route
+                                                path="/ordertest"
+                                                element={<OrderTEST />}
+                                            />
+                                            <Route
+                                                path="/ordertest2"
+                                                element={<BasicDatePicker />}
+                                            />
+                                            <Route
+                                                path="/signstate"
+                                                element={<SignState />}
+                                            />
+                                            <Route
+                                                path="/Board"
+                                                element={<Board />}
+                                            />
+                                            <Route
+                                                path="/MyOrderList"
+                                                element={<MyOrderList />}
+                                            />
+                                            <Route
+                                                path="/AnnounceForEvery"
+                                                element={<AnnounceForEvery />}
+                                            />
+                                            <Route
+                                                path="/AnnounceWrite"
+                                                element={<AnnounceWrite />}
+                                            />
+                                            <Route
+                                                path="/Announcement"
+                                                element={<Announcement />}
+                                            />
+                                            <Route
+                                                path="/Membership"
+                                                element={<Membership />}
+                                            />
+                                            <Route
+                                                path="/SupplierBoard"
+                                                element={<SupplierBoard />}
+                                            />
+                                            <Route
+                                                path="/PurchaseRequest"
+                                                element={<PurchaseRequest />}
+                                            />
+                                            <Route
+                                                path="/getOrderDetail/:orderId"
+                                                element={<OrderManage />}
+                                            />
+                                        </Routes>
+                                    </AlertProvider>
+                                </main>
+                                <Footer />
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </BrowserRouter>
+        </ThemeProvider>
+    );
 }
 
 function MainApp() {
-  const alias = localStorage.getItem("alias"); // alias를 로컬스토리지에서 가져오기
+    const alias = localStorage.getItem("alias"); // alias를 로컬스토리지에서 가져오기
 
-  return (
-    <div className="w-full h-full flex items-center justify-center">
-      <h1 className="text-3xl font-bold text-white">
-        Welcome, {alias ? alias : "User"} !
-      </h1>
-    </div>
-  );
+    return (
+        <div className="w-full h-full flex items-center justify-center">
+            <h1 className="text-3xl font-bold text-white">
+                Welcome, {alias ? alias : "User"} !
+            </h1>
+        </div>
+    );
 }
 
 export default App;
