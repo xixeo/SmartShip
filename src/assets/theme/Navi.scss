@@ -6,8 +6,8 @@ $sidebar-bg: #0098dd;
 .sidebar {
   width: 250px;
   height: 100%;
-  /* background: linear-gradient(to bottom, #4a8cf8, #382a80); */
-  background: $sidebar-bg;
+  background: linear-gradient(to bottom, #5b3bd9, #382a80);
+  // background: $sidebar-bg;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

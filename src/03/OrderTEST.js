@@ -183,7 +183,6 @@ export default function OrderTest() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
-
   //////////////////
   // currentItem2 //
   //////////////////
@@ -282,7 +281,7 @@ export default function OrderTest() {
     const checkitemidandquantity = getCheckedItemsWithQuantity();
     const purchaseData = {
       cartItems: checkitemidandquantity.map(item => ({
-        itemsId: item.itemId, // itemId를 itemsId로 변경
+        itemsId: item.itemId,
         quantity: item.quantity
       })),
       memo: memo
@@ -318,14 +317,14 @@ export default function OrderTest() {
       <div className="text-xl font-semibold text-white mb-4">장바구니</div>
       <div className="flex-col text-white OrderBasket">
         <div className="bg-[#2F2E38] m-5 p-5 rounded-lg">
-          <div className='flex items-center m-2 gap-7'>
+          <div className='flex items-center m-2 mb-5 gap-7'>
             <h4 className='m-0'>창고 출고 예정일</h4>
             <BasicDatePicker onDateAccept={(date) => setSelectedDate(date)} />
           </div>
           <div className='flex mr-5 ml-5 items-center justify-between'>
-            <div className='flex gap-7 items-center '>
-              <div className='m-0 items-center'>물품목록</div>
-              <div className='m-0 gap-4 flex items-center'>
+            <div className='flex items-center'>
+              <div className='items-center ml-0.5'>물품목록</div>
+              <div className='ml-16 gap-4 flex items-center'>
                 <TextField
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -428,9 +427,9 @@ export default function OrderTest() {
           </div>
           <div className="pagination-container">
             <Pagination
-              count={totalPages}
+              count={Math.ceil(filteredData.length / itemsPerPage)}
               page={currentPage}
-              onChange={handlePageChange}
+              onChange={(event, value) => setCurrentPage(value)}
               shape="rounded"
             />
           </div>
