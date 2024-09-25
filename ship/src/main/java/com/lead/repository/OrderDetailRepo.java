@@ -15,6 +15,9 @@ public interface OrderDetailRepo extends JpaRepository<OrderDetail, Integer> {
 			"item.category3.category2.category1" })
 	List<OrderDetail> findByOrderOrderId(Integer orderId);
 	
+	   // OrderId로 OrderDetail 조회 (cancel=false 인 항목만)
+    List<OrderDetail> findByOrderOrderIdAndCancelFalse(Integer orderId);
+	
 	//List<OrderDetail> findByOrder_Member_Username(String username);
 
 	// OrderDetail 엔티티를 조회할 때, 연관된 Items 또는 Orders 엔티티를 참조할 수 있다. 각 엔티티마다 별도의 쿼리가

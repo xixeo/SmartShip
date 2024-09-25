@@ -109,15 +109,15 @@ public class NoticeController {
 	}
 
 	// 공지사항 삭제
-	@DeleteMapping("/notice")
-	public ResponseEntity<String> deleteNotice(@RequestBody List<Integer> noticeIds) {
+	@DeleteMapping("/notice/{noticeId}")
+	public ResponseEntity<String> deleteNotice(@RequestBody List<Integer> noticeId) {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String username = authentication.getName(); // 토큰에서 username 추출
 
 		try {
 			// 공지사항 삭제 로직 호출
-			noticeService.deleteNotice(noticeIds, username);
+			noticeService.deleteNotice(noticeId, username);
 			System.out.println("===========================공지 삭제 한다");
 			
 			return ResponseEntity.ok("공지사항이 성공적으로 삭제되었습니다.");

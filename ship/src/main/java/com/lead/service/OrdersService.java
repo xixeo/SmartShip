@@ -249,6 +249,7 @@ public class OrdersService {
 					leadtime,
 					item.getMember().getUsername(), 
 					recommendedOrderDate, orderDetail.isOrdering(),
+					orderDetail.isCancel(),
 					orderDetail.getOrderDate());
 		}).collect(Collectors.toList());
 	}

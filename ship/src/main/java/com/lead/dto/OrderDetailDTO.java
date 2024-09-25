@@ -25,5 +25,6 @@ public class OrderDetailDTO {
     private String username;
     private LocalDate recommendedOrderDate;
     private boolean ordering;
+    private boolean cancel;
     private LocalDate orderDate;
 }

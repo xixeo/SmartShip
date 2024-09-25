@@ -57,6 +57,7 @@ public class OrderDetailService {
                 item.getMember().getUsername(),
                 null,
                 orderDetail.isOrdering(),
+                orderDetail.isCancel(),
                 orderDetail.getOrderDate()
             );
         }).collect(Collectors.toList());
@@ -98,27 +99,30 @@ public class OrderDetailService {
     	}
     }
     
-    // OrderDetail DELETE
-    public void deleteDetailItem(Integer itemId) {
+    /// 발주 내역에서 아이템 삭제
+    public void cancelDetailItem(Integer itemId) {
 
-        // itemId로 아이템을 찾음
-        Items item = itemsRepo.findById(itemId)
-                  .orElseThrow(() -> new RuntimeException("해당 물품을 찾을 수 없습니다. ID: " + itemId));
+        // orderDetail에서 itemId로 해당 항목을 찾음
+        OrderDetail orderDetail = orderDetailRepo.findById(itemId)
+                .orElseThrow(() -> new RuntimeException("해당 주문 세부 항목을 찾을 수 없습니다. ID: " + itemId));
 
-        // 현재 로그인한 사용자의 권한을 확인 (현재 사용자의 ROLE_MANAGER 권한 확인)
+        // 현재 로그인한 사용자의 권한을 확인
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        // 사용자의 권한이 ROLE_MANAGER인지 확인
         boolean isManager = authentication.getAuthorities().stream()
-            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_MANAGER"));
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_MANAGER"));
 
         if (!isManager) {
-            throw new RuntimeException("해당 물품을 삭제할 권한이 없습니다.");
+            throw new RuntimeException("해당 항목을 취소할 권한이 없습니다.");
         }
 
-        // 삭제 작업
-        itemsRepo.delete(item);  // 실제로 아이템을 삭제하는 로직
+        // cancel 필드를 true로 설정
+        orderDetail.setCancel(true);
+        
+        // 업데이트 후 저장
+        orderDetailRepo.save(orderDetail);
     }
+
+
 
     
     // bestOrderDate 계산 
@@ -166,6 +170,7 @@ public class OrderDetailService {
           newItem.getMember().getUsername(),
           null,
           orderDetail.isOrdering(),
+          orderDetail.isCancel(),
           orderDetail.getOrderDate()
       );
   }

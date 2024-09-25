@@ -39,6 +39,9 @@ public class OrderDetail {
     @Column(name = "ordering", nullable = false)
     private boolean ordering; 
     
+    @Column(name = "cancel", nullable = false)
+    private boolean cancel; 
+    
     @Column(name = "order_date", nullable = true)
     private LocalDate orderDate;
 }
