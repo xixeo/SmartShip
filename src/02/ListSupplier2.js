@@ -639,39 +639,39 @@ const ListSupplier2 = () => {
                     />
                 </div>
                 <div className="flex space-x-3">
-                    <Button
+                    <button
                         onClick={handleSearchButtonClick}
                         variant="contained"
-                        className="bluebutton"
+                        className="blue-btn"
                     >
                         검색
-                    </Button>
-                    <Button
+                    </button>
+                    <button
                         onClick={handleRegisterButtonClick}
                         variant="contained"
-                        className="bluebutton"
+                        className="blue-btn"
                     >
                         등록
-                    </Button>
+                    </button>
                     <Modal3
                         open={isModalOpen}
                         setOpen={setIsModalOpen}
                         title="신규 상품 등록"
                     />
-                    <Button
+                    <button
                         onClick={handleDelete}
                         variant="contained"
-                        className="bluebutton"
+                        className="blue-btn"
                     >
                         삭제
-                    </Button>
-                    <Button
+                    </button>
+                    <button
                         onClick={handleSave}
                         variant="contained"
-                        className="bluebutton"
+                        className="blue-btn"
                     >
                         저장
-                    </Button>
+                    </button>
                 </div>
             </div>
 

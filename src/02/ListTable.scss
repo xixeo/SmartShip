@@ -96,7 +96,7 @@
     }
 
     &.Mui-focused .MuiOutlinedInput-notchedOutline {
-      border-color: $input-color !important;
+      border-color: $blue-btn !important;
     }
   }
 
@@ -111,19 +111,19 @@
     }
 
     .MuiOutlinedInput-notchedOutline {
-      border-color: $input-color !important;
+      border-color: $inner-input-color !important;
     }
 
     .MuiSvgIcon-root {
-      color: $input-color;
+      color: #fff;
     }
 
     &:hover .MuiOutlinedInput-notchedOutline {
-      border-color: $input-color !important;
+      border-color: $inner-input-color !important;
     }
 
     &.Mui-focused .MuiOutlinedInput-notchedOutline {
-      border-color: $input-color !important;
+      border-color: $blue-btn !important;
     }
   }
 
@@ -151,7 +151,7 @@
       }
 
       &.Mui-focused fieldset {
-        border-color: $input-color !important;
+        border-color: $blue-btn !important;
       }
     }
   }
@@ -174,15 +174,15 @@
       width: 100%;
 
       & fieldset {
-        border-color: $input-color !important;
+        border-color: $inner-input-color !important;
       }
 
       &:hover fieldset {
-        border-color: $input-color !important;
+        border-color: $inner-input-color !important;
       }
 
       &.Mui-focused fieldset {
-        border-color: $input-color !important;
+        border-color: $blue-btn !important;
       }
     }
   }

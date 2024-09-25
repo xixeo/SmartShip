@@ -9,6 +9,10 @@
   outline: 0 !important;
   background: #ffffff00;
   padding: 6px 10px;
+
+  &:focus{
+    border-color:  $blue-btn;
+  }
 }
 
 .blue-btn {
