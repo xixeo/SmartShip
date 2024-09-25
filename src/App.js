@@ -18,6 +18,11 @@ import BasicDatePicker from "./03/BasicDatePicker";
 import MyOrderList from "./04/MyOrderList";
 import PurchaseRequest from "./DashBoard/PurchaseRequest";
 import OrderManage from "./DashBoard/OrderManage";
+import AnnounceForEvery from "./Compo/AnnounceForEvery";
+import AnnounceWrite from "./Admin/AnnounceWrite";
+import Announcement from "./Admin/Announcement";
+import Membership from "./Admin/Membership";
+import SupplierBoard from "./DashBoard/SupplierBoard";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -73,6 +78,11 @@ function App() {
                   <Route path="/signstate" element={<SignState />} />
                   <Route path="/Board" element={<Board />} />
                   <Route path="/MyOrderList" element={<MyOrderList />} />
+                  <Route path="/AnnounceForEvery" element={<AnnounceForEvery />} />
+                  <Route path="/AnnounceWrite" element={<AnnounceWrite />} />
+                  <Route path="/Announcement" element={<Announcement />} />
+                  <Route path="/Membership" element={<Membership />} />
+                  <Route path="/SupplierBoard" element={<SupplierBoard />} />
                   <Route
                     path="/PurchaseRequest"
                     element={<PurchaseRequest />}

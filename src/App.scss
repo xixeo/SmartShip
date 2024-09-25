@@ -21,6 +21,7 @@ body {
   height: 100%;
   margin: 0;
   font-family: $mainfont;
+  font-size: 0.95rem;
 }
 
 /** ✏️ APP.JS LAYOUT CSS  */
@@ -58,7 +59,7 @@ body {
 
 .main {
   height: calc(100vh - $header-height - $footer-height);
-  overflow: hidden;
+  // overflow: hidden;
   // min-height: calc(100vh - $header-height - $footer-height);
 }
 .footer {
