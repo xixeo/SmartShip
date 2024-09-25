@@ -1,5 +1,21 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Button, Paper, TextField, InputAdornment, Select, MenuItem,IconButton, Pagination } from "@mui/material";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Checkbox,
+    Button,
+    Paper,
+    TextField,
+    InputAdornment,
+    Select,
+    MenuItem,
+    IconButton,
+    Pagination,
+} from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
@@ -33,12 +49,7 @@ function EnhancedTableHead({
     allRowsSelected,
 }) {
     return (
-        <TableHead
-            sx={{
-                backgroundColor: "#47464F",
-                "& th": { fontWeight: "bold", color: "#fff" },
-            }}
-        >
+        <TableHead>
             <TableRow>
                 <TableCell padding="checkbox" style={{ width: "5%" }}>
                     <Checkbox
@@ -119,77 +130,99 @@ function ListTableDB() {
     }, []);
 
     // category1 필터링 (고정된 카테고리 옵션)
-const category1Options = useMemo(() => {
-    return [...new Set(rows.map((row) => row.category1Name))];
-  }, [rows]);
-  
-  // category2 필터링 (category1 선택에 따른 변경)
-  const category2Options = useMemo(() => {
-    if (!category1Name) return [];
-    return [
-      ...new Set(
-        rows
-          .filter((row) => row.category1Name === category1Name)
-          .map((row) => row.category2Name)
-      ),
-    ];
-  }, [category1Name, rows]);
-  
-  // category3 필터링 (category2 선택에 따른 변경)
-  const category3Options = useMemo(() => {
-    if (!category2Name) return [];
-    return [
-      ...new Set(
-        rows
-          .filter((row) => row.category2Name === category2Name)
-          .map((row) => row.category3Name)
-      ),
-    ];
-  }, [category2Name, rows]);
+    const category1Options = useMemo(() => {
+        return [...new Set(rows.map((row) => row.category1Name))];
+    }, [rows]);
 
-  const uniqueRows = useMemo(() => {
-    const groupedItems = {};
+    // category2 필터링 (category1 선택에 따른 변경)
+    const category2Options = useMemo(() => {
+        if (!category1Name) return [];
+        return [
+            ...new Set(
+                rows
+                    .filter((row) => row.category1Name === category1Name)
+                    .map((row) => row.category2Name)
+            ),
+        ];
+    }, [category1Name, rows]);
 
-    rows.forEach((row) => {
-        // 고유한 키로 중복 제거 (category1Name, category2Name, category3Name, part1, itemName)
-        const key = `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.part1}-${row.itemName}`;
+    // category3 필터링 (category2 선택에 따른 변경)
+    const category3Options = useMemo(() => {
+        if (!category2Name) return [];
+        return [
+            ...new Set(
+                rows
+                    .filter((row) => row.category2Name === category2Name)
+                    .map((row) => row.category3Name)
+            ),
+        ];
+    }, [category2Name, rows]);
 
-        // 이미 해당 key가 있는지 확인
-        if (!groupedItems[key]) {
-            groupedItems[key] = {
-                ...row, // row의 나머지 정보를 복사
-                itemIds: [row.itemId], // itemId를 배열로 설정
-                quantity: row.quantity, // quantity 값을 설정
-            };
-        } else {
-            // 이미 존재하는 key라면 itemId만 배열에 추가 (중복된 itemIds 추가)
-            groupedItems[key].itemIds.push(row.itemId);
-        }
-    });
+    const uniqueRows = useMemo(() => {
+        const groupedItems = {};
 
-    // 중복 제거된 행들을 반환
-    return Object.values(groupedItems);
-}, [rows]);
+        rows.forEach((row) => {
+            // 고유한 키로 중복 제거 (category1Name, category2Name, category3Name, part1, itemName)
+            const key = `${row.category1Name}-${row.category2Name}-${row.category3Name}-${row.part1}-${row.itemName}`;
 
+            // 이미 해당 key가 있는지 확인
+            if (!groupedItems[key]) {
+                groupedItems[key] = {
+                    ...row, // row의 나머지 정보를 복사
+                    itemIds: [row.itemId], // itemId를 배열로 설정
+                    quantity: row.quantity, // quantity 값을 설정
+                };
+            } else {
+                // 이미 존재하는 key라면 itemId만 배열에 추가 (중복된 itemIds 추가)
+                groupedItems[key].itemIds.push(row.itemId);
+            }
+        });
 
-// 카테고리 필터링 적용
-const filteredUniqueRows = useMemo(() => {
-    return uniqueRows.filter((row) => {
-      const matchesCategory1 = category1Name ? row.category1Name === category1Name : true;
-      const matchesCategory2 = category2Name ? row.category2Name === category2Name : true;
-      const matchesCategory3 = category3Name ? row.category3Name === category3Name : true;
-      const matchesSearchQuery = appliedSearchQuery ? row.itemName.toLowerCase().includes(appliedSearchQuery.toLowerCase()) : true;
-      return matchesCategory1 && matchesCategory2 && matchesCategory3 && matchesSearchQuery;
-    });
-  }, [uniqueRows, category1Name, category2Name, category3Name, appliedSearchQuery]);
-  
+        // 중복 제거된 행들을 반환
+        return Object.values(groupedItems);
+    }, [rows]);
+
+    // 카테고리 필터링 적용
+    const filteredUniqueRows = useMemo(() => {
+        return uniqueRows.filter((row) => {
+            const matchesCategory1 = category1Name
+                ? row.category1Name === category1Name
+                : true;
+            const matchesCategory2 = category2Name
+                ? row.category2Name === category2Name
+                : true;
+            const matchesCategory3 = category3Name
+                ? row.category3Name === category3Name
+                : true;
+            const matchesSearchQuery = appliedSearchQuery
+                ? row.itemName
+                      .toLowerCase()
+                      .includes(appliedSearchQuery.toLowerCase())
+                : true;
+            return (
+                matchesCategory1 &&
+                matchesCategory2 &&
+                matchesCategory3 &&
+                matchesSearchQuery
+            );
+        });
+    }, [
+        uniqueRows,
+        category1Name,
+        category2Name,
+        category3Name,
+        appliedSearchQuery,
+    ]);
+
     useEffect(() => {
         setPage(1);
     }, [searchQuery, category1Name, category2Name, category3Name, rowsPerPage]);
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelected = new Set(filteredUniqueRows.map((row) => row.itemId));
+            const newSelected = new Set(
+                filteredUniqueRows.map((row) => row.itemId)
+            );
             setSelected(
                 (prevSelected) => new Set([...prevSelected, ...newSelected])
             );
@@ -197,7 +230,10 @@ const filteredUniqueRows = useMemo(() => {
             setSelected((prevSelected) => {
                 const newSelected = new Set(
                     [...prevSelected].filter(
-                        (item) => !filteredUniqueRows.some((row) => row.itemId === item)
+                        (item) =>
+                            !filteredUniqueRows.some(
+                                (row) => row.itemId === item
+                            )
                     )
                 );
                 return newSelected;
@@ -485,153 +521,132 @@ const filteredUniqueRows = useMemo(() => {
                 </div>
             </div>
 
-            <div className="bg-custom">
-                <TableContainer
-                    component={Paper}
-                    sx={{ minHeight: "400px", width: "100%" }}
-                >
-                    <Table>
-                        <EnhancedTableHead
-                            onSelectAllClick={handleSelectAllClick}
-                            numSelected={selected.size}
-                            rowCount={uniqueRows.length}
-                            allRowsSelected={allRowsSelected}
-                        />
-                        <TableBody>
-                            {filteredUniqueRows
-                                .slice(
-                                    (page - 1) * rowsPerPage,
-                                    page * rowsPerPage
-                                )
-                                .map((row, index) => (
-                                    <TableRow
-                                        key={generateKey(row)}
-                                        hover
-                                        tabIndex={-1}
-                                        // 해당 uniqueRow에 속한 itemId들이 선택되었는지 확인
-                                        selected={rows.some(
-                                            (originalRow) =>
-                                                selected.has(
-                                                    originalRow.itemId
-                                                ) &&
-                                                originalRow.category1Name ===
-                                                    row.category1Name &&
-                                                originalRow.category2Name ===
-                                                    row.category2Name &&
-                                                originalRow.category3Name ===
-                                                    row.category3Name &&
-                                                originalRow.part1 ===
-                                                    row.part1 &&
-                                                originalRow.itemName ===
-                                                    row.itemName
-                                        )}
-                                    >
-                                        <TableCell
-                                            padding="checkbox"
-                                            style={{ width: "5%" }}
-                                        >
-                                            <Checkbox
-                                                checked={rows.some(
-                                                    (originalRow) =>
-                                                        selected.has(
-                                                            originalRow.itemId
-                                                        ) &&
-                                                        originalRow.category1Name ===
-                                                            row.category1Name &&
-                                                        originalRow.category2Name ===
-                                                            row.category2Name &&
-                                                        originalRow.category3Name ===
-                                                            row.category3Name &&
-                                                        originalRow.part1 ===
-                                                            row.part1 &&
-                                                        originalRow.itemName ===
-                                                            row.itemName
-                                                )}
-                                                inputProps={{
-                                                    "aria-labelledby":
-                                                        row.itemId,
-                                                }}
-                                                onChange={(event) =>
-                                                    handleClick(event, row)
-                                                }
-                                            />
-                                        </TableCell>
-                                        <TableCell
-                                            align="center"
-                                            className="item-cell"
-                                        >
-                                            {(page - 1) * rowsPerPage +
-                                                index +
-                                                1}
-                                        </TableCell>
-                                        <TableCell
-                                            align="center"
-                                            className="item-cell"
-                                        >
-                                            {formatCellValue(row.category1Name)}
-                                        </TableCell>
-                                        <TableCell
-                                            align="center"
-                                            className="item-cell"
-                                        >
-                                            {formatCellValue(row.category2Name)}
-                                        </TableCell>
-                                        <TableCell
-                                            align="center"
-                                            className="item-cell"
-                                        >
-                                            {formatCellValue(row.category3Name)}
-                                        </TableCell>
-                                        <TableCell
-                                            align="center"
-                                            className="item-cell"
-                                        >
-                                            {formatCellValue(row.itemName)}
-                                        </TableCell>
-                                        <TableCell
-                                            align="center"
-                                            className="item-cell"
-                                        >
-                                            {formatCellValue(row.part1)}
-                                        </TableCell>
-                                        <TableCell
-                                            align="center"
-                                            className="item-cell"
-                                        >
-                                            <TextField
-                                                className="custom-quantity"
-                                                type="number"
-                                                value={row.quantity}
-                                                onChange={(event) =>
-                                                    handleQuantityChange(
-                                                        row.itemId,
-                                                        event
-                                                    )
-                                                }
-                                                inputProps={{ min: 1 }}
-                                                size="small"
-                                                variant="outlined"
-                                            />
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            {emptyRows > 0 && (
+            <TableContainer>
+                <Table stickyHeader>
+                    <EnhancedTableHead
+                        onSelectAllClick={handleSelectAllClick}
+                        numSelected={selected.size}
+                        rowCount={uniqueRows.length}
+                        allRowsSelected={allRowsSelected}
+                    />
+                    <TableBody>
+                        {filteredUniqueRows
+                            .slice((page - 1) * rowsPerPage, page * rowsPerPage)
+                            .map((row, index) => (
                                 <TableRow
-                                    style={{ height: 53 * emptyRows }}
-                                ></TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </div>
-            <div className="pagination-container">
-                <Pagination
-                    count={totalPages}
-                    page={page}
-                    onChange={handleChangePage}
-                    shape="rounded"
-                />
-            </div>
+                                    key={generateKey(row)}
+                                    hover
+                                    tabIndex={-1}
+                                    // 해당 uniqueRow에 속한 itemId들이 선택되었는지 확인
+                                    selected={rows.some(
+                                        (originalRow) =>
+                                            selected.has(originalRow.itemId) &&
+                                            originalRow.category1Name ===
+                                                row.category1Name &&
+                                            originalRow.category2Name ===
+                                                row.category2Name &&
+                                            originalRow.category3Name ===
+                                                row.category3Name &&
+                                            originalRow.part1 === row.part1 &&
+                                            originalRow.itemName ===
+                                                row.itemName
+                                    )}
+                                >
+                                    <TableCell
+                                        padding="checkbox"
+                                        style={{ width: "5%" }}
+                                    >
+                                        <Checkbox
+                                            checked={rows.some(
+                                                (originalRow) =>
+                                                    selected.has(
+                                                        originalRow.itemId
+                                                    ) &&
+                                                    originalRow.category1Name ===
+                                                        row.category1Name &&
+                                                    originalRow.category2Name ===
+                                                        row.category2Name &&
+                                                    originalRow.category3Name ===
+                                                        row.category3Name &&
+                                                    originalRow.part1 ===
+                                                        row.part1 &&
+                                                    originalRow.itemName ===
+                                                        row.itemName
+                                            )}
+                                            inputProps={{
+                                                "aria-labelledby": row.itemId,
+                                            }}
+                                            onChange={(event) =>
+                                                handleClick(event, row)
+                                            }
+                                        />
+                                    </TableCell>
+                                    <TableCell
+                                        align="center"
+                                        className="item-cell"
+                                    >
+                                        {(page - 1) * rowsPerPage + index + 1}
+                                    </TableCell>
+                                    <TableCell
+                                        align="center"
+                                        className="item-cell"
+                                    >
+                                        {formatCellValue(row.category1Name)}
+                                    </TableCell>
+                                    <TableCell
+                                        align="center"
+                                        className="item-cell"
+                                    >
+                                        {formatCellValue(row.category2Name)}
+                                    </TableCell>
+                                    <TableCell
+                                        align="center"
+                                        className="item-cell"
+                                    >
+                                        {formatCellValue(row.category3Name)}
+                                    </TableCell>
+                                    <TableCell
+                                        align="center"
+                                        className="item-cell"
+                                    >
+                                        {formatCellValue(row.itemName)}
+                                    </TableCell>
+                                    <TableCell
+                                        align="center"
+                                        className="item-cell"
+                                    >
+                                        {formatCellValue(row.part1)}
+                                    </TableCell>
+                                    <TableCell
+                                        align="center"
+                                        className="item-cell"
+                                    >
+                                        <TextField
+                                            className="custom-quantity"
+                                            type="number"
+                                            value={row.quantity}
+                                            onChange={(event) =>
+                                                handleQuantityChange(
+                                                    row.itemId,
+                                                    event
+                                                )
+                                            }
+                                            inputProps={{ min: 1 }}
+                                            size="small"
+                                            variant="outlined"
+                                        />
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        {emptyRows > 0 && (
+                            <TableRow
+                                style={{ height: 53 * emptyRows }}
+                            ></TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
             <div className="flex justify-between items-center mt-6">
                 <div className="flex gap-4">
                     {/* 페이지당 항목 수 선택 */}
@@ -646,6 +661,14 @@ const filteredUniqueRows = useMemo(() => {
                             </MenuItem>
                         ))}
                     </Select>
+                </div>
+                <div className="pagination-container">
+                    <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={handleChangePage}
+                        shape="rounded"
+                    />
                 </div>
                 <div className="flex gap-4">
                     <Button className="bluebutton2" onClick={handleAddToCart}>

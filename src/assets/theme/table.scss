@@ -2,19 +2,25 @@
 
 /** ✏️ TABLE CSS  */
 .MuiTable-root {
-    font-family: $mainfont !important;
 
-    .css-195ujk9-MuiTableCell-root,
-    .css-1voojl0-MuiTableCell-root {
-        font-family: $mainfont !important;
-    }
     th,
     td {
         color: #fff;
-        border-bottom: 1px solid #0c182e;
+        border-bottom: 1px solid $main-bg;
+        padding: 4px;
     }
 
-    .css-1y5vrnu-MuiButtonBase-root-MuiCheckbox-root {
+    th{
+      background: $table-header !important;
+      font-weight: 600;
+    }
+
+    td{
+      background: rgba(255, 255, 255, 0.3) !important;
+      font-weight: 400;
+    }
+
+    .MuiCheckbox-root{
         color: #fff;
     }
 
@@ -27,4 +33,9 @@
             background-color: #4b7e98 !important;
         }
     }
+}
+
+.MuiTableContainer-root{
+  height: 100%;
+  overflow-x: hidden !important;
 }

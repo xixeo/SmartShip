@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "./App.scss";
 import "../src/assets/theme/input.scss";
+import "../src/assets/theme/table.scss";
 import SignUp from "./Sign/SignUp";
 import SignIn from "./Sign/SignIn";
 import SignState from "./Sign/SignState";
@@ -23,8 +24,15 @@ import AnnounceWrite from "./Admin/AnnounceWrite";
 import Announcement from "./Admin/Announcement";
 import Membership from "./Admin/Membership";
 import SupplierBoard from "./DashBoard/SupplierBoard";
+import { createTheme, ThemeProvider } from '@mui/material';
 
 function App() {
+  const theme = createTheme({
+    typography: {
+        fontFamily: 'Pretendard',
+    },
+});
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [redirectPath, setRedirectPath] = useState("/");
 
@@ -40,6 +48,7 @@ function App() {
   };
 
   return (
+    <ThemeProvider theme={theme}>
     <BrowserRouter>
       <div className="flex flex-col h-screen w-full">
         {!isAuthenticated ? (
@@ -99,6 +108,7 @@ function App() {
         )}
       </div>
     </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

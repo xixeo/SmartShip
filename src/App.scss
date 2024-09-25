@@ -15,6 +15,9 @@ $main-bg: #0c182e;
 $calendar-btn-border: #7d7c82;
 $input-color: #9d9b9b;
 $blue-btn: #43c5fe;
+$inner-btn: #3DD19D;
+$input-height: 32px;
+$table-header: #303A4D;
 
 html,
 body {
@@ -69,3 +72,13 @@ body {
   font-weight: 200;
   font-size: 0.8rem;
 }
+
+.scrollbar { 
+  width: 250px;
+  height: 250px;
+  overflow-y: scroll; /*  */
+}
+
+
+
+

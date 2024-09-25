@@ -32,9 +32,10 @@ export default function Announcement() {
                 }}
             >
                 <Table aria-label="table">
-                    <TableHead
+                    <TableHead>                    
+                    {/* <TableHead
                         style={{ background: "rgba(255, 255, 255, 0.15)" }}
-                    >
+                    > */}
                         <TableRow>
                             <TableCell>
                                 <Checkbox />
@@ -49,13 +50,13 @@ export default function Announcement() {
                     </TableHead>
                     <TableBody>
                         <React.Fragment>
-                            <TableRow
+                            {/* <TableRow
                                 style={{
-                                    borderTop: "1px solid #e4e4e4",
                                     background: "rgba(255, 255, 255, 0.3)",
                                     color: "#fff",
                                 }}
-                            >
+                            > */}
+                            <TableRow>
                                 <TableCell style={{ width: "50px" }}>
                                     <Checkbox />
                                 </TableCell>
