@@ -511,13 +511,13 @@ function ListTableDB() {
                         }}
                         className="custom-textfield"
                     />
-                    <Button
+                    <button
                         onClick={handleSearchButtonClick}
                         variant="contained"
-                        className="bluebutton"
+                        className="blue-btn"
                     >
                         검색
-                    </Button>
+                    </button>
                 </div>
             </div>
 

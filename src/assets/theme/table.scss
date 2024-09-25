@@ -26,11 +26,14 @@
 
     // switch 동그라미
     .MuiSwitch-root {
+      .Mui-checked+.MuiSwitch-track{
+        opacity: 1 !important;
+      }
         .Mui-checked {
             color: #56b8e9 !important;
         }
         .MuiSwitch-track {
-            background-color: #4b7e98 !important;
+            background-color: #5494b5 !important;
         }
     }
 }
