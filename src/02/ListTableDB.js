@@ -165,7 +165,6 @@ const category1Options = useMemo(() => {
       ),
     ];
   }, [category2Name, rows]);
-  
 
   const uniqueRows = useMemo(() => {
     const groupedItems = {};
@@ -198,21 +197,18 @@ const filteredUniqueRows = useMemo(() => {
       const matchesCategory1 = category1Name ? row.category1Name === category1Name : true;
       const matchesCategory2 = category2Name ? row.category2Name === category2Name : true;
       const matchesCategory3 = category3Name ? row.category3Name === category3Name : true;
-      
-      return matchesCategory1 && matchesCategory2 && matchesCategory3;
+      const matchesSearchQuery = appliedSearchQuery ? row.itemName.toLowerCase().includes(appliedSearchQuery.toLowerCase()) : true;
+      return matchesCategory1 && matchesCategory2 && matchesCategory3 && matchesSearchQuery;
     });
-  }, [uniqueRows, category1Name, category2Name, category3Name]);
+  }, [uniqueRows, category1Name, category2Name, category3Name, appliedSearchQuery]);
   
-  
-
-
     useEffect(() => {
         setPage(1);
     }, [searchQuery, category1Name, category2Name, category3Name, rowsPerPage]);
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelected = new Set(uniqueRows.map((row) => row.itemId));
+            const newSelected = new Set(filteredUniqueRows.map((row) => row.itemId));
             setSelected(
                 (prevSelected) => new Set([...prevSelected, ...newSelected])
             );
@@ -220,7 +216,7 @@ const filteredUniqueRows = useMemo(() => {
             setSelected((prevSelected) => {
                 const newSelected = new Set(
                     [...prevSelected].filter(
-                        (item) => !uniqueRows.some((row) => row.itemId === item)
+                        (item) => !filteredUniqueRows.some((row) => row.itemId === item)
                     )
                 );
                 return newSelected;
@@ -369,8 +365,6 @@ const filteredUniqueRows = useMemo(() => {
     //     console.error('장바구니 추가 중 오류 발생:', error);
     //   }
     // };
-
-    // 장바구니에 항목 추가할 때, 중복된 항목들도 모두 itemId를 전송
 
     // 장바구니에 항목 추가할 때, 중복된 항목들도 모두 itemId를 전송
     const handleAddToCart = async () => {
@@ -550,9 +544,6 @@ const filteredUniqueRows = useMemo(() => {
                                                 originalRow.itemName ===
                                                     row.itemName
                                         )}
-                                        onClick={(event) =>
-                                            handleClick(event, row)
-                                        } // 클릭 이벤트 처리
                                     >
                                         <TableCell
                                             padding="checkbox"
