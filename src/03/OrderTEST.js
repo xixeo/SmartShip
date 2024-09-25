@@ -53,6 +53,15 @@ export default function OrderTest() {
         orderDetails: orderbasket.cartItem.cartItems || [], // cartItems가 없으면 빈 배열
       };
 
+      const cartItems = orderbasket.cartItem.cartItems;
+
+      if (!Array.isArray(cartItems)) {
+        console.warn('cartItems는 배열이 아닙니다:', cartItems);
+      } else {
+        setListdatas(cartItems); // 정상적인 경우에만 리스트 데이터를 설정
+        console.log("cartItems : ",cartItems);
+      }
+
       setListdatas(basket.orderDetails); // orderDetails를 listdatas에 설정
     } catch (error) {
       console.error('Failed to fetch orderbasket:', error);
@@ -94,6 +103,30 @@ export default function OrderTest() {
     );
   };
 
+  // itemId가 작은 값의 quantity를 따라서 가지도록
+  useEffect(() => {
+    const updateQuantities = () => {
+      const updatedList = listdatas.reduce((acc, item) => {
+        const key = `${item.category1Name}-${item.category2Name}-${item.category3Name}-${item.itemName}-${item.part1}`;
+        // 해당 key가 없다면 추가, 있다면 itemId가 작은 것을 기준으로 교체
+        if (!acc[key] || item.itemsId < acc[key].itemsId) {
+          acc[key] = { ...item };
+        }
+        return acc;
+      }, {});
+
+      // 그룹 내의 항목 모두 동일한 수량으로 설정
+      const finalList = listdatas.map(item => {
+        const key = `${item.category1Name}-${item.category2Name}-${item.category3Name}-${item.itemName}-${item.part1}`;
+        return { ...item, quantity: updatedList[key].quantity };
+      });
+
+      setListdatas(finalList);
+    };
+
+    updateQuantities();
+  }, [listdatas]);
+
   //////////////////////
   //  정보 추출 함수   //
   //////////////////////
@@ -134,15 +167,53 @@ export default function OrderTest() {
       .map((detail) => detail.itemsId);
   };
 
-  // 체크된 항목의 아이디와 수량을 추출
-  const getCheckedItemsWithQuantity = () => {
-    return Array.from(selectedItems).map(itemId => {
+  // 체크된 항목의 아이디와 수량을 추출 (전달해줄때에는 같은 카테고리, 물품명, part1이라도 다른 값으로)
+
+  //!!!!!!!!!!!!!!!!!!!///
+  // 여기부터 콘솔 안찍힘 //
+  //!!!!!!!!!!!!!!!!!!!///
+
+  const getCheckedItemsWithQuantity2 = () => {
+    const itemQuantities = {}; // 각 항목의 수량을 저장할 객체
+
+    selectedItems.forEach(itemId => {
       const item = listdatas.find(detail => detail.itemsId === itemId);
-      return {
-        itemId,
-        quantity: item.quantity,
-      };
+      console.log('찾은 아이템:', item);
+      if (item) {
+        const key = `${item.category1Name}-${item.category2Name}-${item.category3Name}-${item.itemName}-${item.part1}`;
+        if (!itemQuantities[key]) {
+          itemQuantities[key] = {
+            itemsId: item.itemsId,
+            quantity: item.quantity // 현재 수량 사용
+          };
+        } else {
+          itemQuantities[key].quantity += item.quantity; // 수량을 더하는 부분
+        }
+      }
     });
+
+    const groupedItems = Object.values(itemQuantities);
+    const result = [];
+
+    groupedItems.forEach(group => {
+      const relatedItems = listdatas.filter(detail =>
+        detail.category1Name === group.category1Name &&
+        detail.category2Name === group.category2Name &&
+        detail.category3Name === group.category3Name &&
+        detail.itemName === group.itemName &&
+        detail.part1 === group.part1
+      );
+
+      relatedItems.forEach(relatedItem => {
+        result.push({
+          itemsId: relatedItem.itemsId,
+          quantity: relatedItem.quantity
+        });
+      });
+    });
+
+    console.log('생성된 결과:', result);
+    return result;
   };
 
   //////////////////////
@@ -187,10 +258,10 @@ export default function OrderTest() {
   // currentItem2 //
   //////////////////
 
-   // 동일한 category1Name, category2Name, category3Name, itemName, part1을 가진 항목 중 itemId가 작은 항목만 추출
-   const currentItem2 = currentItems.reduce((acc, item) => {
+  // 동일한 category1Name, category2Name, category3Name, itemName, part1을 가진 항목 중 itemId가 작은 항목만 추출
+  const currentItem2 = currentItems.reduce((acc, item) => {
     const key = `${item.category1Name}-${item.category2Name}-${item.category3Name}-${item.itemName}-${item.part1}`;
-    
+
     // key에 해당하는 항목이 없다면 현재 item을 추가
     if (!acc[key]) {
       acc[key] = item;
@@ -198,7 +269,7 @@ export default function OrderTest() {
       // 이미 저장된 항목보다 itemId가 작으면 업데이트
       acc[key] = item;
     }
-    
+
     return acc;
   }, {});
 
@@ -277,18 +348,30 @@ export default function OrderTest() {
 
 
   // 구매버튼
-  const handlePerchase = async (orderdate) => {
-    const checkitemidandquantity = getCheckedItemsWithQuantity();
+  const handlePurchase = async (orderdate) => {
+    const selectedItemsWithQuantity = getCheckedItemsWithQuantity2(); // 체크된 항목들
+
+    // fetchorderlist로 가져온 데이터
+    const orderlist = await fetchorderlist(orderdate);
+
+    // 일치하는 항목 필터링
+    const matchedItems = selectedItemsWithQuantity.filter(selectedItem =>
+      orderlist.some(orderItem =>
+        orderItem.category1Name === selectedItem.category1Name &&
+        orderItem.category2Name === selectedItem.category2Name &&
+        orderItem.category3Name === selectedItem.category3Name &&
+        orderItem.itemName === selectedItem.itemName &&
+        orderItem.part1 === selectedItem.part1
+      )
+    );
+
     const purchaseData = {
-      cartItems: checkitemidandquantity.map(item => ({
-        itemsId: item.itemId,
-        quantity: item.quantity
-      })),
+      cartItems: matchedItems, // 일치하는 항목만 전송
       memo: memo
     };
 
     try {
-      console.log('Sending purchase data:', purchaseData);
+      console.log('Sending purchase data:', JSON.stringify(purchaseData, null, 2));
       const response = await fetch(`saveToOrder/${orderdate}`,
         {
           method: 'POST',
@@ -323,7 +406,7 @@ export default function OrderTest() {
           </div>
           <div className='flex mr-5 ml-5 items-center justify-between'>
             <div className='flex items-center'>
-              <div className='items-center ml-0.5'>물품목록</div>
+              <div className='items-center'>물품목록</div>
               <div className='ml-16 gap-4 flex items-center'>
                 <TextField
                   value={searchQuery}
@@ -437,16 +520,19 @@ export default function OrderTest() {
             <Select
               value={itemsPerPage}
               onChange={(e) => {
-                setItemsPerPage(e.target.value);
+                setItemsPerPage(Number(e.target.value));
                 setCurrentPage(1);
               }}
               className="select-custom ml-5"
             >
-              {[5, 10, 15].map((option) => (
+              {/* {[5, 10, 15].map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}
                 </MenuItem>
-              ))}
+              ))} */}
+              <MenuItem value={5}>5</MenuItem>
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={15}>15</MenuItem>
             </Select></div>
 
           <div className='m-5'>
@@ -466,7 +552,7 @@ export default function OrderTest() {
               open={perchasopen}
               setOpen={setPerchasOpen}
               title="주문하시겠습니까?"
-              onConfirm={() => handlePerchase(orderdate)}
+              onConfirm={() => handlePurchase(orderdate)}
               orderDate={orderdate}
             />
           </div>
