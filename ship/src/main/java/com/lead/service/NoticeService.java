@@ -49,7 +49,7 @@ public class NoticeService {
 				.author(notice.getAuthor().getUsername()).createdAt(notice.getCreatedAt().toLocalDate()) // 날짜만 반환
 				.views(notice.getViews()).status(notice.getStatus()).build();
 	}
-	
+
 	// 일반 사용자용 NoticeDTO로 변환하는 메서드
 	private NoticeDTO convertToDTOwithoutStatus(Notice notice) {
 		return NoticeDTO.builder().noticeId(notice.getNoticeId()).title(notice.getTitle())
@@ -78,14 +78,15 @@ public class NoticeService {
 	}
 
 	/////////////////////////////////////////////////////////// notice 등록
-	public void createNotice(String title, String content, MultipartFile[] files, String username, Authentication authentication) throws IOException {
+	public void createNotice(String title, String content, MultipartFile[] files, String username,
+			Authentication authentication) throws IOException {
 		List<String> fileNames = new ArrayList<>();
 
 		// 현재 사용자의 권한이 ROLE_ADMIN이 아닌 경우 예외 발생
-	    if (authentication.getAuthorities().stream()
-	            .noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))) {
-	        throw new RuntimeException("공지사항 등록 권한이 없습니다.");
-	    }
+		if (authentication.getAuthorities().stream()
+				.noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))) {
+			throw new RuntimeException("공지사항 등록 권한이 없습니다.");
+		}
 
 		if (files != null) {
 			for (MultipartFile file : files) {
@@ -137,31 +138,50 @@ public class NoticeService {
 
 	/////////////////////////////////////////////////////////// notice 수정
 	@Transactional
-	public void updateNotice(Integer noticeId, String title, String content, Boolean status, MultipartFile file, String username) {
-	    // noticeId로 공지사항 조회
-	    Notice notice = noticeRepo.findById(noticeId)
-	            .orElseThrow(() -> new RuntimeException("해당 공지사항을 찾을 수 없습니다."));
+	public void updateNotice(Integer noticeId, String title, String content, Boolean status, MultipartFile file,
+			String username) {
+		// noticeId로 공지사항 조회
+		Notice notice = noticeRepo.findById(noticeId).orElseThrow(() -> new RuntimeException("해당 공지사항을 찾을 수 없습니다."));
 
-	    // 현재 사용자가 작성자인지 확인
-	    if (!notice.getAuthor().getUsername().equals(username)) {
-	        throw new RuntimeException("공지사항을 수정할 권한이 없습니다.");
-	    }
+		// 현재 사용자가 작성자인지 확인
+		if (!notice.getAuthor().getUsername().equals(username)) {
+			throw new RuntimeException("공지사항을 수정할 권한이 없습니다.");
+		}
 
-	    // 제목 및 내용 업데이트
-	    notice.setTitle(title);
-	    notice.setContent(content);
-	    notice.setStatus(status);
+		// 제목 및 내용 업데이트
+		notice.setTitle(title);
+		notice.setContent(content);
+		notice.setStatus(status);
 
-	    // 파일이 있을 경우 파일 저장 및 업데이트
-	    if (file != null && !file.isEmpty()) {
-	        try {
-	            String fileName = fileService.storeFile(file);  // IOException 처리
-	            notice.setAttachment(fileName);
-	        } catch (IOException e) {
-	            throw new RuntimeException("파일 저장 중 오류가 발생했습니다.", e);
-	        }
-	    }
+		// 파일이 있을 경우 파일 저장 및 업데이트
+		if (file != null && !file.isEmpty()) {
+			try {
+				String fileName = fileService.storeFile(file); // IOException 처리
+				notice.setAttachment(fileName);
+			} catch (IOException e) {
+				throw new RuntimeException("파일 저장 중 오류가 발생했습니다.", e);
+			}
+		}
 
-	    noticeRepo.save(notice);
+		noticeRepo.save(notice);
+	}
+
+	/////////////////////////////////////////////////////////// notice 수정 (노출여부)
+	@Transactional
+	public void updateNoticeState(Integer noticeId, Boolean status, Authentication authentication) {
+		// noticeId로 공지사항 조회
+		Notice notice = noticeRepo.findById(noticeId).orElseThrow(() -> new RuntimeException("해당 공지사항을 찾을 수 없습니다."));
+
+
+		// 현재 사용자의 권한이 ROLE_ADMIN이 아닌 경우 예외 발생
+		if (authentication.getAuthorities().stream()
+				.noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))) {
+			throw new RuntimeException("공지사항 등록 권한이 없습니다.");
+		}
+
+		// status 업데이트
+		notice.setStatus(status);
+
+		noticeRepo.save(notice);
 	}
 }

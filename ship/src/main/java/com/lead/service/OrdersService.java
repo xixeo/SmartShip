@@ -73,8 +73,9 @@ public class OrdersService {
 		// 해당 주문에 연결된 OrderDetail 정보 조회
 		List<OrderDetail> orderDetails = orderDetailRepo.findByOrderOrderId(orderId);
 
-		// ordering = false인 OrderDetail만 필터링
-		List<OrderDetail> filteredOrderDetails = orderDetails.stream().filter(orderDetail -> !orderDetail.isOrdering())
+		// ordering = false이고 cancel = false인 OrderDetail만 필터링
+		
+		List<OrderDetail> filteredOrderDetails = orderDetails.stream().filter(orderDetail -> !orderDetail.isOrdering() && !orderDetail.isCancel())
 				.collect(Collectors.toList());
 
 		// bestOrderDate 계산
@@ -188,7 +189,8 @@ public class OrdersService {
 	            item.getUnit(),
 	            orderDetail.getQuantity(),
 	            item.getMember().getUsername(),
-	            orderDetail.getOrder().getRequestDate()
+	            orderDetail.getOrder().getRequestDate(),
+	            orderDetail.isCancel()
 	        );
 	    }).collect(Collectors.toList());
 	}

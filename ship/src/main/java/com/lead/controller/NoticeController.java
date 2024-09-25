@@ -148,4 +148,22 @@ public class NoticeController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("공지사항 수정 중 오류가 발생했습니다." + e.getMessage());
 	    }
 	}
+	
+	//공지사항 노출여부 수정
+		@PutMapping("/noticeStatus/{noticeId}")
+		public ResponseEntity<String> updateNoticeState(@PathVariable Integer noticeId,
+		                                           @RequestParam("status") Boolean status,
+		                                           Authentication authentication) {
+		    //String username = authentication.getName(); // 토큰에서 사용자 이름 가져오기
+
+		    try {
+		        // 공지사항 수정 로직 호출
+		        noticeService.updateNoticeState(noticeId, status, authentication);
+		        return ResponseEntity.ok("공지사항이 성공적으로 수정되었습니다.");
+		    } catch (RuntimeException e) {
+		        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+		    } catch (Exception e) {
+		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("공지사항 수정 중 오류가 발생했습니다." + e.getMessage());
+		    }
+		}
 }

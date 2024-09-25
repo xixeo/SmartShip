@@ -46,6 +46,7 @@ public class OrdersController {
 		}
 	}
 
+	// orderDetail 조회
 	@GetMapping("/getOrderDetail/{orderId}")
 	public ResponseEntity<?> getOrderById(@PathVariable Integer orderId) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -61,6 +62,7 @@ public class OrdersController {
 		}
 	}
 
+	// 발주 처리
 	@PutMapping("/orderUpdate")
 	public ResponseEntity<String> updateOrderDetails(@RequestBody List<OrderDetailUpdateDTO> updateRequest,
 			Authentication authentication) {
@@ -106,6 +108,7 @@ public class OrdersController {
 		}
 	}
 
+	// 발주 불가능한 품목 삭제처리
 	@PutMapping("/cancelOrderItem/{orderDetailId}")
 	public ResponseEntity<?> cancelDetailItem(@PathVariable Integer orderDetailId) {
 	    try {

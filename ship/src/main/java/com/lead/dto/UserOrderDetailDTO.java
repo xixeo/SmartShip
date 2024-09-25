@@ -20,4 +20,5 @@ public class UserOrderDetailDTO {
     private Integer quantity;
     private String username;
     private LocalDate orderDate;
+    private Boolean cancel;
 }
