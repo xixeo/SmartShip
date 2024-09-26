@@ -12,10 +12,13 @@ import './OrderManage.scss';
 export default function OrderTest() {
   const { orderId } = useParams(); // URL에서 orderId 가져오기
   const [purDetails, setPurDetails] = useState([]);
+  const [purDetails2, setPurDetails2] = useState([]);
   const [quantityState, setQuantityState] = useState({});
   const [pastleadopen, setPastleadOpen] = useState(false);
   const [preleadopen, setPreleadOpen] = useState(false);
   const [perchasopen, setPerchasopen] = useState(false);
+  const [recoal, setrecoal] = useState(false);
+  const [recoal2, setrecoal2] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selrow, setSelrow] = useState([]);
   const [totalAmounts, setTotalAmounts] = useState({});
@@ -23,6 +26,9 @@ export default function OrderTest() {
   const [supplierOptions, setSupplierOptions] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState({});
   const [selectrowOrderid, setSelectrowOrderid] = useState([]);
+  const [selectrowitemid, setSelectrowitemid] = useState({});
+  const [Currentrow, setCurrentrow] = useState({});
+  const [rows, setRows] = useState([]);
   const token = localStorage.getItem('token');
   // console.log('id', orderId);
   const [eey, setEey] = useState([])
@@ -106,74 +112,74 @@ export default function OrderTest() {
       }
       const details = await response.json();
       console.log('od목록', details)
-      // // 서버에서 받은 데이터를 rows 형식에 맞게 변환해서 저장
-      // const formattedData = (Array.isArray(details) ? details : [details]).flatMap((order) =>
-      //   order.orderDetails.map((detail) => ({
-      //     username: order.username,
-      //     alias: order.alias,
-      //     tel: order.phone,
-      //     releaseDate: order.releaseDate,
-      //     orderdetailid: detail.orderDetailId,
-      //     itemid: detail.itemsId,
-      //     Category1: detail.category1Name,
-      //     Category2: detail.category2Name,
-      //     Category3: detail.category3Name,
-      //     itemName: detail.itemName,
-      //     part1: detail.part1,
-      //     quantity: detail.quantity,
-      //     price: detail.price,
-      //     unitprice: getCurrencySymbol(detail.unit) + detail.price,
-      //     amount: formatPrice(detail.price, detail.quantity, detail.unit),
-      //     supplier: detail.username,
-      //     BestOrderDate: detail.recommendedOrderDate + `(${detail.leadtime}일)`,
-      //     unit: detail.unit,
-      //     leadtime: detail.leadtime,
-      //   }))
-      // );
+      // 서버에서 받은 데이터를 rows 형식에 맞게 변환해서 저장
+      const formattedData = (Array.isArray(details) ? details : [details]).flatMap((order) =>
+        order.orderDetails.map((detail) => ({
+          username: order.username,
+          alias: order.alias,
+          tel: order.phone,
+          releaseDate: order.releaseDate,
+          orderdetailid: detail.orderDetailId,
+          itemid: detail.itemsId,
+          Category1: detail.category1Name,
+          Category2: detail.category2Name,
+          Category3: detail.category3Name,
+          itemName: detail.itemName,
+          part1: detail.part1,
+          quantity: detail.quantity,
+          price: detail.price,
+          unitprice: getCurrencySymbol(detail.unit) + detail.price,
+          amount: formatPrice(detail.price, detail.quantity, detail.unit),
+          supplier: detail.username,
+          BestOrderDate: detail.recommendedOrderDate + `(${detail.leadtime}일)`,
+          unit: detail.unit,
+          leadtime: detail.leadtime,
+        }))
+      );
       // console.log('formattedData', formattedData)
-      // setPurDetails(formattedData);
+      setPurDetails2(formattedData);
       const formatted = Array.isArray(details) ? details : [details];
-  
-  const groupedData = formatted.reduce((acc, order) => {
-    order.orderDetails.forEach(detail => {
-      const key = `${detail.category1Name}-${detail.category2Name}-${detail.category3Name}-${detail.itemName}-${detail.part1}`;
-      setEey(key)
-      if (!acc[key]) {
-        acc[key] = [];
-      }
-      acc[key].push({
-        username: order.username,
-        alias: order.alias,
-        tel: order.phone,
-        releaseDate: order.releaseDate,
-        orderdetailid: detail.orderDetailId,
-        itemid: detail.itemsId,
-        Category1: detail.category1Name,
-        Category2: detail.category2Name,
-        Category3: detail.category3Name,
-        itemName: detail.itemName,
-        part1: detail.part1,
-        quantity: detail.quantity,
-        price: detail.price,
-        unitprice: getCurrencySymbol(detail.unit) + detail.price,
-        amount: formatPrice(detail.price, detail.quantity, detail.unit),
-        supplier: detail.username,
-        BestOrderDate: detail.recommendedOrderDate + `(${detail.leadtime}일)`,
-        unit: detail.unit,
-        leadtime: detail.leadtime,
-      });
-    });
-    return acc;
-  }, {});
-  const groupedDataArray = Object.keys(groupedData).map(key => { return { key : key, detail : groupedData[key]}});
-  console.log('gro',groupedData)
-  console.log('groA',groupedDataArray)
-  setPurDetails(groupedDataArray); 
-  const initialQuantities = [groupedData].reduce((acc, detail) => {
-    acc[detail.itemid] = detail.quantity;
-    return acc;
-  }, {});
-  setQuantityState(initialQuantities);
+
+      const groupedData = formatted.reduce((acc, order) => {
+        order.orderDetails.forEach(detail => {
+          const key = `${detail.category1Name}-${detail.category2Name}-${detail.category3Name}-${detail.itemName}-${detail.part1}`;
+          setEey(key)
+          if (!acc[key]) {
+            acc[key] = [];
+          }
+          acc[key].push({
+            username: order.username,
+            alias: order.alias,
+            tel: order.phone,
+            releaseDate: order.releaseDate,
+            orderdetailid: detail.orderDetailId,
+            itemid: detail.itemsId,
+            Category1: detail.category1Name,
+            Category2: detail.category2Name,
+            Category3: detail.category3Name,
+            itemName: detail.itemName,
+            part1: detail.part1,
+            quantity: detail.quantity,
+            price: detail.price,
+            unitprice: getCurrencySymbol(detail.unit) + detail.price,
+            amount: formatPrice(detail.price, detail.quantity, detail.unit),
+            supplier: detail.username,
+            BestOrderDate: detail.recommendedOrderDate + `(${detail.leadtime}일)`,
+            unit: detail.unit,
+            leadtime: detail.leadtime,
+          });
+        });
+        return acc;
+      }, {});
+      const groupedDataArray = Object.keys(groupedData).map(key => { return { key: key, detail: groupedData[key] } });
+      // console.log('gro', groupedData)
+      // console.log('groA', groupedDataArray)
+      setPurDetails(groupedDataArray);
+      const initialQuantities = [groupedData].reduce((acc, detail) => {
+        acc[detail.itemid] = detail.quantity;
+        return acc;
+      }, {});
+      setQuantityState(initialQuantities);
     } catch (e) {
       console.error('Error fetching order details:', e);
     } finally {
@@ -184,45 +190,15 @@ export default function OrderTest() {
     fetchOrderDetails();
   }, [orderId]);
 
-  console.log('purdetails', purDetails)
+  // console.log('purdetails', purDetails)
+  // const test = purDetails.flatMap(order => {
+  //   return order.detail.map((item) => item.itemid)
+  // });
+  // console.log('purdetails flatmap', test)
   // console.log('purdetails[0]', purDetails[0])
-  // console.log('purdetails[0].', purDetails[0].detail[0])
-
-
-
-  const handleSupplierChange = (rowKey, selectedSupplierName, rowData) => {
-    const selectedSupplier = purDetails[rowKey].find(supplier => supplier.supplier === selectedSupplierName);
-
-    if (selectedSupplier) {
-        const newItemId = selectedSupplier.itemid; // 선택된 공급자의 itemid
-        const newPrice = selectedSupplier.price; // 선택된 공급자의 price
-
-        // purDetails 업데이트
-        setPurDetails(prevDetails =>
-            prevDetails.map(detail => {
-                if (detail.itemid === rowData.itemid) {
-                    return {
-                        ...detail,
-                        itemid: newItemId, // itemid 업데이트
-                        price: newPrice,   // price 업데이트
-                        amount: formatPrice(newPrice, detail.quantity, detail.unit) // 새로운 금액 계산
-                    };
-                }
-                return detail;
-            })
-        );
-
-        // 선택된 공급자 상태 업데이트
-        setSelectedSupplier(prev => ({
-            ...prev,
-            [rowKey]: selectedSupplierName,
-        }));
-    }
-};
-
-
-
-
+  // console.log('purdetails[detail]', purDetails[detail])
+  // console.log('purdetails[0].detail', purDetails.length > 0 ? purDetails[0].detail : '데이터 패치전')
+  // console.log('purdetails[0].detail.', purDetails.length > 0 ? purDetails[0].detail[0].releaseDate : '데이터 패치전')
 
   //////////////////////
   //  통화 단위 함수   //
@@ -252,8 +228,15 @@ export default function OrderTest() {
   };
 
   // 선택된 행 화폐단위별 총 합계
-  const calculateTotalAmount = (selectedIds) => {
-    const selectedDetails = purDetails.filter(detail => selectedIds.includes(detail.itemid));
+  const calculateTotalAmount = (rowid,selectedIds) => {
+    console.log('ttttttttt',rowid)
+    console.log('dddddd',selectedIds)
+    const selectedDetails = rows
+    .filter(row => rowid.includes(row.id)) 
+    .map(detail => detail.details) 
+    .flatMap(detailsArray => detailsArray) 
+    .filter(i => selectedIds.includes(i.itemid)); 
+    console.log('sdafnks;a',selectedDetails)
     const totals = selectedDetails.reduce((acc, detail) => {
       const { unit, price, quantity } = detail;
       const totalPrice = price * quantity; // 숫자만 추출하여 계산
@@ -268,11 +251,12 @@ export default function OrderTest() {
     setTotalAmounts(totals);
   };
 
-  useEffect(() => {
-    if (selrow.length > 0) {
-      calculateTotalAmount(selrow);
-    }
-  }, [purDetails, selrow]);
+  // useEffect(() => {
+  //   if (selrow.length > 0 && selectedIds.length > 0) {
+  //     calculateTotalAmount(selrow, selectedIds); // rows가 변경될 때 총 금액 재계산
+  //   }
+  // }, [rows, selrow, selectedIds]);
+  
 
   console.log('total', totalAmounts)
 
@@ -282,7 +266,8 @@ export default function OrderTest() {
 
   // 선택된 행 중 리드타임 제일 긴 항목 추출
   const getLongestCheckedLeadTime = (selectedIds) => {
-    const selectedDetails = purDetails.filter(detail => selectedIds.includes(detail.itemid));
+    console.log('리드타임 id', selectedIds)
+    const selectedDetails = purDetails2.filter(detail => selectedIds.includes(detail.itemid));
     const checkedLeadTimes = selectedDetails.map((detail) => detail.leadtime)
 
     return Math.max(...checkedLeadTimes) + ' 일'; // 가장 긴 leadtime을 반환
@@ -293,19 +278,6 @@ export default function OrderTest() {
   /////////////////////
 
   // 열 설정
-  // const col = [
-  //   { field: 'Category1', headerName: 'Category 1', width: 130 },
-  //   { field: 'Category2', headerName: 'Category 2', width: 130 },
-  //   { field: 'Category3', headerName: 'Category 3', width: 130 },
-  //   { field: 'itemName', headerName: 'ItemName', width: 130 },
-  //   { field: 'part1', headerName: 'Part 1', width: 130 },
-  //   { field: 'unitprice', headerName: 'Unit Price', width: 130 },
-  //   { field: 'quantity', headerName: 'Quantity', width: 80, renderCell: (params) => (<input type='number' value={quantityState[params.row.itemid]} onChange={(e) => handleQnt(e, params.row.itemid)} className='bg-[#67666E] text-white w-10' />), },
-  //   { field: 'amount', headerName: 'amount', width: 130 },
-  //   { field: 'BestOrderDate', headerName: 'BestOrderDate', width: 130 },
-  //   { field: 'supplier', headerName: 'Supplier', width: 130 },
-  //   { field: 'Pastlead', headerName: 'PastLeadTime', width: 130, renderCell: (params) => (<div onClick={(e) => { e.stopPropagation() }}><Button className='greenbutton'>과거리드타임</Button></div>), },
-  // ];
   const col = [
     { field: 'Category1', headerName: 'Category 1', width: 130 },
     { field: 'Category2', headerName: 'Category 2', width: 130 },
@@ -313,98 +285,199 @@ export default function OrderTest() {
     { field: 'itemName', headerName: 'Item Name', width: 130 },
     { field: 'part1', headerName: 'Part 1', width: 130 },
     { field: 'unitprice', headerName: 'Unit Price', width: 130 },
-    { field: 'quantity', headerName: 'Quantity', width: 80, renderCell: (params) => (
-        <input
+    {
+      field: 'quantity', headerName: 'Quantity', width: 80, renderCell: (params) => {
+        return params.row.details.map((detail) => (
+          <input
+            key={detail.itemid} // 각 detail의 itemid를 키로 사용
             type='number'
-            value={quantityState[params.row.itemid] || params.row.quantity} // 수량 업데이트
-            onChange={(e) => handleQnt(e, params.row.itemid)}
-            className='bg-[#67666E] text-white w-10'
-        />
-    )},
+            value={quantityState[detail.itemid] || detail.quantity} // detail의 수량 업데이트
+            onChange={(e) => handleQnt(e, params.row.id, detail.itemid)} // rowid와 detail의 itemid 전달
+            className={`bg-[#67666E] w-10 ${isDisabledRow(params.row.BestOrderDate) ? 'text-[#868686]' : 'text-white'}`}
+            disabled={isDisabledRow(params.row.BestOrderDate)}
+          />
+        ));
+      }
+      },
+    // {
+    //   field: 'quantity',
+    //   headerName: 'Quantity',
+    //   width: 80,
+    //   renderCell: (params) => {
+    //     const validClickRow = Array.isArray(clickrow) ? clickrow : [];
+    //     console.log('ppppppapapa',   params.row.itemid); // 로그 출력
+    //     console.log('ppppppapapa',   params.row.details.map(s => s.itemid).filter(itemid => validClickRow.includes(itemid))); // 로그 출력
+    
+    //     return (
+    //       <input
+    //         type='number'
+    //         value={quantityState[params.row.itemid] || params.row.quantity} // 수량 업데이트
+    //         onChange={(e) => handleQnt(e, params.row.details)}
+    //         className={`bg-[#67666E] w-10 ${isDisabledRow(params.row.BestOrderDate) ? 'text-[#868686]' : 'text-white'}`}
+    //         disabled={isDisabledRow(params.row.BestOrderDate)}
+    //       />
+    //     );
+    //   }
+    // },
     { field: 'amount', headerName: 'Amount', width: 130 },
     { field: 'BestOrderDate', headerName: 'Best Order Date', width: 130 },
-    { field: 'supplier', headerName: 'Supplier', width: 130, renderCell: (params) => {
-        const rowKey = `${params.row.Category1}-${params.row.Category2}-${params.row.Category3}-${params.row.itemName}-${params.row.part1}`;
-        const suppliersForRow = purDetails[rowKey] || []; // 해당 행의 공급자 리스트
-         // 디버깅용 로그
-    console.log('params:', params); 
-    console.log('rowKey:', rowKey); 
-    console.log('pur:',  purDetails); 
-    console.log('purDetails[fakekey]:', purDetails[rowKey]); 
-    console.log('suppliersForRow:', suppliersForRow); 
-    console.log('selectedSupplier:', selectedSupplier[rowKey]);
+    {
+      field: 'suppliers', headerName: 'Supplier', width: 130, renderCell: (params) => {
+        const rowKey = params.row.id; // 행의 ID
+
         return (
+          <div onClick={(e) => { e.stopPropagation() }}>
             <select
-                className='w-full'
-                value={selectedSupplier[rowKey] || ""}
-                onChange={(e) => handleSupplierChange(rowKey, e.target.value, params.row)}
+              className="w-full bg-[#67666E]"
+              value={params.row.selectedSupplier}
+              onChange={(e) => handleSupplierChange(rowKey, e.target.value)}
             >
-                {suppliersForRow.map((supplier) => (
-                    <option key={supplier.itemid} value={supplier.supplier}>
-                        {supplier.supplier}
-                    </option>
-                ))}
+              {params.row.details.map((detail, index) => (
+                <option key={index} value={detail.supplier}>
+                  {detail.supplier}
+                </option>
+              ))}
             </select>
+          </div>
         );
-    }},
-    { field: 'Pastlead', headerName: 'Past Lead Time', width: 130, renderCell: (params) => (
+      }
+    },
+    {
+      field: 'Pastlead', headerName: 'Past Lead Time', width: 130, renderCell: (params) => (
         <div onClick={(e) => { e.stopPropagation() }}>
-            <Button className='greenbutton'>과거리드타임</Button>
+          <Button className='greenbutton'>과거리드타임</Button>
         </div>
-    )},
-    { field: 'delete', headerName: '', width: 8, renderCell: (params) => (
+      )
+    },
+    {
+      field: 'delete', headerName: '', width: 8, renderCell: (params) => (
         <IconButton onClick={() => handleDelete(params.row.orderdetailid)}>
-            <ClearOutlinedIcon/>
+          <ClearOutlinedIcon />
         </IconButton>
-    )},
-];
+      )
+    },
+  ];
 
-  // 수량 변경 함수
-  const handleQnt = (e, itemid) => {
-    const newQuantity = e.target.value;
+  // setRows값이 없을때 purDetails값을 초기값으로 설정
+  useEffect(() => {
+    const initialRows = purDetails.map((entry, index) => {
+      const firstDetail = entry.detail[0]; // 첫 번째 공급자의 정보를 가져옴
+      return {
+        id: `row-${index}`, // 고유한 ID
+        key: entry.key, // 카테고리 key
+        details: entry.detail, // 공급자별 상세 정보를 포함
+        selectedSupplier: firstDetail.supplier, // 기본적으로 첫 번째 공급자 선택
+        // 나머지 정보
+        ...firstDetail,
+      };
+    });
 
-    // quantityState 업데이트
-    setQuantityState((prevState) => ({
-      ...prevState,
-      [itemid]: newQuantity,
-    }));
+    setRows(initialRows); // 상태 초기화
+  }, [purDetails]);
 
-    // purDetails 업데이트
-    setPurDetails((prevDetails) =>
-      prevDetails.map((detail) => {
-        if (detail.itemid === itemid) {
-          // 새로운 수량을 기반으로 amount 재계산
-          const newAmount = formatPrice(detail.price, newQuantity, detail.unit);
-          return {
-            ...detail,
-            quantity: newQuantity, // 수량 업데이트
-            amount: newAmount,     // amount 업데이트
-          };
+console.log('rows',rows)
+
+  // 테이블에서 공급자 바뀌면 해당 행에 정보 업데이트
+  const handleSupplierChange = (rowKey, selectedSupplier) => {
+    setRows(prevRows =>
+      prevRows.map(r => {
+        if (r.id === rowKey) {
+          // 선택된 공급자에 해당하는 detail 찾기
+          const selectedDetail = r.details.find(detail => detail.supplier === selectedSupplier);
+          if (selectedDetail) { // selectedDetail이 존재하는 경우
+            return {
+              ...r,
+              selectedSupplier: selectedSupplier,
+              // 공급자에 맞는 데이터 업데이트
+              price: selectedDetail.price,
+              quantity: selectedDetail.quantity,
+              unitprice: selectedDetail.unitprice,
+              amount: selectedDetail.amount,
+              BestOrderDate: selectedDetail.BestOrderDate,
+              tel: selectedDetail.tel,
+              releaseDate: selectedDetail.releaseDate,
+              leadtime: selectedDetail.leadtime,
+            };
+          }
         }
-        return detail;
+        return r; // 변경되지 않은 행은 그대로 반환
       })
     );
   };
 
+  //inputbox disable 조건
+  const isDisabledRow = (bestOrderDate) => {
+    const currentDate = new Date();
+    return new Date(bestOrderDate) < currentDate; // 현재 날짜보다 이전이면 비활성화
+  };
+
+  // 수량 변경 함수
+  const handleQnt = (e, rowid, itemid) => {
+    const newQuantity = e.target.value;
+    console.log('화긴해봐', itemid, rowid);
+  
+    // rows에서 해당 행을 찾아 수량과 amount 업데이트
+    const updatedRows = rows.map(row => {
+      if (row.id === rowid) { // 선택한 행 ID와 비교
+        const updatedDetails = row.details.map(detail => {
+          if (detail.itemid === itemid) { // 선택한 detail의 itemid와 비교
+            const newAmount = formatPrice(detail.price, newQuantity, detail.unit); // 수량에 따라 amount 재계산
+            return { ...detail, quantity: newQuantity, amount: newAmount }; // 수량과 amount 업데이트
+          }
+          return detail; // 다른 detail은 그대로 유지
+        });
+        return { ...row, details: updatedDetails }; // 행 업데이트
+      }
+      return row; // 다른 행은 그대로 유지
+    });
+  
+    // 상태 업데이트
+    setRows(updatedRows);
+    setQuantityState(prev => ({ ...prev, [itemid]: newQuantity }));
+  
+    // 선택한 itemid를 calculateTotalAmount에 전달
+    calculateTotalAmount(rowid, [itemid]);
+  };
+  
+  // const handleQnt = (e, itemid) => {
+  //   const newQuantity = e.target.value;
+  // console.log('화긴해봐',itemid)
+  //   // rows에서 해당 행을 찾아 수량과 amount 업데이트
+  //   const updatedRows = rows.map(row => {
+  //     if (row.itemid === itemid) {
+  //       const newAmount = formatPrice(row.price ,newQuantity,row.unit); // 수량에 따라 amount 재계산
+  //       return { ...row, quantity: newQuantity, amount: newAmount }; // 수량과 amount 업데이트
+  //     }
+  //     return row;
+  //   });
+  
+  //   // 상태 업데이트
+  //   setRows(updatedRows);
+  //   setQuantityState(prev => ({ ...prev, [itemid]: newQuantity }));
+  //   calculateTotalAmount(selrow,itemid)
+  // };
+  
+  
+
   // 행 삭제
   const handleDelete = async (id) => {
-     try {
-       const response = await fetch(`/cancelOrderItem/${id}`,
-         {
-           method: 'PUT',
-           headers: {
-             'Authorization': `Bearer ${token}`,
-             'Content-Type': 'application/json',
-           },
-         }
-       );
-       if (!response.ok) {
-         throw new Error('ordering cancel item response was not ok');
-       };
-       window.location.reload();
-     } catch (error) {
-       console.log(error);
-     }
+    try {
+      const response = await fetch(`/cancelOrderItem/${id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error('ordering cancel item response was not ok');
+      };
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   ///////////////////////
@@ -413,51 +486,73 @@ export default function OrderTest() {
 
   // 체크된 행 배열값 전달
   const handleSelectionChange = (newSelection) => {
-    // console.log('newsel', newSelection)
-    setSelrow(newSelection);
-    calculateTotalAmount(newSelection);
-    getDetaildata(newSelection);
+    const selectedItemIds = newSelection.map((rowId) => {
+      // 선택된 rowId를 가진 행을 찾기
+      const selectedRow = rows.find(row => row.id === rowId); 
+      console.log('sR',selectedRow.details); // 확인용
+      if (selectedRow) {
+        // 현재 선택된 공급자에 해당하는 detail 찾기
+        const selectedDetail = selectedRow.details.find(detail => detail.supplier === selectedRow.selectedSupplier);
+        return selectedDetail ? selectedDetail.itemid : null; // 해당 공급자의 itemid 반환
+      }
+      return null; // rowId에 해당하는 행이 없으면 null 반환
+    }).filter(Boolean); // null 제거하여 유효한 itemid만 반환
+  
+    console.log(selectedItemIds); // 확인용
+    setSelrow(selectedItemIds);
+    calculateTotalAmount(newSelection,selectedItemIds);
+    getDetaildata(newSelection,selectedItemIds);
   };
+  
 
   // 체크된 행 데이터 처리 및 정보 추출
-  const getDetaildata = (selectedIds) => {
+  const getDetaildata = (rowid,selectedIds) => {
 
-    const selectedDetails = purDetails.filter(detail => selectedIds.includes(detail.itemid));
-    // console.log('체크박스 선택', selectedDetails)
-    const senddata = selectedDetails.map((detail) => ({
-      orderDetailId: detail.orderdetailid,
-      itemsId: detail.itemid,
-      quantity: detail.quantity
-    }))
+    // console.log('ri',rowid)
+    const senddata = rows.filter(row => rowid.includes(row.id)) // rowid가 포함된 행 필터링
+                        .map(detail => detail.details) // 각 행의 details 가져오기
+                        .flatMap(detailsArray => detailsArray.map(dt => ({
+                          itemid: dt.itemid,
+                          orderdetailid: dt.orderdetailid,
+                          quantity: dt.quantity
+                        }))).filter(i => selectedIds.includes(i.itemid));
     // console.log('발주할 데이터',senddata)
     setSelectrowforordering(senddata)
-    // const orderdetailid = selectedDetails.map((detail) => detail.orderdetailid);
-    // const itemid = selectedDetails.map((detail) => detail.itemid);
-    // const qnt = selectedDetails.map((detail) => detail.quantity);
-    // setSelectrowOrderid(orderdetailid);
-    // setSelectrowqnt(qnt);
-    // setSelectrowitemid(itemid)
   }
 
   // 선택 행 값 전달
-  const handleRowclick = (clickrow, event) => {
-    setClickrow(clickrow)
-    getOrderDetaildata(clickrow, event)
-    const id = clickrow.id
-    fetchRecommenditems(id, event)
+  const handleRowclick = (params, event) => {
+    const currentRow = rows.find(row => row.id === params.id);
+    setCurrentrow(currentRow)
+    // console.log('currentRow:', currentRow);
+    if (currentRow) {
+      // 현재 선택된 공급자의 정보를 가져옴
+      const selectedDetail = currentRow.details.find(detail => detail.supplier === currentRow.selectedSupplier);
+      // console.log('Selected Row Data:', selectedDetail);
+
+      // 선택 행 값 전달
+      setClickrow(selectedDetail);
+      getOrderDetaildata(selectedDetail, event);
+      const id = selectedDetail.itemid;
+      // console.log('클릭한 id', id)
+      fetchRecommenditems(id, event);
+    }
   };
 
   // 선택 행 정보 추출 함수
   const getOrderDetaildata = (clickrow, event) => {
     event.preventDefault();
-    console.log('clickrow', clickrow)
+    // console.log('clickrow', clickrow)
 
     if (event.target.closest('input[type="checkbox"]') === null) {
-      const itemname = clickrow.row.itemName;
-      const orderdetailid = clickrow.row.orderdetailid;
-      // console.log('행선택itemname', typeof itemname)
+      const itemname = clickrow.itemName;
+      const orderdetailid = clickrow.orderdetailid;
+      const itemid = clickrow.itemid;
+      // console.log('행선택itemname', itemname)
+      // console.log('행선택orderdetailid', orderdetailid)
       setSelectrowitemname(itemname)
       setSelectrowOrderid(orderdetailid)
+      setSelectrowitemid(itemid)
     }
   };
 
@@ -467,7 +562,7 @@ export default function OrderTest() {
   const handlePerchase = () => {
     const fetchOrdering = async () => {
       const preordering = selectrowforordering;
-      console.log('peeeeeee', preordering)
+      // console.log('peeeeeee', preordering)
       try {
         const response = await fetch(`/orderUpdate`, {
           method: 'PUT',
@@ -488,34 +583,42 @@ export default function OrderTest() {
     window.location.reload();
   };
 
+  const handleclo = () => { setrecoal(false); setrecoal2(false); }
+
   //  ================
   // | 물품 바꾸기 api |
   //  ================
   const handleRecommend = (reco) => {
 
-    // console.log('대체추천 선택',reco)
-    // console.log('선택한 행 오더아이디', selectrowOrderid) // 바로 끌어다 쓰면 될듯
+    // 선택한 물품이 공급업체를 바꾸기만 하면되면 모달
+    if (Currentrow.details.map(detail => detail.itemid).includes(reco)) {
+      return setrecoal(true)
+    }
+    // 선택한 물품이 이미 장바구니에 있을 때 모달
+    if (rows.map(detail => detail.itemid).includes(reco)) {
+      return setrecoal2(true)
+    }
     const fetchChangeitem = async () => {
       try {
-        const response = await fetch(`/updateItem?orderDetailId=${selectrowOrderid}&newItemId=${reco}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+        const response =
+          await fetch(`/updateItem?orderDetailId=${selectrowOrderid}&newItemId=${reco}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          })
+          if (!response.ok) {
+            throw new Error("Changeitem response was not ok");
           }
-        })
-        if (!response.ok) {
-          throw new Error("Changeitem response was not ok");
-        }
-        // 선택한 행을 해제
-        setClickrow(null); // 선택 해제
-        fetchOrderDetails(); // 필요하다면 여기서 호출
+          // 선택한 행을 해제
+          setClickrow(null); 
+        fetchOrderDetails();
       } catch (e) {
         console.error('Failed to fetch Changeitem :', e)
       }
     }
     fetchChangeitem()
-    // fetchOrderDetails()
   };
 
   // ======================
@@ -526,11 +629,11 @@ export default function OrderTest() {
   const [selectrowitemname, setSelectrowitemname] = useState();
   const [recommendItem, setRecommendItem] = useState([]);
   const [selectrowforordering, setSelectrowforordering] = useState([]);
-  const [selectrowitemid, setSelectrowitemid] = useState({});
   const [selectrowqnt, setSelectrowqnt] = useState([]);
 
   // 비활성화된 행 갯수
   const countdisablerow = (rows) => {
+    // console.log('비활성화 row', rows)
     const currentDate = new Date();
     const count = rows.filter(row => {
       const bestOrderDate = new Date(row.BestOrderDate);
@@ -543,8 +646,8 @@ export default function OrderTest() {
 
   // 비활성화 행 감시
   useEffect(() => {
-    countdisablerow(purDetails)
-  }, [purDetails])
+    countdisablerow(rows)
+  }, [rows.length > 0 ? rows : ""])
 
   // 전화번호 - 표시
   const formatPhoneNumber = (phoneNumber) => {
@@ -559,7 +662,7 @@ export default function OrderTest() {
   const fetchRecommenditems = async (id, event) => {
     event.preventDefault();
     // console.log('clickrow', clickrow)
-    const orderdate = purDetails[0].releaseDate;
+    const orderdate = purDetails2[0].releaseDate;
 
     // setLoading(true)
     setRecommendItem([])
@@ -613,7 +716,7 @@ export default function OrderTest() {
         throw new Error('Recommend item response was not ok');
       };
       const recoitems = await response.json();
-      console.log('reco', recoitems);
+      // console.log('reco', recoitems);
       setRecommendItem(recoitems);
       // console.log('최종',recommenditem)
     } catch (error) {
@@ -623,7 +726,7 @@ export default function OrderTest() {
     }
   };
 
-  console.log('추천data', recommendItem)
+  // console.log('추천data', recommendItem)
 
   return (
     <div>
@@ -631,7 +734,7 @@ export default function OrderTest() {
         <div className="flex-col text-white OrderManage">
           <div className='flex m-2 items-center'>
             <h4 className='font-bold text-xl m-2'>창고 출고 예정일 </h4>
-            <div className='text-2xl font-bold'>{purDetails[0].releaseDate}</div>
+            <div className='text-2xl font-bold'>{purDetails2.length > 0 ? purDetails2[0].releaseDate : ' '}</div>
           </div>
           <div className="bg-[#162136] m-5 p-5 rounded-lg">
             <div className='flex justify-between'>
@@ -669,30 +772,7 @@ export default function OrderTest() {
             <div className='p-6'>
               <DataGrid
                 columns={col}
-                // rows={Object.keys(purDetails).map(key => {
-                //   const suppliers = Array.isArray(purDetails[key]) ? purDetails[key] : [purDetails[key]]; // 배열인지 확인
-                //   if (suppliers.length === 0) {
-                //     return null; // 빈 배열일 경우 null 반환 (필요에 따라 수정 가능)
-                //   }
-                
-                //   return {
-                //     ...suppliers[0], // 첫 번째 공급자의 데이터로 행 생성
-                //     suppliers: suppliers.map(s => s.supplier), // 공급자 배열 추가
-                //   };
-                // }).filter(row => row !== null)} // null 값 필터링
-                // rows={Object.keys(purDetails).flatMap(key => {
-                //   const suppliers = Array.isArray(purDetails[key]) ? purDetails[key] : [purDetails[key]]; // 배열인지 확인
-                //   if (suppliers.length === 0) {
-                //     return []; // 빈 배열일 경우 건너뜀
-                //   }
-            
-                //   return suppliers.map((supplier, index) => ({
-                //     ...supplier,
-                //     id: `${supplier.itemid}-${index}`, // 고유한 id 생성
-                //     suppliers: suppliers.map(s => s.supplier), // 공급자 배열 추가
-                //   }));
-                // })}
-                // rows={purDetails[0]}
+                rows={rows}
                 getRowId={(row) => row.id}
                 pageSizeOptions={[10, 25, 50, 100]}
                 checkboxSelection
@@ -834,7 +914,7 @@ export default function OrderTest() {
                       <div className='flex items-end'>
                         <h1 className='mt-5 ml-5 text-rose-500 font-bold text-2xl'> 대체 가능한 상품이 없습니다.</h1>
                       </div>
-                      <h1 className='mt-2 ml-5 text-xl font-bold'>구매자 : {purDetails[0].username + ` (${purDetails[0].alias})`} {formatPhoneNumber(purDetails[0].tel)}</h1>
+                      <h1 className='mt-2 ml-5 text-xl font-bold'>구매자 : {purDetails2[0].username + ` (${purDetails2[0].alias})`} {formatPhoneNumber(purDetails2[0].tel)}</h1>
                     </div>
                     :
                     recommendItem.map(detail => (
@@ -856,6 +936,59 @@ export default function OrderTest() {
           </div> : null}
         </div>
       )}
+
+      <Modal open={recoal} onClose={handleclo}>
+        <Box
+          className="modalContent"
+          sx={{
+            color: 'black',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'absolute', // 또는 'fixed'로 설정
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)', // 중앙 정렬
+            width: '400px',  // 원하는 너비로 설정
+            height: '200px', // 원하는 높이로 설정
+            bgcolor: '#17161D', // 배경색 설정 (선택 사항)
+            p: 3, // 패딩 설정 (선택 사항)
+            borderRadius: 2, // 모서리 둥글기 (선택 사항)
+            boxShadow: 24, // 그림자 (선택 사항)
+          }}
+        >
+          <div>
+            <h1 className='text-white text-2xl font-bold'> supplier를 바꾸세요</h1>
+          </div>
+        </Box>
+      </Modal>
+      <Modal open={recoal2} onClose={handleclo}>
+        <Box
+          className="modalContent"
+          sx={{
+            color: 'black',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'absolute', // 또는 'fixed'로 설정
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)', // 중앙 정렬
+            width: '400px',  // 원하는 너비로 설정
+            height: '200px', // 원하는 높이로 설정
+            bgcolor: '#17161D', // 배경색 설정 (선택 사항)
+            p: 3, // 패딩 설정 (선택 사항)
+            borderRadius: 2, // 모서리 둥글기 (선택 사항)
+            boxShadow: 24, // 그림자 (선택 사항)
+          }}
+        >
+          <div>
+            <h1 className='text-white text-2xl font-bold'> 장바구니에 있는 상품입니다.</h1>
+          </div>
+        </Box>
+      </Modal>
     </div>
   );
 }

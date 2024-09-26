@@ -67,14 +67,6 @@ function SignUp({ setIsAuthenticated }) {
     // 중복 확인할 데이터
     const params = {username};
 
-    // if (type === "username") {
-    //   params.append("username", username);
-    // } else if (type === "alias") {
-    //   params.append("alias", alias);
-    // } else if (type === "phone") {
-    //   params.append("phone", phone);
-    // }
-
     console.log("중복 확인 요청 데이터:", params); // 요청 데이터 콘솔 출력
 
     const response = await fetch(`/signuptest`, {
@@ -84,7 +76,7 @@ function SignUp({ setIsAuthenticated }) {
       },
       body: JSON.stringify(params),
     });
-
+    
     // 응답 상태 로그
     console.log("응답 상태:", response.status);
     const data = await response.json();
@@ -92,11 +84,6 @@ function SignUp({ setIsAuthenticated }) {
   } 
   catch (error) {
     console.error("오류 발생:", error); // 오류 발생 시 오류 메시지 콘솔 출력
-    // if (type === "username") {
-    //   setUsernameCheckMessage("회사명 또는 선박명 중복 확인 중 오류가 발생했습니다.");
-    // } else {
-    //   setAliasCheckMessage("아이디 중복 확인 중 오류가 발생했습니다.");
-    // }
   }
 };
 
