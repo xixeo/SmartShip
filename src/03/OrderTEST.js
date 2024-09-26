@@ -396,7 +396,7 @@ export default function OrderTest() {
   
       setPerchaseOpen(false);
       console.log('주문이 성공적으로 저장되었습니다!');
-      navigate("/PurchaseRequest");
+      navigate("/MyOrderList");
     } catch (error) {
       console.log('구매 중 오류 발생:', error);
     }

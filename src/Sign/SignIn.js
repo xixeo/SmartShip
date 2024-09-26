@@ -84,7 +84,7 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
           <img src={logo} alt="Logo" className="w-12 h-auto" />
           <span className="logoText">SMARTSHIP</span>
         </div>
-        <form onSubmit={handleSubmit} className=" w-full w-md p-8 rounded-lg ">
+        <form onSubmit={handleSubmit} className=" w-full w-md p-8 rounded-lg">
           <h2 className="text-2xl font-bold mb-6 text-center text-white">
             SIGN IN
           </h2>
@@ -97,6 +97,7 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
+              placeholder="해운선사_신입"
               className="w-full px-1 py-2 login-input"
             />
           </div>

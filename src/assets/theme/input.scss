@@ -28,3 +28,17 @@
     transition: all 0.3s;
   }
 }
+
+.check-btn {
+  border: 1px solid $check-btn;
+  color: $check-btn;
+  border-radius: 4px;
+  outline: 0 !important;
+  padding: 6px 16px;
+
+  &:hover {
+    background: $check-btn;
+    color: #fff;
+    transition: all 0.3s;
+  }
+}
