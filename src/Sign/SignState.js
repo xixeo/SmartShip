@@ -24,6 +24,7 @@ const SignState = () => {
     localStorage.removeItem("role");
     localStorage.removeItem("token");
     navigate("/signin");
+    window.location.reload();
   };
 
   return (

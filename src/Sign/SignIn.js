@@ -3,12 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import logo from "../assets/img/logo.png";
 import "../assets/theme/login.scss";
+import Checkbox from '@mui/material/Checkbox';
 
 function SignIn({ setIsAuthenticated, setRedirectPath }) {
   const [username, setUsername] = useState("");
   const [pw, setPw] = useState("");
   const [loginError, setLoginError] = useState("");
+  const [remember, setRemember] = useState(false); // 아이디 저장할지 체크박스 상태
   const navigate = useNavigate();
+
+  // 컴포넌트가 마운트될 때 로컬 스토리지에서 아이디를 가져와서 설정
+  React.useEffect(() => {
+    const storedUsername = localStorage.getItem("storedUsername");
+    if (storedUsername) {
+      setUsername(storedUsername);
+      setRemember(true); // 저장된 아이디가 있을 경우 체크박스 체크
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,6 +56,13 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
         localStorage.setItem("username", username);
         localStorage.setItem("alias", alias);
         localStorage.setItem("role", role);
+
+        // 체크박스가 체크되어 있으면 아이디를 로컬 스토리지에 저장
+        if (remember) {
+          localStorage.setItem("storedUsername", username);
+        } else {
+          localStorage.removeItem("storedUsername"); // 체크 해제 시 저장된 아이디 삭제
+        }
 
         setIsAuthenticated(true);
 
@@ -97,11 +115,11 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
           {loginError && <p className="text-red-500 pb-2">{loginError}</p>}
           <div className="flex items-start">
             <div className="flex items-center h-5">
-              <input
-                id="remember"
-                aria-describedby="remember"
-                type="checkbox"
-                className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
+              <Checkbox
+                checked={remember}
+                onChange={() => setRemember((prev) => !prev)}
+                className="w-4 h-4 text-primary"
+                sx={{ color: 'white', '&.Mui-checked': { color: 'white' } }}
               />
             </div>
             <div className="ml-3 text-sm">
