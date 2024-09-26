@@ -390,9 +390,24 @@ function ListTableDB() {
         // 선택된 itemId들을 배열로 구성
         const cartItems = Array.from(selected).map((itemId) => {
             const itemRow = rows.find((row) => row.itemId === itemId);
+
+
+            // 같은 카테고리, itemName, part1을 가진 행들을 찾음
+        const relatedItems = rows.filter(
+            (row) =>
+                row.category1Name === itemRow.category1Name &&
+                row.category2Name === itemRow.category2Name &&
+                row.category3Name === itemRow.category3Name &&
+                row.part1 === itemRow.part1 &&
+                row.itemName === itemRow.itemName
+        );
+
+            // 해당 그룹의 첫 번째 행의 수량으로 통일
+        const groupQuantity = relatedItems[0].quantity;
+
             return {
                 itemsId: itemId, // 선택된 itemId
-                quantity: itemRow.quantity, // 해당 itemId의 수량
+                quantity: groupQuantity, // 해당 itemId의 수량
             };
         });
 
@@ -579,6 +594,7 @@ function ListTableDB() {
                                             onChange={(event) =>
                                                 handleClick(event, row)
                                             }
+                                            color='default'
                                         />
                                     </TableCell>
                                     <TableCell
