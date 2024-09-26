@@ -2,43 +2,48 @@
 
 /** ✏️ TABLE CSS  */
 .MuiTable-root {
+  th,
+  td {
+    color: #fff;
+    border-bottom: 1px solid #ffffff2c;
+    padding: 4px;
+  }
 
-    th,
+  th {
+    background: $table-header !important;
+    font-weight: 600;
+  }
+
+  td {
+    background: $table-body !important;
+    font-weight: 400;
+  }
+
+  .MuiTableRow-root:last-child {
     td {
-        color: #fff;
-        border-bottom: 1px solid $main-bg;
-        padding: 4px;
+      border-bottom: 0 !important;
     }
+  }
 
-    th{
-      background: $table-header !important;
-      font-weight: 600;
-    }
+  .MuiCheckbox-root {
+    color: #fff;
+  }
 
-    td{
-      background: rgba(255, 255, 255, 0.3) !important;
-      font-weight: 400;
+  // switch 동그라미
+  .MuiSwitch-root {
+    .Mui-checked + .MuiSwitch-track {
+      opacity: 1 !important;
     }
-
-    .MuiCheckbox-root{
-        color: #fff;
+    .Mui-checked {
+      color: $blue-btn !important;
     }
-
-    // switch 동그라미
-    .MuiSwitch-root {
-      .Mui-checked+.MuiSwitch-track{
-        opacity: 1 !important;
-      }
-        .Mui-checked {
-            color: #56b8e9 !important;
-        }
-        .MuiSwitch-track {
-            background-color: #5494b5 !important;
-        }
+    .MuiSwitch-track {
+      background-color: #46465c !important;
     }
+  }
 }
 
-.MuiTableContainer-root{
+.MuiTableContainer-root {
   height: 100%;
   overflow-x: hidden !important;
 }

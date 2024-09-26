@@ -10,8 +10,8 @@
   background: #ffffff00;
   padding: 6px 10px;
 
-  &:focus{
-    border-color:  $blue-btn;
+  &:focus {
+    border-color: $blue-btn;
   }
 }
 
@@ -41,4 +41,11 @@
     color: #fff;
     transition: all 0.3s;
   }
+}
+
+.MuiInputBase-input {
+  padding-top: 6.5px !important;
+  padding-bottom: 6.5px !important;
+
+  max-width: 180px !important;
 }

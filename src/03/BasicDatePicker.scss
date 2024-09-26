@@ -1,35 +1,44 @@
+@import "../App.scss";
+
 .BasicDatePicker {
-  *, ::after, ::before {
-    border-color: #9D9B9B !important; // Match the border color
+  * {
+    outline: 0 !important; // 모든 요소의 outline 제거
   }
 
-  .css-18pjc51-MuiFormLabel-root-MuiInputLabel-root {
-    color: #fff !important; // Label color
+  // Label 스타일
+  .MuiFormLabel-root {
+    color: #fff !important; // Label 색상
   }
 
-  .css-lxfshk-MuiInputBase-root-MuiOutlinedInput-root {
-    color: #fff !important; // Input text color
-    height: 40px; // Set height
-    & fieldset {
-      border-color: #9D9B9B !important; // Border color
-    }
+  // Input 스타일
+  .MuiInputBase-root {
+    color: #fff !important; // Input 텍스트 색상
+    height: 32px; // 높이 설정
 
-    &:hover fieldset {
-      border-color: #9D9B9B !important; // Border color on hover
-    }
+    &.MuiOutlinedInput-root {
+      & fieldset {
+        border-color: $input-color !important; // 기본 border 색상
+      }
 
-    &.Mui-focused fieldset {
-      border-color: #9D9B9B !important; // Border color when focused
+      &:hover fieldset {
+        border-color: $input-color !important; // hover 시 border 색상
+      }
+
+      &.Mui-focused fieldset {
+        border-color: $blue-btn !important; // 포커스 시 border 색상
+      }
     }
   }
 
-  .css-1a7z5rc-MuiButtonBase-root-MuiIconButton-root {
-    color:#69686F !important;
-    }
+  // IconButton 스타일
+  .MuiButtonBase-root.MuiIconButton-root {
+    color: #fff !important;
+  }
 
+  // Input 기본 스타일
   .MuiInputBase-input {
     height: 100%;
     color: white;
     font-size: 16px;
-  }  
+  }
 }

@@ -158,10 +158,10 @@
 
   .custom-quantity {
     height: $input-height;
-    width: 80% !important; 
+    width: 80% !important;
     max-width: 300px;
     background-color: transparent;
-    
+
     .MuiInputBase-input {
       color: white;
       height: 100%;
@@ -215,12 +215,16 @@
     background-color: $blue-btn;
     color: #fff;
     border: 1px solid transparent;
-    
+
     &:hover {
       background-color: transparent;
       border: 1px solid $blue-btn;
       color: $blue-btn;
     }
+  }
+
+  .bottomWrap {
+    position: relative;
   }
 
   /* 페이지네이션 부분 */
@@ -231,35 +235,35 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    
+
     .MuiPagination-root {
       color: white;
-      
+
       .MuiPagination-ul {
         .MuiButtonBase-root {
           color: white;
           border-radius: 50%;
-  
+
           &.Mui-selected {
-            background-color: #47464F; 
-            color: white; 
+            background-color: #ffffff2e;
+            color: white;
           }
-  
+
           &:hover {
-            background-color: #5f5e6b; 
+            background-color: #ffffff0f;
           }
         }
       }
-  
+
       .MuiPaginationItem-root {
         color: white;
-  
+
         &.Mui-selected {
-          background-color: #47464F; 
+          background-color: #47464f;
           color: white;
         }
       }
-  
+
       .MuiPaginationItem-ellipsis {
         color: white;
       }
@@ -269,12 +273,12 @@
   .item-cell {
     color: white;
   }
-  
+
   .price-cell {
     color: white;
     text-align: right; /* 기본적으로 우측 정렬 */
     padding-right: 3%;
-  
+
     /* 가격이 '-'일 때 중앙 정렬 */
     &.price-cell-no-price {
       text-align: center; /* '-'일 때 중앙 정렬 */
@@ -287,25 +291,27 @@
       order: -1;
       color: #ffffff;
     }
-  
+
     .MuiSwitch-track {
-      background-color: #d0d0d0; 
+      background-color: #d0d0d0;
     }
 
     margin-left: 16px;
   }
 
-  .select-supplier, .custom-quantity {
+  .select-supplier,
+  .custom-quantity {
     width: 100%; /* 부모 요소에 맞게 너비를 조절 */
   }
 
   .supplier-toggle {
     .MuiSwitch-track {
-      background-color: #d0d0d0; 
+      background-color: #d0d0d0;
     }
   }
 
-  .select-supplier, .custom-quantity {
+  .select-supplier,
+  .custom-quantity {
     width: 100%; /* 부모 요소에 맞게 너비를 조절 */
   }
 }

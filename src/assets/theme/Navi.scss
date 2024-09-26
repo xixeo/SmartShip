@@ -5,7 +5,12 @@ $sidebar-bg: #0098dd;
   width: 250px;
   height: 100%;
   // background: linear-gradient(to bottom, #5b3bd9, #382a80);
-  background: linear-gradient(130deg, rgba(59,143,217,1) 0%, rgba(56,42,128,1) 100%);
+  background: linear-gradient(
+    130deg,
+    rgba(59, 143, 217, 1) 0%,
+    rgb(73, 56, 158) 50%,
+    rgb(50, 41, 90) 100%
+  );
   // background: $sidebar-bg;
   display: flex;
   flex-direction: column;

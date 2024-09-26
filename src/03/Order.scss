@@ -1,107 +1,108 @@
-  .OrderBasket {
+@import "../App.scss";
 
-    .activerow {
-      td{
-        background-color: #ca4242;
-      }
+.OrderBasket {
+  .activerow {
+    td {
+      background-color: #ca4242;
     }
+  }
 
-    .normalrow {
-      td{
-        background-color: #69686F;
-      }
+  .normalrow {
+    td {
+      background-color: #69686f;
     }
+  }
 
-    .MuiButton-root.greenbutton {
-      background-color: transparent;
-      border: 1px solid #3DD19D;
-      color: #3DD19D;
-  
-      &:hover {
-        background-color: #3DD19D;
-        color: #fff;
-        border: 1px solid transparent;
-      }
-    }
-  
-    .MuiButton-root.bluebutton {
-      background-color: transparent;
-      border: 1px solid #43C5FE;
-      color: #43C5FE;
-  
-      &:hover {
-        background-color: #43C5FE;
-        color: #fff;
-        border: 1px solid transparent;
-      }
-    }
-  
-    .MuiButton-root.bluebutton2 {
-      background-color: #43C5FE;
+  .MuiButton-root.greenbutton {
+    background-color: transparent;
+    border: 1px solid $inner-btn;
+    color: $inner-btn;
+
+    &:hover {
+      background-color: $inner-btn;
       color: #fff;
       border: 1px solid transparent;
-      
-      &:hover {
-        background-color: transparent;
-        border: 1px solid #43C5FE;
-        color: #43C5FE;
-      }
+    }
+  }
+
+  .MuiButton-root.bluebutton {
+    background-color: transparent;
+    border: 1px solid $blue-btn;
+    color: $blue-btn;
+
+    &:hover {
+      background-color: $blue-btn;
+      color: #fff;
+      border: 1px solid transparent;
+    }
+  }
+
+  .MuiButton-root.bluebutton2 {
+    background-color: $blue-btn;
+    color: #fff;
+    border: 1px solid transparent;
+
+    &:hover {
+      background-color: transparent;
+      border: 1px solid $blue-btn;
+      color: $blue-btn;
+    }
+  }
+
+  .memo-textfield {
+    height: auto; // 자동으로 높이 조절
+    width: 100%;
+    background-color: transparent;
+
+    .MuiInputBase-input {
+      color: white;
+      height: auto; // 입력 내용에 따라 높이 조절
+      overflow-y: auto; // 스크롤 생성을 위해 추가
     }
 
-    .memo-textfield {
+    .MuiOutlinedInput-root {
       height: auto; // 자동으로 높이 조절
-      width: 100%;
-      background-color: transparent;
-    
-      .MuiInputBase-input {
-        color: white;
-        height: auto; // 입력 내용에 따라 높이 조절
-        overflow-y: auto; // 스크롤 생성을 위해 추가
-      }
-    
-      .MuiOutlinedInput-root {
-        height: auto; // 자동으로 높이 조절
-    
-        & fieldset {
-          border-color: #9D9B9B !important;
-        }
-    
-        &:hover fieldset {
-          border-color: #9D9B9B !important;
-        }
-    
-        &.Mui-focused fieldset {
-          border-color: #9D9B9B !important;
-        }
-      }
-    }
 
-    .custom-orderquantity {
-      height: 40px;
-      width: 90px !important;
-      background-color: transparent;
-      
-      .MuiInputBase-input {
-        color: white;
-        height: 100%;
-        font-size: 14px;
-        text-align: center;
+      & fieldset {
+        border-color: $input-color !important;
       }
-  
-      .MuiOutlinedInput-root {
-        height: 40px;
-  
-        & fieldset {
-          border-color: #9D9B9B !important;
-        }
-  
-        &:hover fieldset {
-          border-color: #9D9B9B !important;
-        }
-  
-        &.Mui-focused fieldset {
-          border-color: #9D9B9B !important;
-        }
+
+      &:hover fieldset {
+        border-color: $input-color !important;
+      }
+
+      &.Mui-focused fieldset {
+        border-color: $blue-btn !important;
       }
     }
   }
+
+  .custom-orderquantity {
+    height: 40px;
+    width: 90px !important;
+    background-color: transparent;
+
+    .MuiInputBase-input {
+      color: white;
+      height: 100%;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .MuiOutlinedInput-root {
+      height: 40px;
+
+      & fieldset {
+        border-color: $input-color !important;
+      }
+
+      &:hover fieldset {
+        border-color: $input-color !important;
+      }
+
+      &.Mui-focused fieldset {
+        border-color: $input-color !important;
+      }
+    }
+  }
+}

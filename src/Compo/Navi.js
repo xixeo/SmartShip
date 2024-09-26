@@ -63,9 +63,9 @@ const Navi = () => {
             </div>
           </li>
           <li className="menu-item" onClick={() => navigate("/ordertest")}>
-            <Side04 className="icon" />
+            <Side06 className="icon" />
             <div className="menu-text flex justify-between items-center">
-              {!isCollapsed && <span>발주 관리</span>}
+              {!isCollapsed && <span>장바구니</span>}
               {!isCollapsed && <ArrowR className="right-arrow" />}
             </div>
           </li>
@@ -76,8 +76,11 @@ const Navi = () => {
               {!isCollapsed && <ArrowR className="right-arrow" />}
             </div>
           </li>
-          <li className="menu-item" onClick={() => navigate("/PurchaseRequest")}>
-            <Side03 className="icon" />
+          <li
+            className="menu-item"
+            onClick={() => navigate("/PurchaseRequest")}
+          >
+            <Side04 className="icon" />
             <div className="menu-text flex justify-between items-center">
               {!isCollapsed && <span>발주 요청 내역</span>}
               {!isCollapsed && <ArrowR className="right-arrow" />}
@@ -118,7 +121,10 @@ const Navi = () => {
               {!isCollapsed && <ArrowR className="right-arrow" />}
             </div>
           </li>
-          <li className="menu-item" onClick={() => navigate("/AnnounceForEvery")}>
+          <li
+            className="menu-item"
+            onClick={() => navigate("/AnnounceForEvery")}
+          >
             <Side01 className="icon" />
             <div className="menu-text flex justify-between items-center">
               {!isCollapsed && <span>공지사항</span>}

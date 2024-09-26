@@ -11,15 +11,21 @@ $footer-height: 50px;
 $footer-bg: rgba(0, 0, 0, 0.2);
 $footer-color: #fff;
 $white-card: #ffffff20;
-$main-bg: #0c182e;
+// $main-bg: #0c182e;
+$main-bg: #1a192b;
 $calendar-btn-border: #7d7c82;
 $input-color: #ffffff50;
-$blue-btn: #43c5fe;
+$blue-btn: #9c87ff;
 $check-btn: #3af0ff;
-$inner-btn: #3DD19D;
+$inner-btn: #3dd19d;
 $input-height: 32px;
 $inner-input-color: #ffffff30;
-$table-header: #303A4D;
+// $table-header: rgba(255, 255, 255, 0.6);
+$table-header: #302955;
+// $table-header: #415275;
+// $table-header: #303a4d;
+$table-body: #ffffff1c;
+$card-bg: rgba(255, 255, 255, 0.075);
 
 html,
 body {
@@ -75,6 +81,10 @@ body {
   font-size: 0.8rem;
 }
 
+.card-bg {
+  background-color: $card-bg;
+}
+
 /* 전체 스크롤바 영역 */
 ::-webkit-scrollbar {
   width: 10px;
@@ -91,7 +101,7 @@ body {
 ::-webkit-scrollbar-thumb {
   background-color: #fdfdfd4b; /* 원하는 스크롤바 색 */
   border-radius: 10px;
-  border: 2px solid #18315f;/* 배경과 겹치지 않도록 여백 */
+  border: 2px solid #18315f; /* 배경과 겹치지 않도록 여백 */
 }
 
 /* 스크롤바 핸들에 hover 했을 때 */
