@@ -13,8 +13,10 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Pagination from '@mui/material/Pagination';
 import Modal2 from '../Compo/Modal2';
+import { useNavigate } from'react-router-dom';
 
 export default function OrderTest() {
+  const navigate = useNavigate();
   const [listdatas, setListdatas] = useState([]);
   const [selectedDate, setSelectedDate] = useState(
     () => {
@@ -23,9 +25,7 @@ export default function OrderTest() {
     }
   );
   const [deleteopen, setDeleteOpen] = useState(false);
-  const [perchasopen, setPerchasOpen] = useState(false);
-
-
+  const [perchaseopen, setPerchaseOpen] = useState(false);
   const token = localStorage.getItem('token');
 
   //  ==================
@@ -59,7 +59,7 @@ export default function OrderTest() {
         console.warn('cartItems는 배열이 아닙니다:', cartItems);
       } else {
         setListdatas(cartItems); // 정상적인 경우에만 리스트 데이터를 설정
-        console.log("cartItems : ",cartItems);
+        console.log("cartItems : ", cartItems);
       }
 
       setListdatas(basket.orderDetails); // orderDetails를 listdatas에 설정
@@ -175,39 +175,47 @@ export default function OrderTest() {
 
   const getCheckedItemsWithQuantity2 = () => {
     const itemQuantities = {}; // 각 항목의 수량을 저장할 객체
-
+    console.log("selected items : ",selectedItems)
     selectedItems.forEach(itemId => {
       const item = listdatas.find(detail => detail.itemsId === itemId);
-      console.log('찾은 아이템:', item);
       if (item) {
         const key = `${item.category1Name}-${item.category2Name}-${item.category3Name}-${item.itemName}-${item.part1}`;
+
         if (!itemQuantities[key]) {
           itemQuantities[key] = {
             itemsId: item.itemsId,
-            quantity: item.quantity // 현재 수량 사용
+            quantity: item.quantity, // 대표 항목의 수량 사용
+            relatedItems: [], // 관련된 항목을 저장할 배열
           };
-        } else {
-          itemQuantities[key].quantity += item.quantity; // 수량을 더하는 부분
         }
+
+        // 대표 항목에 해당하지 않는 다른 항목들을 relatedItems 배열에 추가
+        const relatedItems = listdatas.filter(detail =>
+          detail.category1Name === item.category1Name &&
+          detail.category2Name === item.category2Name &&
+          detail.category3Name === item.category3Name &&
+          detail.itemName === item.itemName &&
+          detail.part1 === item.part1 &&
+          detail.itemsId !== item.itemsId // 대표 항목이 아닌 다른 항목들만 추가
+        );
+
+        itemQuantities[key].relatedItems = [...itemQuantities[key].relatedItems, ...relatedItems];
       }
     });
 
-    const groupedItems = Object.values(itemQuantities);
     const result = [];
 
-    groupedItems.forEach(group => {
-      const relatedItems = listdatas.filter(detail =>
-        detail.category1Name === group.category1Name &&
-        detail.category2Name === group.category2Name &&
-        detail.category3Name === group.category3Name &&
-        detail.itemName === group.itemName &&
-        detail.part1 === group.part1
-      );
+    // 각 그룹별 대표 항목과 관련된 항목들의 itemsId와 quantity 추가
+    Object.values(itemQuantities).forEach(group => {
+      result.push({
+        itemsId: group.itemsId,
+        quantity: group.quantity,
+      });
 
-      relatedItems.forEach(relatedItem => {
+      group.relatedItems.forEach(relatedItem => {
         result.push({
           itemsId: relatedItem.itemsId,
-          quantity: relatedItem.quantity
+          quantity: relatedItem.quantity,
         });
       });
     });
@@ -215,6 +223,7 @@ export default function OrderTest() {
     console.log('생성된 결과:', result);
     return result;
   };
+
 
   //////////////////////
   //  버튼 관련 함수   //
@@ -346,54 +355,53 @@ export default function OrderTest() {
   // 비고
   const [memo, setMemo] = useState(''); // 비고 상태 추가
 
+  const handlePurchaseButtonClick = () => {
+    const selectedItemsWithQuantity = getCheckedItemsWithQuantity2();
+  
+    if (selectedItemsWithQuantity.length === 0) {
+      alert('구매할 물건을 선택해 주세요.');
+      return; // 장바구니가 비어있으면 여기서 함수 종료
+    }
+  
+    setPerchaseOpen(true); // 물건이 있을 경우 모달 열기
+  };
 
-  // 구매버튼
   const handlePurchase = async (orderdate) => {
     const selectedItemsWithQuantity = getCheckedItemsWithQuantity2(); // 체크된 항목들
 
-    // fetchorderlist로 가져온 데이터
-    const orderlist = await fetchorderlist(orderdate);
-
-    // 일치하는 항목 필터링
-    const matchedItems = selectedItemsWithQuantity.filter(selectedItem =>
-      orderlist.some(orderItem =>
-        orderItem.category1Name === selectedItem.category1Name &&
-        orderItem.category2Name === selectedItem.category2Name &&
-        orderItem.category3Name === selectedItem.category3Name &&
-        orderItem.itemName === selectedItem.itemName &&
-        orderItem.part1 === selectedItem.part1
-      )
-    );
-
     const purchaseData = {
-      cartItems: matchedItems, // 일치하는 항목만 전송
-      memo: memo
+      cartItems: selectedItemsWithQuantity.map(item => ({
+        itemsId: item.itemsId,
+        quantity: item.quantity,
+      })), // 필요한 구조로 매핑
+      memo: memo || "",
     };
-
+  
     try {
       console.log('Sending purchase data:', JSON.stringify(purchaseData, null, 2));
-      const response = await fetch(`saveToOrder/${orderdate}`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(purchaseData),
-        }
-      );
+      const response = await fetch(`saveToOrder/${orderdate}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(purchaseData),
+      });
+      
       if (!response.ok) {
         const errorText = await response.text();
         console.error('주문 저장 실패:', errorText);
         throw new Error('주문 장바구니 구매 아이템 응답이 올바르지 않음');
       }
-
-      setPerchasOpen(false);
+  
+      setPerchaseOpen(false);
       console.log('주문이 성공적으로 저장되었습니다!');
+      navigate("/PurchaseRequest");
     } catch (error) {
       console.log('구매 중 오류 발생:', error);
     }
   };
+  
 
   return (
     <div className="list-table-root flex flex-col p-6">
@@ -465,6 +473,7 @@ export default function OrderTest() {
                     checked={isAllSelected()} // 여기서 업데이트된 체크 상태 사용
                     onChange={handleSelectAllChange}
                     sx={{ color: 'white', width: '80px' }}
+                    color='default'
                   /></TableCell>
                   <TableCell align="center">Category 1</TableCell>
                   <TableCell align="center">Category 2</TableCell>
@@ -484,6 +493,7 @@ export default function OrderTest() {
                           checked={selectedItems.has(detail.itemsId)}
                           onChange={() => handleCheckboxChange(detail.itemsId)}
                           sx={{ width: '80px' }}
+                          color='default'
                         />
                       </TableCell>
                       <TableCell align="center" sx={{ fontWeight: 'semi-bold', color: 'white', border: 'none', width: '15%' }}>{detail.category1Name}</TableCell>
@@ -547,10 +557,10 @@ export default function OrderTest() {
             />
           </div>
           <div className='flex justify-end m-5'>
-            <Button className='bluebutton2' onClick={() => setPerchasOpen(true)}>구매신청</Button>
+          <Button className='bluebutton2' onClick={handlePurchaseButtonClick}>구매신청</Button>
             <Modal2
-              open={perchasopen}
-              setOpen={setPerchasOpen}
+              open={perchaseopen}
+              setOpen={setPerchaseOpen}
               title="주문하시겠습니까?"
               onConfirm={() => handlePurchase(orderdate)}
               orderDate={orderdate}

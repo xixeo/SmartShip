@@ -1,23 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Checkbox,
-    Button,
-    Paper,
-    TextField,
-    InputAdornment,
-    Select,
-    MenuItem,
-    IconButton,
-    Pagination,
-} from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import CloseIcon from "@mui/icons-material/Close";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Button, Paper, TextField, InputAdornment, Select, MenuItem, IconButton, Pagination } from "@mui/material";
+import { Search as SearchIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Modal2 from "../Compo/Modal2";
 import "./ListTable.scss";
