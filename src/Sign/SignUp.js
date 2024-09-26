@@ -65,50 +65,30 @@ function SignUp({ setIsAuthenticated }) {
   const checkDuplicate = async (type) => {
   try {
     // 중복 확인할 데이터
-    const params = new URLSearchParams();
+    const params = {username};
 
-    if (type === "username") {
-      params.append("username", username);
-    } else if (type === "alias") {
-      params.append("alias", alias);
-    } else if (type === "phone") {
-      params.append("phone", phone);
-    }
+    // if (type === "username") {
+    //   params.append("username", username);
+    // } else if (type === "alias") {
+    //   params.append("alias", alias);
+    // } else if (type === "phone") {
+    //   params.append("phone", phone);
+    // }
 
-    console.log("중복 확인 요청 데이터:", params.toString()); // 요청 데이터 콘솔 출력
+    console.log("중복 확인 요청 데이터:", params); // 요청 데이터 콘솔 출력
 
     const response = await fetch(`/signuptest`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({username:params.toString()}),
+      body: JSON.stringify(params),
     });
 
     // 응답 상태 로그
     console.log("응답 상태:", response.status);
     const data = await response.json();
     console.log("전체 회원 데이터:", data); // API로부터 받은 데이터 콘솔 출력
-  
-     // 메시지 출력
-     if (data.message) {
-      console.log("서버 응답 메시지:", data.message); // 메시지 출력
-
-      // 중복 여부 확인
-    //   if (type === "username") {
-    //     setUsernameCheckMessage(data.message); // 중복 메시지 설정
-    //   } else {
-    //     setAliasCheckMessage(data.message); // 중복 메시지 설정
-    //   }
-     } 
-     else {
-    //   // 중복 데이터가 존재하지 않을 경우
-    //   if (type === "username") {
-    //     setUsernameCheckMessage("사용 가능한 아이디입니다.");
-    //   } else {
-    //     setAliasCheckMessage("사용 가능한 아이디입니다.");
-    //   }
-     }
   } 
   catch (error) {
     console.error("오류 발생:", error); // 오류 발생 시 오류 메시지 콘솔 출력
