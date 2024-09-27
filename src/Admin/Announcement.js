@@ -13,6 +13,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useAlert } from "../Compo/AlertContext";
+import { useLoading } from "../Compo/LoadingContext";
 import "../assets/theme/table.scss";
 
 export default function Announcement() {
@@ -23,6 +24,8 @@ export default function Announcement() {
   const [page, setPage] = useState(1); // 현재 페이지
   const [currentPage, setCurrentPage] = useState(1);
   const { showAlert } = useAlert(); // useAlert 훅 사용
+  const { setLoading } = useLoading();
+
   // useEffect를 사용하여 컴포넌트가 마운트될 때 초기 데이터를 설정
   // 조회버튼을 누르지 않아도 초기에 전체 데이터 한번 렌더링 시키기
   const token = localStorage.getItem("token");
@@ -33,7 +36,7 @@ export default function Announcement() {
         // showAlert("토큰이 저장되지 않았습니다.", "error");
         return;
       }
-      // setLoading(true); // 로딩 시작
+      setLoading(true); // 로딩 시작
       try {
         const response = await fetch("/notice", {
           method: "GET",
@@ -65,24 +68,13 @@ export default function Announcement() {
         console.error("Fetch error:", error);
         showAlert("데이터를 가져오는 데 실패했습니다.", "error");
       }
-      //  finally {
-      //     setLoading(false); // 로딩 종료
-      // }
+       finally {
+          setLoading(false); // 로딩 종료
+      }
     };
 
     fetchData();
   }, []);
-
-  // const handleStatusChange = (noticeId, event) => {
-  //     const newStatus = event.target.checked;
-  //     setRows(
-  //         rows.map((row) =>
-  //             row.noticeId === noticeId ? { ...row, status: newStatus } : row
-  //         )
-  //     );
-  //     //console.log(newStatus, 'statuuuuuuuuuuuu')
-
-  // };
 
   //status 저장
   const handleStatusChange = async (noticeId, event) => {
