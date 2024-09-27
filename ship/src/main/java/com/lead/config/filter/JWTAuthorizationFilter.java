@@ -24,31 +24,34 @@ import com.lead.repository.MemberRepo;
 @RequiredArgsConstructor
 public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
-    private final MemberRepo memRepo;
+	private final MemberRepo memRepo;
 
-protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-		
+	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+			throws IOException, ServletException {
+
 		String srcToken = req.getHeader("Authorization");
-		if(srcToken == null || !srcToken.startsWith("Bearer ")) {
+		if (srcToken == null || !srcToken.startsWith("Bearer ")) {
 			chain.doFilter(req, res);
 			return;
 		}
 		String jwtToken = srcToken.replace("Bearer ", "");
-		
-		String username = JWT.require(Algorithm.HMAC256("com.lead.jwt")).build().verify(jwtToken).getClaim("username").asString();
-		Optional<Member> opt = memRepo.findById(username);
-		if(!opt.isPresent()) {
+
+		String id = JWT.require(Algorithm.HMAC256("com.lead.jwt")).build().verify(jwtToken).getClaim("id")
+				.asString();
+		Optional<Member> opt = memRepo.findById(id);
+		if (!opt.isPresent()) {
 			chain.doFilter(req, res);
 			return;
 		}
 		Member findmem = opt.get();
-		
-		User user = new User(findmem.getUsername(),findmem.getPw(), AuthorityUtils.createAuthorityList(findmem.getRole().toString()));
-		
+
+		User user = new User(findmem.getId(), findmem.getPw(),
+				AuthorityUtils.createAuthorityList(findmem.getRole().toString()));
+
 		Authentication auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-		
+
 		SecurityContextHolder.getContext().setAuthentication(auth);
-		
+
 		chain.doFilter(req, res);
 	}
 }

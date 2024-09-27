@@ -17,6 +17,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class MemberDTO {
 
+	private String id;
     private String username;
     private String alias;
     private Role role;

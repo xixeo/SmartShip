@@ -40,30 +40,36 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) {
         ObjectMapper mapper = new ObjectMapper();
         try {
+            // JSON 데이터를 Member 객체로 변환
             Member member = mapper.readValue(req.getInputStream(), Member.class);
-            Authentication authToken = new UsernamePasswordAuthenticationToken(member.getUsername(), member.getPw());
-            System.out.println(member.getUsername() + "이 로그인 시도 했다.");
+            
+            // id와 pw를 사용한 인증 토큰 생성
+            Authentication authToken = new UsernamePasswordAuthenticationToken(member.getId(), member.getPw());
+            
+            log.info(member.getId() + "이 로그인 시도 했다.");
             return authenticationManager.authenticate(authToken);
         } catch (Exception e) {
-            log.info(e.getMessage());
+            log.error("로그인 오류: " + e.getMessage());
+            res.setStatus(HttpStatus.UNAUTHORIZED.value());
         }
-        res.setStatus(HttpStatus.UNAUTHORIZED.value());
         return null;
     }
+
     
     @Override
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         log.info("successfulAuthentication");
         User user = (User) authResult.getPrincipal();
-        String username = user.getUsername();
+        String id = user.getUsername();
         
         // MemberRepo를 통해 username으로 Member 객체를 조회
-        Member member = memberRepo.findByUsername(username)
+        Member member = memberRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found")); // 예외 처리를 추가하여 NPE 방지
 
         String token = JWT.create()
                 .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 1000))
-                .withClaim("username", username) // username 토큰으로 전달
+                .withClaim("id", id) // id 토큰으로 전달
+                .withClaim("username", member.getUsername()) // username 토큰으로 전달
                 .withClaim("alias", member.getAlias()) // alias 추가
                 .withClaim("role", member.getRole().toString()) // role 추가
                 .sign(Algorithm.HMAC256("com.lead.jwt"));

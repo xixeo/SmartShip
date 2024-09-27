@@ -61,15 +61,15 @@ public class SecurityConfig {
 	    // 로그인 성공 시
 	    @EventListener
 	    public void onAuthenticationSuccess(AuthenticationSuccessEvent event) {
-	        String username = event.getAuthentication().getName();
-	        logger.info("사용자 '{}'가 성공적으로 로그인했습니다.", username);
+	        String id = event.getAuthentication().getName();
+	        logger.info("사용자 '{}'가 성공적으로 로그인했습니다.", id);
 	    }
 
 	    // 로그인 실패 시
 	    @EventListener
 	    public void onAuthenticationFailure(AuthenticationFailureBadCredentialsEvent event) {
-	        String username = (String) event.getAuthentication().getPrincipal();
-	        logger.warn("사용자 '{}'의 로그인 시도가 실패했습니다.", username);
+	        String id = (String) event.getAuthentication().getPrincipal();
+	        logger.warn("사용자 '{}'의 로그인 시도가 실패했습니다.", id);
 	    }
 	}
 	

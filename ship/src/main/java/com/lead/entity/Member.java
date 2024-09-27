@@ -21,6 +21,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "Member")
 public class Member {
     @Id
+    private String id;
+    
+    @Column(nullable = false)
     private String username;
 
     @Column(nullable = false)
