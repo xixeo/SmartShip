@@ -125,6 +125,11 @@ public class CartService {
 		// 사용자의 기존 장바구니가 있는지 확인
 		Cart cart = cartRepo.findByMemberUsername(username).orElse(null);
 
+	    // 상품 목록이 비어 있는지 확인
+	    if (cartItems == null || cartItems.isEmpty()) {
+	        throw new RuntimeException("주문할 상품을 선택하세요.");
+	    }
+
 		if (cart == null) {
 			// 장바구니가 없으면 새로 생성
 			cart = new Cart();
