@@ -40,7 +40,7 @@ public class Orders {
     private String memo;
 
     @ManyToOne
-    @JoinColumn(name = "username", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private Member member;
 
     @OneToMany(mappedBy = "order")

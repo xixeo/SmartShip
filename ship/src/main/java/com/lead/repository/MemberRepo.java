@@ -15,5 +15,6 @@ public interface MemberRepo extends JpaRepository<Member, String>{
     Optional<Member> findByAlias(String alias);
     // phone으로 Member 찾기
     Optional<Member> findByPhone(String phone);
+    
 
 }

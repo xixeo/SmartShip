@@ -41,7 +41,7 @@ public class MemberService {
 		Optional<Member> memberById = memberRepo.findById(id);
 
 		// 휴대폰 번호로 회원 조회
-		Optional<Member> memberByPhone = memberRepo.findByPhone(phone);
+		//Optional<Member> memberByPhone = memberRepo.findByPhone(phone);
 
 		if (memberById.isPresent()) {
 			if (memberById.get().isEnabled()) {
@@ -52,9 +52,9 @@ public class MemberService {
 		}
 
 		// 이미 등록된 휴대폰 번호 확인
-		if (memberByPhone.isPresent()) {
-			return "이미 등록된 번호입니다.";
-		}
+//		if (memberByPhone.isPresent()) {
+//			return "이미 등록된 번호입니다.";
+//		}
 
 		System.out.println("Setting role: " + member.getRole());
 
@@ -69,7 +69,7 @@ public class MemberService {
 	}
 	
 	public String testMembers(Member member) {
-		String id = member.getUsername();
+		String id = member.getId();
 		
 		// 사용자 이름으로 회원 조회
 		Optional<Member> testId = memberRepo.findById(id);

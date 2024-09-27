@@ -32,7 +32,7 @@ public class Items {
     private Category3 category3;
 
     @ManyToOne
-    @JoinColumn(name = "username", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private Member member;
 
     @Column(name = "item_name", nullable = false)
