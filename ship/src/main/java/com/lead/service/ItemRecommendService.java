@@ -18,9 +18,8 @@ public class ItemRecommendService {
     @Autowired
     private ItemsRepo itemsRepo;
 
-    public List<ItemRecommendDTO> getRecommendedItems(Integer selectItemId, LocalDate releaseDate) {
-        String releaseDateStr = releaseDate.toString();
-        List<Object[]> results = itemsRepo.findAlternativeItems(selectItemId, releaseDateStr);
+    public List<ItemRecommendDTO> getRecommendedItems(Integer selectItemId, LocalDate releaseDate, Integer orderId) {
+        List<Object[]> results = itemsRepo.findAlternativeItems(selectItemId, releaseDate, orderId);
 
         List<ItemRecommendDTO> recommendedItems = new ArrayList<>();
         for (Object[] result : results) {

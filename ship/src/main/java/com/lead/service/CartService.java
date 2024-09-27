@@ -18,14 +18,13 @@ import com.lead.dto.OrdersDTO;
 import com.lead.entity.Cart;
 import com.lead.entity.CartItem;
 import com.lead.entity.Items;
-import com.lead.entity.Leadtime;
 import com.lead.entity.Member;
 import com.lead.entity.OrderDetail;
 import com.lead.entity.Orders;
+import com.lead.entity.SelectedDay;
 import com.lead.repository.CartItemRepo;
 import com.lead.repository.CartRepo;
 import com.lead.repository.ItemsRepo;
-import com.lead.repository.LeadtimeRepo;
 import com.lead.repository.MemberRepo;
 import com.lead.repository.OrderDetailRepo;
 import com.lead.repository.OrdersRepo;
@@ -51,9 +50,6 @@ public class CartService {
 	@Autowired
 	private OrderDetailRepo orderDetailRepo;
 
-	@Autowired
-	private LeadtimeRepo leadtimeRepo;
-
 	/////////////////////////////////////////////////////////////////////////////////// 장바구니
 	/////////////////////////////////////////////////////////////////////////////////// 조회
 	public CartDTO getCartByDate(LocalDate releaseDate) {
@@ -70,12 +66,7 @@ public class CartService {
 
 			Items item = cartItem.getItem();
 
-			// Leadtime 정보 조회
-			Leadtime leadtime = leadtimeRepo.findByItems_ItemsId(item.getItemsId())
-					.orElseThrow(() -> new RuntimeException("리드타임 정보가 없습니다."));
-
-			// LocalDate bestOrderDate = releaseDate.minusDays(leadtime.getLeadtime());
-
+			
 			// 판매 가능 여부: enabled가 true이고 forSale이 true여야 판매 가능
 			boolean isSell = item.isEnabled() && item.isForSale(); // 판매 여부 판단
 
@@ -83,12 +74,11 @@ public class CartService {
 					item.getCategory3().getCategory2().getCategory1().getCategoryName(),
 					item.getCategory3().getCategory2().getCategory2Name(), item.getCategory3().getCategory3Name(),
 					item.getItemsId(), item.getItemName(), item.getPart1(), cartItem.getQuantity(), item.getPrice(),
-					item.getUnit(), item.getMember().getUsername(), null, leadtime.getLeadtime(), isSell);
+					item.getUnit(), item.getMember().getUsername(), null, 
+					//leadtime.getLeadtime(), 
+					null,
+					isSell);
 		}).collect(Collectors.toList());
-
-		// bestOrderDate 계산
-		// LocalDate calculatedBestOrderDate = calculateBestOrderDate(cartItemDTOs,
-		// releaseDate);
 
 		// 최종 결과 반환
 		return new CartDTO(cart.getCartId(), cart.getMember().getUsername(), cart.getMember().getAlias(), releaseDate, // releaseDate는
@@ -101,15 +91,6 @@ public class CartService {
 				null, cart.getCreatedAt(), cartItemDTOs);
 	}
 
-	// bestOrderDate 계산 로직
-//	private LocalDate calculateBestOrderDate(List<CartItemDTO> cartItems, LocalDate releaseDate) {
-//		return cartItems.stream().map(item -> {
-//			Leadtime leadtime = leadtimeRepo.findByItems_ItemsId(item.getItemsId())
-//					.orElseThrow(() -> new RuntimeException("리드타임 정보가 없습니다."));
-//			return releaseDate.minusDays(leadtime.getLeadtime());
-//		}).min(LocalDate::compareTo) // 가장 늦은 bestOrderDate 반환
-//				.orElse(releaseDate);		
-//	}
 
 	/////////////////////////////////////////////////////////////////////////////////// 장바구니
 	/////////////////////////////////////////////////////////////////////////////////// 추가
@@ -191,7 +172,7 @@ public class CartService {
 	/////////////////////////////////////////////////////////////////////////////////// 저장
 
 	@Transactional
-	public OrdersDTO saveCartItemsToOrder(List<CartItemDTO> cartItems, LocalDate releaseDate, String memo) {
+	public OrdersDTO saveCartItemsToOrder(List<CartItemDTO> cartItems, LocalDate releaseDate, String memo, SelectedDay selectedDay) {
 		// JWT 토큰에서 사용자 정보 추출
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String username = authentication.getName(); // 토큰에서 username 추출
@@ -205,6 +186,7 @@ public class CartService {
 		order.setReleaseDate(releaseDate);
 		order.setRequestDate(LocalDate.now());
 		order.setMemo(memo); // memo 설정
+		order.setSelectedDay(selectedDay);
 		Orders savedOrder = ordersRepo.save(order);
 
 		// OrderDetail 저장 및 장바구니에서 삭제
@@ -237,8 +219,7 @@ public class CartService {
 
 		return new OrdersDTO(savedOrder.getOrderId(), savedOrder.getMember().getUsername(),
 				savedOrder.getMember().getAlias(), savedOrder.getMember().getPhone(), savedOrder.getReleaseDate(), null, // bestOrderDate는 여전히 계산되지 않았으므로
-				savedOrder.getRequestDate(), savedOrder.getMemo(), // 저장된 memo 반환
+				savedOrder.getRequestDate(), savedOrder.getMemo(), savedOrder.getSelectedDay(), // 저장된 memo 반환
 				null);
 	}
-
 }

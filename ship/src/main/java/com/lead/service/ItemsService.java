@@ -95,7 +95,7 @@ public class ItemsService {
 		if (role.equals("ROLE_SUPPLIER")) {
 			return items.stream().map(this::convertToDtoWithEnabled).collect(Collectors.toList());
 		} else {
-			return items.stream().map(this::convertToDtoWithoutEnabled).collect(Collectors.toList());
+			return items.stream().map(this::convertToDtoWithoutEnabledForSailors).collect(Collectors.toList());
 		}
 	}
 
@@ -121,30 +121,31 @@ public class ItemsService {
 
 	private ItemsDTO convertToDtoWithEnabled(Items item) {
 
-		// Leadtime 정보 조회
-		Leadtime leadtime = leadtimeRepo.findByItems_ItemsId(item.getItemsId())
-				.orElseThrow(() -> new RuntimeException("리드타임 정보가 없습니다."));
 
 		return ItemsDTO.builder().itemId(item.getItemsId()).itemName(item.getItemName())
 				.category1Name(item.getCategory3().getCategory2().getCategory1().getCategoryName())
 				.category2Name(item.getCategory3().getCategory2().getCategory2Name())
 				.category3Name(item.getCategory3().getCategory3Name()).part1(item.getPart1()).part2(item.getPart2())
 				.price(item.getPrice()).unit(item.getUnit()).supplierName(item.getMember().getUsername())
-				.alias(item.getMember().getAlias()).leadtime(leadtime.getLeadtime()).forSale(item.isForSale()).build();
+				.alias(item.getMember().getAlias()).forSale(item.isForSale()).build();
 	}
 
-	private ItemsDTO convertToDtoWithoutEnabled(Items item) {
-
-		// Leadtime 정보 조회
-		Leadtime leadtime = leadtimeRepo.findByItems_ItemsId(item.getItemsId())
-				.orElseThrow(() -> new RuntimeException("리드타임 정보가 없습니다."));
-
-		return ItemsDTO.builder().itemId(item.getItemsId()).itemName(item.getItemName())
-				.category1Name(item.getCategory3().getCategory2().getCategory1().getCategoryName())
-				.category2Name(item.getCategory3().getCategory2().getCategory2Name())
-				.category3Name(item.getCategory3().getCategory3Name()).part1(item.getPart1()).part2(item.getPart2())
-				.price(item.getPrice()).unit(item.getUnit()).supplierName(item.getMember().getUsername())
-				.alias(item.getMember().getAlias()).leadtime(leadtime.getLeadtime()).build();
+	// 리드타임 없이 DTO 생성
+	private ItemsDTO convertToDtoWithoutEnabledForSailors(Items item) {
+	    return ItemsDTO.builder()
+	            .itemId(item.getItemsId())
+	            .itemName(item.getItemName())
+	            .category1Name(item.getCategory3().getCategory2().getCategory1().getCategoryName())
+	            .category2Name(item.getCategory3().getCategory2().getCategory2Name())
+	            .category3Name(item.getCategory3().getCategory3Name())
+	            .part1(item.getPart1())
+	            .part2(item.getPart2())
+	            .price(item.getPrice())
+	            .unit(item.getUnit())
+	            .supplierName(item.getMember().getUsername())
+	            .alias(item.getMember().getAlias())
+	            .forSale(item.isForSale())
+	            .build();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////// 상품
@@ -274,20 +275,22 @@ public class ItemsService {
 	/////////////////////////////////////////////////////////////////////////////////// 대체
 	/////////////////////////////////////////////////////////////////////////////////// 상품
 	/////////////////////////////////////////////////////////////////////////////////// 조회
-	public List<ItemRecommendDTO> getRecommendedItems(Integer selectedItemId, LocalDate releaseDate) {
-		List<Object[]> results = itemsRepo.findAlternativeItems(selectedItemId, releaseDate.toString());
+	public List<ItemRecommendDTO> getRecommendedItems(Integer selectedItemId, LocalDate releaseDate, Integer orderId) {
+	    // LocalDate를 String으로 변환하여 사용
+	    List<Object[]> results = itemsRepo.findAlternativeItems(selectedItemId, releaseDate, orderId);
 
-		return results.stream().map(result -> {
-			ItemRecommendDTO dto = new ItemRecommendDTO();
-			dto.setItemsId((Integer) result[0]); // itemsId
-			dto.setItemName((String) result[1]); // itemName
-			dto.setPrice((BigDecimal) result[4]); // price
-			dto.setUnit((String) result[2]); // unit
-			dto.setSupplierName((String) result[3]); // supplierName
-			dto.setLeadtime((Integer) result[5]); // leadtime
-			return dto;
-		}).collect(Collectors.toList());
+	    return results.stream().map(result -> {
+	        ItemRecommendDTO dto = new ItemRecommendDTO();
+	        dto.setItemsId((Integer) result[0]); // itemsId
+	        dto.setItemName((String) result[1]); // itemName
+	        dto.setPrice((BigDecimal) result[4]); // price
+	        dto.setUnit((String) result[2]); // unit
+	        dto.setSupplierName((String) result[3]); // supplierName
+	        dto.setLeadtime((Integer) result[5]); // leadtime
+	        return dto;
+	    }).collect(Collectors.toList());
 	}
+
 
 	/////////////////////////////////////////////////////////////////////////////////// 판매된
 	/////////////////////////////////////////////////////////////////////////////////// 상품

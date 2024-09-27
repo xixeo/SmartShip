@@ -79,6 +79,7 @@ public class CartController {
 	@PostMapping("/saveToOrder/{releaseDate}")
     public ResponseEntity<String> saveCartItemsToOrder(
             @PathVariable String releaseDate,
+            @PathVariable String selectedDay,
             @RequestBody CartRequestDTO cartRequestDTO // CartRequestDTO 사용
     ) {
         try {
@@ -93,7 +94,7 @@ public class CartController {
                 ).collect(Collectors.toList());
 
             // CartItemDTO와 memo를 서비스로 전달
-            cartService.saveCartItemsToOrder(cartItems, parsedReleaseDate, cartRequestDTO.getMemo());
+            cartService.saveCartItemsToOrder(cartItems, parsedReleaseDate, cartRequestDTO.getMemo(), cartRequestDTO.getSelectedDay());
 
             System.out.println("===========================물건 주문 한다");
             return ResponseEntity.ok("주문이 성공적으로 저장되었습니다.");

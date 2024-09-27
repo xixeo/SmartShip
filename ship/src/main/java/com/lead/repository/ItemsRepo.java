@@ -1,5 +1,6 @@
 package com.lead.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,33 +15,43 @@ import com.lead.entity.Items;
 @Repository
 public interface ItemsRepo extends JpaRepository<Items, Integer>, JpaSpecificationExecutor<Items> {
 
-    // 대체상품추천
-    @Query(value = """
-        SELECT
-            i.items_id,
-            i.item_name,
-            i.price,
-            i.unit,
-            m.username AS supplierName, -- member 테이블의 username을 supplierName으로 가져옴
-            l.leadtime
-        FROM
-            Items i
-        JOIN
-            Leadtime l ON i.items_id = l.items_id
-        JOIN
-            member m ON i.user_id = m.id -- Items 테이블의 user_id와 member 테이블의 id를 연결
-        WHERE
-            i.category3_id = (SELECT category3_id FROM Items WHERE items_id = :selectItemId)
-            AND (i.price BETWEEN (SELECT price * 0.9 FROM Items WHERE items_id = :selectItemId) AND (SELECT price * 1.1 FROM Items WHERE items_id = :selectItemId))
-            AND i.items_id <> :selectItemId
-            AND i.enabled = true -- enabled 필터 추가
-            AND l.leadtime <= (SELECT DATEDIFF(:releaseDate, CURRENT_DATE))
-        ORDER BY
-            ABS(i.price - (SELECT price FROM Items WHERE items_id = :selectItemId)) ASC
-        LIMIT 4
-    """, nativeQuery = true)
-    List<Object[]> findAlternativeItems(@Param("selectItemId") Integer selectItemId,
-                                        @Param("releaseDate") String releaseDate);
+
+    // 대체상품추천    
+	  @Query(value = """
+		        SELECT
+		            i.items_id,
+		            i.item_name,
+		            i.price,
+		            i.unit,
+		            m.username AS supplierName,
+		            l.leadtime
+		        FROM
+		            Items i
+		        JOIN
+		            Leadtime1 l ON i.items_id = l.items_id
+		        JOIN
+		            member m ON i.user_id = m.id
+		        WHERE
+		            i.category3_id = (SELECT category3_id FROM Items WHERE items_id = :selectedItemId)
+		            AND (i.price BETWEEN (SELECT price * 0.9 FROM Items WHERE items_id = :selectedItemId) 
+		                AND (SELECT price * 1.1 FROM Items WHERE items_id = :selectedItemId))
+		            AND i.items_id <> :selectedItemId
+		            AND i.enabled = true
+		            AND l.leadtime <= (DATEDIFF(:releaseDate, CURRENT_DATE))
+		            AND l.season = (CASE
+		                WHEN MONTH(:releaseDate) IN (3, 4, 5) THEN 'SPRING'
+		                WHEN MONTH(:releaseDate) IN (6, 7, 8) THEN 'SUMMER'
+		                WHEN MONTH(:releaseDate) IN (9, 10, 11) THEN 'FALL'
+		                ELSE 'WINTER'
+		            END)
+		            AND l.selected_day = (SELECT selected_day FROM Orders WHERE order_id = :orderId)
+		        ORDER BY
+		            ABS(i.price - (SELECT price FROM Items WHERE items_id = :selectedItemId)) ASC
+		        LIMIT 4
+		    """, nativeQuery = true)
+		    List<Object[]> findAlternativeItems(@Param("selectedItemId") Integer selectedItemId,
+		                                         @Param("releaseDate") LocalDate releaseDate,
+		                                         @Param("orderId") Integer orderId);
 
     // 특정 아이템의 구매 횟수 증가
     @Modifying

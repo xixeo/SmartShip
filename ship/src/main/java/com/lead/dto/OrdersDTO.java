@@ -3,6 +3,8 @@ package com.lead.dto;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.lead.entity.SelectedDay;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -17,5 +19,6 @@ public class OrdersDTO {
 	private LocalDate bestOrderDate;
 	private LocalDate requestDate;
 	private String memo;
+    private SelectedDay selectedDay;
 	private List<OrderDetailDTO> orderDetails;
 }

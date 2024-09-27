@@ -128,15 +128,13 @@ public class ItemsController {
 	@GetMapping("/recommend")
 	public ResponseEntity<List<ItemRecommendDTO>> getRecommendations(
 	        @RequestParam("selectedItemId") Integer selectedItemId,
-	        @RequestParam("releaseDate") String releaseDate) {
+	        @RequestParam("releaseDate") LocalDate releaseDate,
+	        @RequestParam("orderId") Integer orderId) {
 
 	    try {
-	        // 문자열을 LocalDate로 변환
-	        LocalDate releaseDateLocal = LocalDate.parse(releaseDate);
-
 	        System.out.println("===========================물품 추천 한다");
 	        
-	        List<ItemRecommendDTO> recommendations = itemRecommendService.getRecommendedItems(selectedItemId, releaseDateLocal);
+	        List<ItemRecommendDTO> recommendations = itemRecommendService.getRecommendedItems(selectedItemId, releaseDate, orderId);
 
 	        // JSON 형식으로 List<ItemRecommendDTO>를 반환
 	        return ResponseEntity.ok(recommendations);
@@ -146,5 +144,6 @@ public class ItemsController {
 	                .body(Collections.emptyList()); // 오류 발생 시 빈 리스트를 반환
 	    }
 	}
+
 
 }

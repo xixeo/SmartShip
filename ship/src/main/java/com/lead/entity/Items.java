@@ -22,10 +22,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "Items")
 public class Items {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "items_id", nullable = false)
-    private Integer itemsId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "items_id")
+	private Integer itemsId; // 기본 키
 
     @ManyToOne
     @JoinColumn(name = "category3_id", nullable = false)

@@ -5,6 +5,8 @@ import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -38,7 +40,11 @@ public class Orders {
     
     @Column(name = "memo", nullable = true)
     private String memo;
-
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "selected_day", nullable = false)
+    private SelectedDay selectedDay;   
+        
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private Member member;
