@@ -49,6 +49,11 @@ const ListSupplier2 = () => {
         }
     };
 
+    // useEffect(() => {
+    //     // 페이지가 로드될 때 데이터 새로고침
+    //     window.location.reload();
+    // }, []);
+
     useEffect(() => {
         const fetchData = async () => {
             try {

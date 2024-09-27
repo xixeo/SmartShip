@@ -22,7 +22,7 @@ const Modal3 = ({ open, setOpen, title, onConfirm }) => {
                     backgroundColor: '#17161D',
                     padding: '24px',
                     borderRadius: '8px',
-                    width: '400px',
+                    width: '600px',
                     color: 'white',
                     position: 'relative',
                     display: 'flex',
@@ -40,17 +40,29 @@ const Modal3 = ({ open, setOpen, title, onConfirm }) => {
                 </button>
 
                 {/* 타이틀 */}
-                <Box sx={{ marginBottom: 2, fontSize: 'large', fontWeight: 'bold' }}>
-                    {title}
+                <Box sx={{ width: '100%' }}>
+                    <Box
+                        sx={{
+                            textAlign: 'left',
+                            fontSize: 'large',
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        {title}
+                    </Box>
+                    <hr style={{ width: '100%', borderColor: 'white', marginTop: '15px' }} /> {/* 흰색 가로선 */}
                 </Box>
 
                  {/* PredictionForm 삽입 */}
                  <PredictionForm />
 
-                {/* 확인 및 취소 버튼 */}
+                {/* 등록 및 취소 버튼 */}
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <Button
-                        sx={{ color: 'white', backgroundColor: '#43C5FE' }}
+                        sx={{ color: 'white', backgroundColor: '#7f6dce',
+                            '&:hover': {
+                                backgroundColor: '#6b5bc1', // hover 색상
+                            }, }}
                         onClick={() => {
                             setOpen(false);
                             onConfirm();
@@ -59,7 +71,10 @@ const Modal3 = ({ open, setOpen, title, onConfirm }) => {
                         등록
                     </Button>
                     <Button
-                        sx={{ color: 'white', backgroundColor: '#BFBFBF' }}
+                        sx={{ color: 'white',  backgroundColor: '#BFBFBF',
+                            '&:hover': {
+                                backgroundColor: '#a3a3a3', // hover 색상
+                            }, }}
                         onClick={() => setOpen(false)}
                     >
                         취소
