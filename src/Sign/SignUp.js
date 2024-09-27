@@ -6,13 +6,13 @@ import { Radio, RadioGroup, FormControlLabel, FormControl } from "@mui/material"
 
 function SignUp({ setIsAuthenticated }) {
   const [username, setUsername] = useState("");
+  const [id, setId] = useState("");
   const [pw, setPw] = useState("");
   const [alias, setAlias] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("ROLE_USER"); // 기본 역할을 'user'로 설정
   const [signupError, setSignupError] = useState("");
-  const [usernameCheckMessage, setUsernameCheckMessage] = useState("");
-  const [aliasCheckMessage, setAliasCheckMessage] = useState("");
+  const [idCheckMessage, setIdCheckMessage] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -21,7 +21,7 @@ function SignUp({ setIsAuthenticated }) {
 
     try {
       const url = "/signup";
-      const body = { username, pw, alias, role, phone };
+      const body = { id, username, pw, alias, role, phone };
 
       // 회원가입 데이터 콘솔 출력
       console.log("회원가입 데이터:", body);
@@ -44,6 +44,7 @@ function SignUp({ setIsAuthenticated }) {
       if (contentType && contentType.includes("application/json")) {
         const data = JSON.parse(text);
         localStorage.setItem("token", data.token);
+        localStorage.setItem("username", data.username);
         localStorage.setItem("alias", data.alias);
         localStorage.setItem("role", role);
         localStorage.setItem("phone", phone);
@@ -69,7 +70,7 @@ function SignUp({ setIsAuthenticated }) {
 
     console.log("중복 확인 요청 데이터:", params); // 요청 데이터 콘솔 출력
 
-    const response = await fetch(`/signuptest`, {
+    const response = await fetch(`/idCheck`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -111,12 +112,12 @@ function SignUp({ setIsAuthenticated }) {
 //   }
 // };
 
-  const checkUsername = () => {
-    checkDuplicate("username");
+  const checkId = () => {
+    checkDuplicate("id");
   };
-  const checkAlias = () => {
-    checkDuplicate("alias");
-  };
+  // const checkAlias = () => {
+  //   checkDuplicate("alias");
+  // };
 
   return (
     <div className="flex items-center justify-center h-full login">
@@ -133,53 +134,55 @@ function SignUp({ setIsAuthenticated }) {
           {/* 회사명 또는 선박명 입력란 */}
           <div className="mb-4 ">
             <label className="block text-white text-sm font-bold mb-2 mr-2">
-              <span className="text-white">*</span> 아이디 ({ role === "ROLE_MANAGER" ? "해운선사명" : role === "ROLE_SUPPLIER" ? "공급업체명" : "선박명" })
+              <span className="text-white">*</span> { role === "ROLE_MANAGER" ? "해운선사명" : role === "ROLE_SUPPLIER" ? "공급업체명" : "선박명" }
             </label>
-            <div className="flex">
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-4/5 px-1 py-2 login-input"
+              className="w-full px-1 py-2 login-input"
             />
-            <button
-              type="button"
-              onClick={checkUsername}
-              className="w-1/5 check-btn ml-2 text-sm"
-              >
-              중복확인
-            </button>
-             </div>
             </div>
-          {usernameCheckMessage && (
-            <p className="text-sm text-red-500 mb-4">{usernameCheckMessage}</p>
-          )}
 
           {/* 닉네임 입력란 */}
           <div className="mt-10 mb-4">
             <label className="block text-white text-sm font-bold mb-2">
               <span className="text-white">*</span> 닉네임
             </label>
-            <div className="flex">
             <input
               type="text"
               value={alias}
               onChange={(e) => setAlias(e.target.value)}
               required
+              className="w-full px-1 py-2 login-input"
+            />
+          </div>
+
+          {/* 아이디 입력란 */}
+          <div className="mt-10 mb-4">
+            <label className="block text-white text-sm font-bold mb-2">
+              <span className="text-white">*</span> 아이디
+            </label>
+            <div className="flex">
+            <input
+              type="text"
+              value={id}
+              onChange={(e) => setId(e.target.value)}
+              required
               className="w-4/5 px-1 py-2 login-input"
             />
-            <button
+          <button
               type="button"
-              onClick={checkAlias}
+              onClick={checkId}
               className="w-1/5 check-btn ml-2 text-sm"
               >
               중복확인
             </button>
-          </div>
-          </div>
-          {aliasCheckMessage && (
-            <p className="text-sm text-red-500 mb-4">{aliasCheckMessage}</p>
+             </div>
+            </div>
+          {idCheckMessage && (
+            <p className="text-sm text-red-500 mb-4">{idCheckMessage}</p>
           )}
 
           {/* 비밀번호 입력란 */}

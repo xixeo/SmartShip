@@ -6,6 +6,7 @@ import "../assets/theme/login.scss";
 import Checkbox from '@mui/material/Checkbox';
 
 function SignIn({ setIsAuthenticated, setRedirectPath }) {
+  const [id, setId] = useState("");
   const [username, setUsername] = useState("");
   const [pw, setPw] = useState("");
   const [loginError, setLoginError] = useState("");
@@ -14,9 +15,9 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
 
   // 컴포넌트가 마운트될 때 로컬 스토리지에서 아이디를 가져와서 설정
   React.useEffect(() => {
-    const storedUsername = localStorage.getItem("storedUsername");
-    if (storedUsername) {
-      setUsername(storedUsername);
+    const storedId = localStorage.getItem("storedId");
+    if (storedId) {
+      setId(storedId);
       setRemember(true); // 저장된 아이디가 있을 경우 체크박스 체크
     }
   }, []);
@@ -33,7 +34,7 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, pw }),
+        body: JSON.stringify({ id, username, pw }),
       });
 
       if (!response.ok) {
@@ -49,19 +50,21 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
         const decodedToken = jwtDecode(cleanedToken);
 
         // 필요한 정보를 로컬 스토리지에 저장
+        const username = decodedToken.username;
         const alias = decodedToken.alias;
         const role = decodedToken.role;
 
         localStorage.setItem("token", cleanedToken);
+        localStorage.setItem("id", id);
         localStorage.setItem("username", username);
         localStorage.setItem("alias", alias);
         localStorage.setItem("role", role);
 
         // 체크박스가 체크되어 있으면 아이디를 로컬 스토리지에 저장
         if (remember) {
-          localStorage.setItem("storedUsername", username);
+          localStorage.setItem("storedId", id);
         } else {
-          localStorage.removeItem("storedUsername"); // 체크 해제 시 저장된 아이디 삭제
+          localStorage.removeItem("storedId"); // 체크 해제 시 저장된 아이디 삭제
         }
 
         setIsAuthenticated(true);
@@ -94,10 +97,9 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
             </label>
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={id}
+              onChange={(e) => setId(e.target.value)}
               required
-              placeholder="해운선사_신입"
               className="w-full px-1 py-2 login-input"
             />
           </div>
