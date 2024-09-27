@@ -29,6 +29,20 @@
   }
 }
 
+.blue-btn2 {
+    background: $blue-btn;
+    color: #fff;
+    border: 1px solid $blue-btn;
+   
+    border-radius: 4px;
+    outline: 0 !important;
+  
+    &:hover {
+      background:#7f6dce;
+      transition: all 0.3s;
+    }
+  }
+
 .check-btn {
   border: 1px solid $check-btn;
   color: $check-btn;

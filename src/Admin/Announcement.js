@@ -110,12 +110,14 @@ export default function Announcement() {
       });
 
       if (response.ok) {
-        console.log("status 변경 성공");
+        showAlert("공지사항 상태를 변경 했습니다.", "success");
       } else {
         console.error("status 변경 실패:", response.statusText);
+        showAlert("공지사항 상태를 변경하지 못했습니다.", "error");
       }
     } catch (error) {
       console.error("status 변경 중 오류 발생:", error);
+      showAlert("공지사항 상태를 변경하지 못했습니다.", "error");
     }
   };
 

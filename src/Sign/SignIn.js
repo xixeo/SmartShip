@@ -133,7 +133,7 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
           </div>
           <button
             type="submit"
-            className="w-full login-btn text-white font-bold py-2 px-4 rounded-lg mt-16"
+            className="w-full blue-btn2 text-white font-bold py-3 px-4 rounded-lg mt-8"
           >
             로그인
           </button>
@@ -142,7 +142,7 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
             <button
               type="button"
               onClick={() => navigate("/signup")}
-              className="text-[#43c5fe] underline ml-2"
+              className="text-[#9c87ff] underline ml-2"
             >
               회원가입
             </button>
