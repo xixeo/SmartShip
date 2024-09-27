@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Button } from '@mui/material';
+import PredictionForm from '../02/PredictionForm';
 
 const Modal3 = ({ open, setOpen, title, onConfirm }) => {
     if (!open) return null;
@@ -43,6 +44,9 @@ const Modal3 = ({ open, setOpen, title, onConfirm }) => {
                     {title}
                 </Box>
 
+                 {/* PredictionForm 삽입 */}
+                 <PredictionForm />
+
                 {/* 확인 및 취소 버튼 */}
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <Button
@@ -52,7 +56,7 @@ const Modal3 = ({ open, setOpen, title, onConfirm }) => {
                             onConfirm();
                         }}
                     >
-                        확인
+                        등록
                     </Button>
                     <Button
                         sx={{ color: 'white', backgroundColor: '#BFBFBF' }}
