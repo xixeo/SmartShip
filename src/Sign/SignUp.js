@@ -61,7 +61,7 @@ function SignUp({ setIsAuthenticated }) {
       setSignupError(error.message);
     }
   };
-
+   
   // 회사명 또는 선박명 중복 확인 함수
   const checkDuplicate = async (type) => {
     try {
