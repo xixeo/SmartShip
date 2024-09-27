@@ -135,93 +135,8 @@ function SignUp({ setIsAuthenticated }) {
             SIGN UP
           </h2>
 
-          {/* 회사명 또는 선박명 입력란 */}
-          <div className="mb-4 ">
-            <label className="block text-white text-sm font-bold mb-2 mr-2">
-              <span className="text-white">*</span> {role === "ROLE_MANAGER" ? "해운선사명" : role === "ROLE_SUPPLIER" ? "공급업체명" : "선박명"}
-            </label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              className="w-full px-1 py-2 login-input"
-            />
-          </div>
-
-          {/* 닉네임 입력란 */}
-          <div className="mt-10 mb-4">
-            <label className="block text-white text-sm font-bold mb-2">
-              <span className="text-white">*</span> 닉네임
-            </label>
-            <input
-              type="text"
-              value={alias}
-              onChange={(e) => setAlias(e.target.value)}
-              required
-              className="w-full px-1 py-2 login-input"
-            />
-          </div>
-
-          {/* 아이디 입력란 */}
-          <div className="mt-10 mb-4">
-            <label className="block text-white text-sm font-bold mb-2">
-              <span className="text-white">*</span> 아이디
-            </label>
-            <div className="flex">
-              <input
-                type="text"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-                required
-                className="w-4/5 px-1 py-2 login-input"
-              />
-              <button
-                type="button"
-                onClick={checkId}
-                className="w-1/5 check-btn ml-2 text-sm"
-              >
-                중복확인
-              </button>
-            </div>
-          </div>
-          {idCheckMessage && (
-            <p className="text-sm text-red-500 mb-4">{idCheckMessage}</p>
-          )}
-
-          {/* 비밀번호 입력란 */}
-          <div className="mt-10 mb-4">
-            <label className="block text-white text-sm font-bold mb-2">
-              <span className="text-white">*</span> 비밀번호
-            </label>
-            <input
-              type="password"
-              value={pw}
-              onChange={(e) => setPw(e.target.value)}
-              required
-              className="w-full px-1 py-2 login-input"
-            />
-          </div>
-
-          {/* 연락처 입력란 */}
-          <div className="mt-10 mb-4">
-            <label className="block text-white text-sm font-bold mb-2 mr-2">
-              <span className="text-white">*</span> 연락처
-            </label>
-            <input
-              type="text"
-              value={phone}
-              onChange={(e) => {
-                const cleanedPhone = e.target.value.replace(/-/g, ''); // '-' 제거
-                setPhone(cleanedPhone);
-              }}
-              required
-              className="w-full px-1 py-2 login-input"
-            />
-          </div>
-
-          {/* 회원 유형 */}
-          <div className="mt-10 mb-4">
+           {/* 회원 유형 */}
+           <div className="mt-8 mb-4">
             <label className="block text-white text-sm font-bold mb-2">
               회원 유형
             </label>
@@ -235,25 +150,114 @@ function SignUp({ setIsAuthenticated }) {
               >
                 <FormControlLabel
                   value="ROLE_MANAGER"
-                  control={<Radio sx={{ color: "#ffffff", '&.Mui-checked': { color: "#ffffff" }, transform: "scale(0.8)" }} />}
+                  control={<Radio sx={{ color: "#ffffff", '&.Mui-checked': { color: "#9c87ff" }, transform: "scale(0.8)" }} />}
                   label="해운선사"
                   sx={{ color: "#ffffff", transform: "scale(0.9)" }}
                 />
                 <FormControlLabel
                   value="ROLE_SUPPLIER"
-                  control={<Radio sx={{ color: "#ffffff", '&.Mui-checked': { color: "#ffffff" }, transform: "scale(0.8)" }} />}
+                  control={<Radio sx={{ color: "#ffffff", '&.Mui-checked': { color: "#9c87ff" }, transform: "scale(0.8)" }} />}
                   label="공급업체"
                   sx={{ color: "#ffffff", transform: "scale(0.9)" }}
                 />
                 <FormControlLabel
                   value="ROLE_USER"
-                  control={<Radio sx={{ color: "#ffffff", '&.Mui-checked': { color: "#ffffff" }, transform: "scale(0.8)" }} />}
+                  control={<Radio sx={{ color: "#ffffff", '&.Mui-checked': { color: "#9c87ff" }, transform: "scale(0.8)" }} />}
                   label="선박"
                   sx={{ color: "#ffffff", transform: "scale(0.9)" }}
                 />
               </RadioGroup>
             </FormControl>
           </div>
+
+          {/* 아이디 입력란 */}
+          <div className="mt-6 mb-2">
+            <label className="block text-white text-sm font-bold">
+               아이디
+            </label>
+            <div className="flex">
+              <input
+                type="text"
+                value={id}
+                onChange={(e) => setId(e.target.value)}
+                required
+                className="w-4/5 px-1 py-2 login-input"
+              />
+              <button
+                type="button"
+                onClick={checkId}
+                className="w-1/5 check-btn ml-1 text-sm"
+              >
+                중복확인
+              </button>
+            </div>
+          </div>
+          {idCheckMessage && (
+            idCheckMessage === "이미 존재하는 ID입니다." ? ( <p className="text-sm text-red-500 mb-4">{idCheckMessage}</p>) : 
+            ( <p className="text-sm text-[#ffffff93] mb-4">{idCheckMessage}</p>)
+           
+          )}
+
+          {/* 비밀번호 입력란 */}
+          <div className="mt-8 mb-4">
+            <label className="block text-white text-sm font-bold">
+               비밀번호
+            </label>
+            <input
+              type="password"
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              required
+              className="w-full px-1 py-2 login-input"
+            />
+          </div>
+
+           {/* 회사명 또는 선박명 입력란 */}
+           <div className="mb-4 ">
+            <label className="block text-white text-sm font-bold mr-2">
+               {role === "ROLE_MANAGER" ? "해운선사명" : role === "ROLE_SUPPLIER" ? "공급업체명" : "선박명"}
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="w-full px-1 py-2 login-input"
+            />
+          </div>
+
+          {/* 닉네임 입력란 */}
+          <div className="mt-8 mb-4">
+            <label className="block text-white text-sm font-bold">
+               닉네임
+            </label>
+            <input
+              type="text"
+              value={alias}
+              onChange={(e) => setAlias(e.target.value)}
+              required
+              className="w-full px-1 py-2 login-input"
+            />
+          </div>
+
+          {/* 연락처 입력란 */}
+          <div className="mt-8 mb-4">
+            <label className="block text-white text-sm font-bold mr-2">
+               연락처
+            </label>
+            <input
+              type="text"
+              value={phone}
+              onChange={(e) => {
+                const cleanedPhone = e.target.value.replace(/-/g, ''); // '-' 제거
+                setPhone(cleanedPhone);
+              }}
+              required
+              className="w-full px-1 py-2 login-input"
+            />
+          </div>
+
+        
           {signupError && (
             <p className="text-red-500 pb-2" style={{ whiteSpace: "pre-wrap" }}>
               {signupError}
@@ -271,15 +275,15 @@ function SignUp({ setIsAuthenticated }) {
             <button
               type="button"
               onClick={() => navigate("/signin")} // 로그인 페이지로 이동
-              className="text-[#43c5fe] underline ml-2"
+              className="main-text underline ml-2"
             >
               로그인
             </button>
           </p>
         </form>
-        <p className="text-sm text-gray-300 text-start w-full w-md px-8 rounded-lg">
+        {/* <p className="text-sm text-gray-300 text-start w-full w-md px-8 rounded-lg">
           * 는 필수 입력 항목입니다.
-        </p>
+        </p> */}
       </div>
     </div>
   );
