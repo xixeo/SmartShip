@@ -64,60 +64,64 @@ function SignUp({ setIsAuthenticated }) {
 
   // 회사명 또는 선박명 중복 확인 함수
   const checkDuplicate = async (type) => {
-  try {
-    // 중복 확인할 데이터
-    const params = {username};
+    try {
+      // 중복 확인할 데이터
+      const params = { id };
 
-    console.log("중복 확인 요청 데이터:", params); // 요청 데이터 콘솔 출력
+      console.log("중복 확인 요청 데이터:", params); // 요청 데이터 콘솔 출력
 
-    const response = await fetch(`/idCheck`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(params),
-    });
-    
-    // 응답 상태 로그
-    console.log("응답 상태:", response.status);
-    const data = await response.json();
-    console.log("전체 회원 데이터:", data); // API로부터 받은 데이터 콘솔 출력
-  } 
-  catch (error) {
-    console.error("오류 발생:", error); // 오류 발생 시 오류 메시지 콘솔 출력
-  }
-};
+      const response = await fetch("/idCheck", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(params),
+      });
 
-    // if (exists) {
-    //   if (type === "username") {
-    //     setUsernameCheckMessage("이미 존재하는 회사명 또는 선박명입니다.");
-    //   } else {
-    //     setAliasCheckMessage("이미 존재하는 아이디입니다.");
-    //   }
-    // } else {
-    //   if (type === "username") {
-    //     setUsernameCheckMessage("사용 가능한 아이디입니다.");
-    //   } else {
-    //     setAliasCheckMessage("사용 가능한 아이디입니다.");
-    //   }
-    // }
+      // 응답 상태 로그
+      console.log("응답 상태:", response.status);
+      const data = await response.json();
+      console.log("전체 회원 데이터:", data); // API로부터 받은 데이터 콘솔 출력
+      setIdCheckMessage(data.message); // 서버에서 받은 message 값
+    }
+    catch (error) {
+      console.error("오류 발생:", error); // 오류 발생 시 오류 메시지 콘솔 출력
+    }
+  };
 
-//   } catch (error) {
-//     console.error("오류 발생:", error); // 오류 발생 시 오류 메시지 콘솔 출력
-//     if (type === "username") {
-//       setUsernameCheckMessage("회사명 또는 선박명 중복 확인 중 오류가 발생했습니다.");
-//     } else {
-//       setAliasCheckMessage("아이디 중복 확인 중 오류가 발생했습니다.");
-//     }
-//   }
-// };
+  // if (exists) {
+  //   if (type === "username") {
+  //     setUsernameCheckMessage("이미 존재하는 회사명 또는 선박명입니다.");
+  //   } else {
+  //     setAliasCheckMessage("이미 존재하는 아이디입니다.");
+  //   }
+  // } else {
+  //   if (type === "username") {
+  //     setUsernameCheckMessage("사용 가능한 아이디입니다.");
+  //   } else {
+  //     setAliasCheckMessage("사용 가능한 아이디입니다.");
+  //   }
+  // }
+
+  //   } catch (error) {
+  //     console.error("오류 발생:", error); // 오류 발생 시 오류 메시지 콘솔 출력
+  //     if (type === "username") {
+  //       setUsernameCheckMessage("회사명 또는 선박명 중복 확인 중 오류가 발생했습니다.");
+  //     } else {
+  //       setAliasCheckMessage("아이디 중복 확인 중 오류가 발생했습니다.");
+  //     }
+  //   }
+  // };
 
   const checkId = () => {
-    checkDuplicate("id");
+    if (!id) {
+      // 아이디 입력이 없을 경우 메시지 설정
+      setIdCheckMessage("아이디를 입력하세요.");
+      return;
+    }
+    // 아이디가 입력된 경우 중복 확인 함수 호출
+    checkDuplicate();
   };
-  // const checkAlias = () => {
-  //   checkDuplicate("alias");
-  // };
 
   return (
     <div className="flex items-center justify-center h-full login">
@@ -134,7 +138,7 @@ function SignUp({ setIsAuthenticated }) {
           {/* 회사명 또는 선박명 입력란 */}
           <div className="mb-4 ">
             <label className="block text-white text-sm font-bold mb-2 mr-2">
-              <span className="text-white">*</span> { role === "ROLE_MANAGER" ? "해운선사명" : role === "ROLE_SUPPLIER" ? "공급업체명" : "선박명" }
+              <span className="text-white">*</span> {role === "ROLE_MANAGER" ? "해운선사명" : role === "ROLE_SUPPLIER" ? "공급업체명" : "선박명"}
             </label>
             <input
               type="text"
@@ -143,7 +147,7 @@ function SignUp({ setIsAuthenticated }) {
               required
               className="w-full px-1 py-2 login-input"
             />
-            </div>
+          </div>
 
           {/* 닉네임 입력란 */}
           <div className="mt-10 mb-4">
@@ -165,22 +169,22 @@ function SignUp({ setIsAuthenticated }) {
               <span className="text-white">*</span> 아이디
             </label>
             <div className="flex">
-            <input
-              type="text"
-              value={id}
-              onChange={(e) => setId(e.target.value)}
-              required
-              className="w-4/5 px-1 py-2 login-input"
-            />
-          <button
-              type="button"
-              onClick={checkId}
-              className="w-1/5 check-btn ml-2 text-sm"
+              <input
+                type="text"
+                value={id}
+                onChange={(e) => setId(e.target.value)}
+                required
+                className="w-4/5 px-1 py-2 login-input"
+              />
+              <button
+                type="button"
+                onClick={checkId}
+                className="w-1/5 check-btn ml-2 text-sm"
               >
-              중복확인
-            </button>
-             </div>
+                중복확인
+              </button>
             </div>
+          </div>
           {idCheckMessage && (
             <p className="text-sm text-red-500 mb-4">{idCheckMessage}</p>
           )}
@@ -250,7 +254,6 @@ function SignUp({ setIsAuthenticated }) {
               </RadioGroup>
             </FormControl>
           </div>
-
           {signupError && (
             <p className="text-red-500 pb-2" style={{ whiteSpace: "pre-wrap" }}>
               {signupError}
