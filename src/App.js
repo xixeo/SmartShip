@@ -26,6 +26,7 @@ import Membership from "./Admin/Membership";
 import SupplierBoard from "./DashBoard/SupplierBoard";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { AlertProvider } from "./Compo/AlertContext";
+import { LoadingProvider } from "./Compo/LoadingContext";
 
 function App() {
     const theme = createTheme({
@@ -81,80 +82,88 @@ function App() {
                                 <main className="p-4 w-full main overflow-x-hidden">
                                     <AlertProvider>
                                         {/* 여기 로딩넣기 */}
-                                        <Routes>
-                                            <Route
-                                                path="/"
-                                                element={<MainApp />}
-                                            />
-                                            <Route
-                                                path="/schedule"
-                                                element={<Schedule />}
-                                            />
-                                            <Route
-                                                path="/listtabledb"
-                                                element={<ListTableDB />}
-                                            />
-                                            <Route
-                                                path="/listsupplier"
-                                                element={<ListSupplier />}
-                                            />
-                                            <Route
-                                                path="/listsupplier2"
-                                                element={<ListSupplier2 />}
-                                            />
-                                            <Route
-                                                path="/order"
-                                                element={<Order />}
-                                            />
-                                            <Route
-                                                path="/ordertest"
-                                                element={<OrderTEST />}
-                                            />
-                                            <Route
-                                                path="/ordertest2"
-                                                element={<BasicDatePicker />}
-                                            />
-                                            <Route
-                                                path="/signstate"
-                                                element={<SignState />}
-                                            />
-                                            <Route
-                                                path="/Board"
-                                                element={<Board />}
-                                            />
-                                            <Route
-                                                path="/MyOrderList"
-                                                element={<MyOrderList />}
-                                            />
-                                            <Route
-                                                path="/AnnounceForEvery"
-                                                element={<AnnounceForEvery />}
-                                            />
-                                            <Route
-                                                path="/AnnounceWrite"
-                                                element={<AnnounceWrite />}
-                                            />
-                                            <Route
-                                                path="/Announcement"
-                                                element={<Announcement />}
-                                            />
-                                            <Route
-                                                path="/Membership"
-                                                element={<Membership />}
-                                            />
-                                            <Route
-                                                path="/SupplierBoard"
-                                                element={<SupplierBoard />}
-                                            />
-                                            <Route
-                                                path="/PurchaseRequest"
-                                                element={<PurchaseRequest />}
-                                            />
-                                            <Route
-                                                path="/getOrderDetail/:orderId"
-                                                element={<OrderManage />}
-                                            />
-                                        </Routes>
+                                        <LoadingProvider>
+                                            <Routes>
+                                                <Route
+                                                    path="/"
+                                                    element={<MainApp />}
+                                                />
+                                                <Route
+                                                    path="/schedule"
+                                                    element={<Schedule />}
+                                                />
+                                                <Route
+                                                    path="/listtabledb"
+                                                    element={<ListTableDB />}
+                                                />
+                                                <Route
+                                                    path="/listsupplier"
+                                                    element={<ListSupplier />}
+                                                />
+                                                <Route
+                                                    path="/listsupplier2"
+                                                    element={<ListSupplier2 />}
+                                                />
+                                                <Route
+                                                    path="/order"
+                                                    element={<Order />}
+                                                />
+                                                <Route
+                                                    path="/ordertest"
+                                                    element={<OrderTEST />}
+                                                />
+                                                <Route
+                                                    path="/ordertest2"
+                                                    element={
+                                                        <BasicDatePicker />
+                                                    }
+                                                />
+                                                <Route
+                                                    path="/signstate"
+                                                    element={<SignState />}
+                                                />
+                                                <Route
+                                                    path="/Board"
+                                                    element={<Board />}
+                                                />
+                                                <Route
+                                                    path="/MyOrderList"
+                                                    element={<MyOrderList />}
+                                                />
+                                                <Route
+                                                    path="/AnnounceForEvery"
+                                                    element={
+                                                        <AnnounceForEvery />
+                                                    }
+                                                />
+                                                <Route
+                                                    path="/AnnounceWrite"
+                                                    element={<AnnounceWrite />}
+                                                />
+                                                <Route
+                                                    path="/Announcement"
+                                                    element={<Announcement />}
+                                                />
+                                                <Route
+                                                    path="/Membership"
+                                                    element={<Membership />}
+                                                />
+                                                <Route
+                                                    path="/SupplierBoard"
+                                                    element={<SupplierBoard />}
+                                                />
+                                                <Route
+                                                    path="/PurchaseRequest"
+                                                    element={
+                                                        <PurchaseRequest />
+                                                    }
+                                                />
+                                                <Route
+                                                    path="/getOrderDetail/:orderId"
+                                                    element={<OrderManage />}
+                                                />
+                                            </Routes>
+                                        </LoadingProvider>
                                     </AlertProvider>
                                 </main>
                                 <Footer />

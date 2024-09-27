@@ -16,7 +16,7 @@ export function AlertProvider({ children }) {
             severity,
             open: true,
         });
-        setTimeout(() => setAlert((prev) => ({ ...prev, open: false })), 5000); // 자동으로 5초 후에 닫기
+        setTimeout(() => setAlert((prev) => ({ ...prev, open: false })), 3000); // 자동으로 5초 후에 닫기
     };
 
     return (
@@ -37,7 +37,7 @@ export function AlertProvider({ children }) {
                                 <CloseIcon fontSize="inherit" />
                             </IconButton>
                         }
-                        sx={{ position: 'fixed', bottom: 16, left: 'calc(50% + 120px)', transform:'translateX(-50%)', zIndex: 1300, width: '80%' }}
+                        sx={{ position: 'fixed', bottom: 45, left: 'calc(50% + 120px)', transform:'translateX(-50%)', zIndex: 1300, width: '80%' }}
                     >
                         {alert.message}
                     </Alert>
