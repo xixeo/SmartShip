@@ -31,12 +31,12 @@
       color: #fff;
 
       &:focus {
-        border-bottom: 1px solid #3af0ff;
+        border-bottom: 1px solid $blue-btn;
       }
     }
 
     .login-btn {
-      background: #43c5fe;
+      background: $blue-btn;
     }
   }
 }
