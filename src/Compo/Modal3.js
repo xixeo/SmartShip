@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState }  from 'react';
 import { Box, Button } from '@mui/material';
 import PredictionForm from '../02/PredictionForm';
 
 const Modal3 = ({ open, setOpen, title, onConfirm }) => {
+    const [assemblyVisible, setAssemblyVisible] = useState(true); // 검색결과 나올때 등록, 취소 버튼이 나타나도록
+
+    
     if (!open) return null;
 
     // 모달 닫기 핸들러
@@ -11,6 +14,34 @@ const Modal3 = ({ open, setOpen, title, onConfirm }) => {
             setOpen(false);
         }
     };
+
+        // // 상품 등록 핸들러
+        // const handleRegistration = async (formData, selectedMajor, selectedMachinery, selectedAssembly) => {
+        //     const payload = {
+        //         category1Name: selectedMajor,
+        //         category2Name: selectedMachinery,
+        //         category3Name: selectedAssembly,
+        //         itemName: formData.item,
+        //         part1: formData.part_no,
+        //         part2: null,
+        //         price: formData.price,
+        //         unit: formData.currency,
+        //     };
+    
+        //     try {
+        //         const response = await fetch('/supplier/items/add', {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
+        //             },
+        //             body: JSON.stringify(payload),
+        //         });
+        //         const result = await response.json();
+        //         console.log(result.message);
+        //     } catch (error) {
+        //         console.log(result.message);
+        //     }
+        // };
 
     return (
         <div
@@ -54,10 +85,11 @@ const Modal3 = ({ open, setOpen, title, onConfirm }) => {
                 </Box>
 
                  {/* PredictionForm 삽입 */}
-                 <PredictionForm />
+                 <PredictionForm setAssemblyVisible={setAssemblyVisible} />
 
                 {/* 등록 및 취소 버튼 */}
-                <Box sx={{ display: 'flex', gap: 2 }}>
+                {assemblyVisible && (
+                <Box sx={{ display: 'flex', gap: 2, marginTop:3 }}>
                     <Button
                         sx={{ color: 'white', backgroundColor: '#7f6dce',
                             '&:hover': {
@@ -66,20 +98,25 @@ const Modal3 = ({ open, setOpen, title, onConfirm }) => {
                         onClick={() => {
                             setOpen(false);
                             onConfirm();
+                            // handleRegistration(formData, selectedMajor, selectedMachinery, selectedAssembly) // 데이터 전달
+                            // 다시 랜더링 되도록해야
                         }}
+
+                        
                     >
                         등록
                     </Button>
                     <Button
-                        sx={{ color: 'white',  backgroundColor: '#BFBFBF',
+                        sx={{ color: 'white',  backgroundColor: '#a3a3a3',
                             '&:hover': {
-                                backgroundColor: '#a3a3a3', // hover 색상
+                                backgroundColor: '#7a7a7a', // hover 색상
                             }, }}
                         onClick={() => setOpen(false)}
                     >
                         취소
                     </Button>
                 </Box>
+            )}
             </Box>
         </div>
     );

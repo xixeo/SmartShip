@@ -1,3 +1,5 @@
+// 새로고침해야 DB 받아옴 ,, 
+
 import React, { useState, useMemo, useEffect } from "react";
 import {
     Checkbox,
