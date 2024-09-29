@@ -1,3 +1,5 @@
+// 새로고침해야 DB 받아옴 ,, 
+
 import React, { useState, useMemo, useEffect } from "react";
 import {
     Checkbox,
@@ -48,6 +50,11 @@ const ListSupplier2 = () => {
             return null; // 오류 발생 시 null 반환
         }
     };
+
+    // useEffect(() => {
+    //     // 페이지가 로드될 때 데이터 새로고침
+    //     window.location.reload();
+    // }, []);
 
     useEffect(() => {
         const fetchData = async () => {

@@ -72,6 +72,15 @@ function App() {
                                     />
                                 }
                             />
+                            <Route
+                                path="/ListSupplier2"
+                                element={
+                                    <ListSupplier2
+                                        setIsAuthenticated={setIsAuthenticated}
+                                        setRedirectPath={setRedirectPath}
+                                    />
+                                }
+                            />
                         </Routes>
                     ) : (
                         <div className="flex content-wrap w-full h-screen">

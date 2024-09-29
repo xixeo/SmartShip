@@ -38,6 +38,17 @@ export default function OrderTest() {
     const savedDate = localStorage.getItem("selectedDate");
     return savedDate ? dayjs(savedDate) : dayjs().add(1, " onth");
   });
+  const weekdaysKor = (day) => {
+    const daysInKorean = {
+      Sunday: "일",Monday: "월",Tuesday: "화",Wednesday: "수",Thursday: "목",Friday: "금",Saturday: "토",};
+    return daysInKorean[day] || day;
+  };
+  
+  const [selectedDay, setSelectedDay] = useState(weekdaysKor(dayjs().format('dddd'))); // 오늘 요일로 초기화
+  const handleDayChange = (day) => {
+    setSelectedDay(day); // 선택된 요일 상태 업데이트
+  };
+
   const [deleteopen, setDeleteOpen] = useState(false);
   const [perchaseopen, setPerchaseOpen] = useState(false);
   const token = localStorage.getItem("token");
@@ -172,6 +183,11 @@ export default function OrderTest() {
     setSelectAll(isChecked);
   };
 
+   // selectedItems 변경 감지
+   useEffect(() => {
+    console.log('Selected Items:', Array.from(selectedItems));
+  }, [selectedItems]);
+
   // 전체 선택 체크박스의 체크 상태를 업데이트하는 함수
   const isAllSelected = () => {
     return (
@@ -189,10 +205,6 @@ export default function OrderTest() {
   };
 
   // 체크된 항목의 아이디와 수량을 추출 (전달해줄때에는 같은 카테고리, 물품명, part1이라도 다른 값으로)
-
-  //!!!!!!!!!!!!!!!!!!!///
-  // 여기부터 콘솔 안찍힘 //
-  //!!!!!!!!!!!!!!!!!!!///
 
   const getCheckedItemsWithQuantity2 = () => {
     const itemQuantities = {}; // 각 항목의 수량을 저장할 객체
@@ -399,6 +411,7 @@ export default function OrderTest() {
         quantity: item.quantity,
       })), // 필요한 구조로 매핑
       memo: memo || "",
+      selectedDay: selectedDay || "",
     };
 
     try {
@@ -435,7 +448,7 @@ export default function OrderTest() {
         <div className="text-xl font-semibold text-white mb-4">장바구니</div>
         <div className="flex items-center gap-7">
           <h4 className="font-semibold text-white">창고 출고 예정일</h4>
-          <BasicDatePicker onDateAccept={(date) => setSelectedDate(date)} />
+          <BasicDatePicker onDateAccept={(date) => setSelectedDate(date)} onDayChange={handleDayChange}/>
         </div>
       </div>
       <div className="flex-col text-white OrderBasket">
@@ -632,7 +645,7 @@ export default function OrderTest() {
           <div className="flex bottomWrap mt-6">
             <div className="pagination-container">
               <Pagination
-                count={Math.ceil(filteredData.length / itemsPerPage)}
+                count={Math.ceil(currentItem2Array.length / itemsPerPage)}
                 page={currentPage}
                 onChange={(event, value) => setCurrentPage(value)}
                 shape="rounded"
