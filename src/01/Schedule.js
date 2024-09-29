@@ -121,33 +121,33 @@ export default function Schedule() {
   // |  스케줄 detail api   |
   //  =====================
   const fetchScheduleDetail = async (orderId) => {
-    //  const details = [
-    // //   {
-    // //     "orderId": 130,
-    // //     "username": "정해인",
-    // //     "alias": "해운선사_신입",
-    // //     "requestDate": "2024-09-27",
-    // //     "releaseDate": "2024-10-01",
-    // //     "memo": "가쟈",
-    // //     "groupedOrderDetails": {
-    // //         "2024-09-29": [
-    // //             {
-    // //                 "orderDetailId": 278,
-    // //                 "itemsId": 9,
-    // //                 "itemName": "청바지",
-    // //                 "part1": "스키니",
-    // //                 "price": 68000.00,
-    // //                 "unit": "KRW",
-    // //                 "quantity": 13,
-    // //                 "username": "민주샵",
-    // //                 "alias": "minjoo",
-    // //                 "orderDate": "2024-09-29"
-    // //             }
-    // //         ]
-    // //     }
-    // // }
-    //  ];
-     setLoading(true)
+     const details = [
+    //   {
+    //     "orderId": 130,
+    //     "username": "정해인",
+    //     "alias": "해운선사_신입",
+    //     "requestDate": "2024-09-27",
+    //     "releaseDate": "2024-10-01",
+    //     "memo": "가쟈",
+    //     "groupedOrderDetails": {
+    //         "2024-09-29": [
+    //             {
+    //                 "orderDetailId": 278,
+    //                 "itemsId": 9,
+    //                 "itemName": "청바지",
+    //                 "part1": "스키니",
+    //                 "price": 68000.00,
+    //                 "unit": "KRW",
+    //                 "quantity": 13,
+    //                 "username": "민주샵",
+    //                 "alias": "minjoo",
+    //                 "orderDate": "2024-09-29"
+    //             }
+    //         ]
+    //     }
+    // }
+     ];
+    setLoading(true)
     try {
       const response = await fetch(`details/${orderId}`, {
         headers: {
@@ -160,7 +160,7 @@ export default function Schedule() {
       const details = await response.json();
       console.log('ddddd', details)
       const detailevents = [details].map((detail) => ({
-        id : detail.orderId,
+        id: detail.orderId,
         title: `${detail.requestDate} ${detail.alias}`,
         releaseDate: detail.releaseDate,
         username: detail.username,
@@ -168,7 +168,8 @@ export default function Schedule() {
         gods: detail.groupedOrderDetails,
       }));
       console.log('확인111', detailevents)
-      setDetaildatas(detailevents);
+      // setDetaildatas(detailevents);
+      return detailevents
       console.log('시간 확인', detaildatas)
     } catch (error) {
       console.error("Failed to fetch scheduleData:", error);
@@ -252,19 +253,18 @@ export default function Schedule() {
     console.log("eventid", eventid);
 
     // 이벤트 아이디를 백으로 넘겨줘서 데이터 받아오기
-    await fetchScheduleDetail(eventid);
-
-     // 받아온 데이터가 업데이트될 때 모달을 생성
-  setTimeout(() => {
-    const eventDetails = detaildatas;
-    console.log("eventdetail", eventDetails);
-    if (eventDetails) {
+    const eventDetails = await fetchScheduleDetail(eventid);
+    console.log('받아온 애', eventDetails)
+    console.log('받아온 애', Object.keys(eventDetails[0].gods).length > 0)
+    if (Object.keys(eventDetails[0].gods).length > 0) {
       const modalContent = generateModalContent(eventDetails);
-      setModalData(modalContent);
-      setOpen(true); // 모달 열기
-    }
-  }, 500); // 데이터를 받아오는 데 시간차가 있을 수 있으니 타이머 추가
 
+      setModalData(<div className="p-4">{modalContent}</div>);
+      setOpen(true);
+    } else {
+      // 알람띄우자 아니야 모달을 띄울까? 발주하러가기로 이동하게? 이건 선택사항인듯
+    }
+  };
     // 받아온 데이터를 들고오기
     // const eventDetails = detaildatas;
     // Modal 콘텐츠 생성 함수
@@ -330,13 +330,7 @@ export default function Schedule() {
         </div>
       );
     };
-    // if (eventDetails) {
-    //   const modalContent = generateModalContent(eventDetails);
-
-    //   setModalData(<div className="p-4">{modalContent}</div>);
-    //   setOpen(true);
-    // }
-  };
+  
 
 
   return (
