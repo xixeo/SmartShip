@@ -234,6 +234,14 @@ export default function Schedule() {
     }));
   };
 
+  // 이벤트 커스텀 렌더링
+  const renderEventContent = (eventInfo) => (
+    <div>
+      <span className="event-dot"></span>
+      <span>{eventInfo.timeText} {eventInfo.event.title}</span>
+    </div>
+  );
+
   //////////
   // Modal//
   /////////
@@ -356,6 +364,7 @@ export default function Schedule() {
         locale={"ko"}
         ref={calendarRef}
         eventClick={handleeventclick}
+        eventContent={renderEventContent}
       />
       <Modal
         open={open}

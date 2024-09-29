@@ -69,6 +69,11 @@
   width: 95%;
 }
 
+.fc-h-event .fc-event-main {
+  color: white;
+  font-weight: 500;
+}
+
 .fc-event-main {
   border-color: "white";
 }
@@ -107,22 +112,25 @@ $colors: #F8FF95, #B2A4FF, #FCA3CC, #9BE3DE, #A9ECA2, #FFA952;
 
 // 각 색상에 대한 클래스를 반복적으로 생성
 @for $i from 1 through length($colors) {
-  .color-#{$i}::before {
+  .color-#{$i}.fc-event .event-dot {
     background-color: nth($colors, $i); /* 색상 적용 */
   }
 }
 
-.fc-event::before {
-  content: '';
+.fc-event {
+  position: relative;
+}
+
+.fc-event .event-dot {
   display: inline-block;
-  width: 10px; /* 점의 너비 */
-  height: 10px; /* 점의 높이 */
-  border-radius: 50%; /* 원 형태 */
-  // background-color: nth($colors, random(length($colors))); /* 점 색상 (원하는 색으로 변경) */
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #000; /* 점의 색상 */
   position: absolute;
-  left: -12px; /* 점의 위치 조정 */
+  left: -12px;
   top: 50%;
-  transform: translateY(-50%); /* 점을 중앙 정렬 */
+  transform: translateY(-50%);
 }
 
 .fc-daygrid-day-events {
