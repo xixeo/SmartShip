@@ -22,6 +22,7 @@ export default function OrderTest() {
   const [loading, setLoading] = useState(true);
   const [selrow, setSelrow] = useState([]);
   const [totalAmounts, setTotalAmounts] = useState({});
+  const [total, setTotal] = useState({});
   const [clickrow, setClickrow] = useState(null);
   const [supplierOptions, setSupplierOptions] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState({});
@@ -161,7 +162,7 @@ export default function OrderTest() {
             part1: detail.part1,
             quantity: detail.quantity,
             price: detail.price,
-            unitprice: getCurrencySymbol(detail.unit) + detail.price,
+            unitprice: getCurrencySymbol(detail.unit) + detail.price.toLocaleString(),
             amount: formatPrice(detail.price, detail.quantity, detail.unit),
             supplier: detail.username,
             BestOrderDate: detail.recommendedOrderDate + `(${detail.leadtime}일)`,
@@ -215,6 +216,28 @@ export default function OrderTest() {
     }
   };
 
+  // 총 주문금액 통화기호 반환
+  const formatTotal = (totals) => {
+    const formattedTotals = [];
+
+    if (totals.KRW) {
+      formattedTotals.push(`${getCurrencySymbol('KRW')}${totals.KRW.toLocaleString()}`);
+    }
+    if (totals.USD) {
+      formattedTotals.push(`${getCurrencySymbol('USD')}${totals.USD.toLocaleString()}`);
+    }
+    if (totals.JPY) {
+      formattedTotals.push(`${getCurrencySymbol('JPY')}${totals.JPY.toLocaleString()}`);
+    }
+    if (totals.EUR) {
+      formattedTotals.push(`${getCurrencySymbol('EUR')}${totals.EUR.toLocaleString()}`);
+    }
+
+    return formattedTotals.map((line, index) => (
+      <div key={index}>{line}</div>
+    ));
+  };
+
   // 수량에 맞춰 가격 계산 + 단위 붙이기
   const formatPrice = (price, quantity, unit) => {
     const totalPrice = price * quantity;
@@ -228,37 +251,47 @@ export default function OrderTest() {
   };
 
   // 선택된 행 화폐단위별 총 합계
-  const calculateTotalAmount = (rowid,selectedIds) => {
-    console.log('ttttttttt',rowid)
-    console.log('dddddd',selectedIds)
-    const selectedDetails = rows
-    .filter(row => rowid.includes(row.id)) 
-    .map(detail => detail.details) 
-    .flatMap(detailsArray => detailsArray) 
-    .filter(i => selectedIds.includes(i.itemid)); 
-    console.log('sdafnks;a',selectedDetails)
-    const totals = selectedDetails.reduce((acc, detail) => {
-      const { unit, price, quantity } = detail;
-      const totalPrice = price * quantity; // 숫자만 추출하여 계산
-
-      if (!acc[unit]) {
-        acc[unit] = 0;
-      }
-      acc[unit] += totalPrice;
-      return acc;
-    }, {});
-
-    setTotalAmounts(totals);
-  };
-
-  // useEffect(() => {
-  //   if (selrow.length > 0 && selectedIds.length > 0) {
-  //     calculateTotalAmount(selrow, selectedIds); // rows가 변경될 때 총 금액 재계산
-  //   }
-  // }, [rows, selrow, selectedIds]);
+  const calculateTotal = (selectedRowIds, updatedRows) => {
+    const totals = {
+      KRW: 0,
+      USD: 0,
+      JPY: 0,
+      EUR: 0,
+    };
   
-
-  console.log('total', totalAmounts)
+    // 선택된 행의 amount를 더함
+    selectedRowIds.forEach(rowId => {
+      const row = updatedRows.find(r => r.id === rowId); // updatedRows에서 가져옴
+      if (row) {
+        // 현재 선택된 공급자의 detail 찾기
+        const currentDetail = row.details.find(detail => detail.supplier === row.selectedSupplier);
+        if (currentDetail) {
+          const amount = parseFloat(currentDetail.amount.replace(/[₩$, ¥, €]/g, '').replace(',', '')); // 문자열을 숫자로 변환
+          switch (currentDetail.unit) { // 현재 공급자의 unit 가져오기
+            case 'KRW':
+              totals.KRW += amount;
+              break;
+            case 'USD':
+              totals.USD += amount;
+              break;
+            case 'JPY':
+              totals.JPY += amount;
+              break;
+            case 'EUR':
+              totals.EUR += amount;
+              break;
+            default:
+              break;
+          }
+        }
+      }
+    });
+  
+    return totals; // 통화별 합계를 반환
+  };
+  
+  
+  console.log('total', total)
 
   //////////////////////
   //  리드타임 함수   //
@@ -284,42 +317,31 @@ export default function OrderTest() {
     { field: 'Category3', headerName: 'Category 3', width: 130 },
     { field: 'itemName', headerName: 'Item Name', width: 130 },
     { field: 'part1', headerName: 'Part 1', width: 130 },
-    { field: 'unitprice', headerName: 'Unit Price', width: 130 },
+    { field: 'unitprice', headerName: 'Unit Price', width: 90 },
     {
       field: 'quantity', headerName: 'Quantity', width: 80, renderCell: (params) => {
-        return params.row.details.map((detail) => (
+        return params.row.details
+        .filter(detail => detail.supplier === params.row.selectedSupplier) // 현재 선택된 공급자에 맞는 detail만 필터링
+        .map((detail) => (
+          <div onClick={(e) => { e.stopPropagation()}}>
           <input
-            key={detail.itemid} // 각 detail의 itemid를 키로 사용
+            key={detail.itemid}
             type='number'
-            value={quantityState[detail.itemid] || detail.quantity} // detail의 수량 업데이트
-            onChange={(e) => handleQnt(e, params.row.id, detail.itemid)} // rowid와 detail의 itemid 전달
+            min={1}
+            value={quantityState[detail.itemid] || detail.quantity}
+            onChange={(e) => handleQnt(e, params.row.id, detail.itemid)}
             className={`bg-[#67666E] w-10 ${isDisabledRow(params.row.BestOrderDate) ? 'text-[#868686]' : 'text-white'}`}
             disabled={isDisabledRow(params.row.BestOrderDate)}
           />
+          </div>
         ));
       }
-      },
-    // {
-    //   field: 'quantity',
-    //   headerName: 'Quantity',
-    //   width: 80,
-    //   renderCell: (params) => {
-    //     const validClickRow = Array.isArray(clickrow) ? clickrow : [];
-    //     console.log('ppppppapapa',   params.row.itemid); // 로그 출력
-    //     console.log('ppppppapapa',   params.row.details.map(s => s.itemid).filter(itemid => validClickRow.includes(itemid))); // 로그 출력
-    
-    //     return (
-    //       <input
-    //         type='number'
-    //         value={quantityState[params.row.itemid] || params.row.quantity} // 수량 업데이트
-    //         onChange={(e) => handleQnt(e, params.row.details)}
-    //         className={`bg-[#67666E] w-10 ${isDisabledRow(params.row.BestOrderDate) ? 'text-[#868686]' : 'text-white'}`}
-    //         disabled={isDisabledRow(params.row.BestOrderDate)}
-    //       />
-    //     );
-    //   }
-    // },
-    { field: 'amount', headerName: 'Amount', width: 130 },
+    },
+    { field: 'amount', headerName: 'Amount', width: 130, renderCell: (params) => {
+      // 현재 선택된 공급자에 맞는 detail만 찾아서 amount 표시
+      const currentDetail = params.row.details.find(detail => detail.supplier === params.row.selectedSupplier);
+      return currentDetail ? formatPrice(currentDetail.price, currentDetail.quantity, currentDetail.unit) : 0;
+    } },
     { field: 'BestOrderDate', headerName: 'Best Order Date', width: 130 },
     {
       field: 'suppliers', headerName: 'Supplier', width: 130, renderCell: (params) => {
@@ -350,7 +372,7 @@ export default function OrderTest() {
       )
     },
     {
-      field: 'delete', headerName: '', width: 8, renderCell: (params) => (
+      field: 'delete', headerName: '', width: 7, renderCell: (params) => (
         <IconButton onClick={() => handleDelete(params.row.orderdetailid)}>
           <ClearOutlinedIcon />
         </IconButton>
@@ -375,7 +397,7 @@ export default function OrderTest() {
     setRows(initialRows); // 상태 초기화
   }, [purDetails]);
 
-console.log('rows',rows)
+  console.log('rows', rows)
 
   // 테이블에서 공급자 바뀌면 해당 행에 정보 업데이트
   const handleSupplierChange = (rowKey, selectedSupplier) => {
@@ -412,52 +434,57 @@ console.log('rows',rows)
   };
 
   // 수량 변경 함수
-  const handleQnt = (e, rowid, itemid) => {
-    const newQuantity = e.target.value;
-    console.log('화긴해봐', itemid, rowid);
+  const handleQnt = (e, rowId, itemid) => {
+    const newQuantity = Number(e.target.value); // 입력된 수량을 숫자로 변환
   
-    // rows에서 해당 행을 찾아 수량과 amount 업데이트
-    const updatedRows = rows.map(row => {
-      if (row.id === rowid) { // 선택한 행 ID와 비교
-        const updatedDetails = row.details.map(detail => {
-          if (detail.itemid === itemid) { // 선택한 detail의 itemid와 비교
-            const newAmount = formatPrice(detail.price, newQuantity, detail.unit); // 수량에 따라 amount 재계산
-            return { ...detail, quantity: newQuantity, amount: newAmount }; // 수량과 amount 업데이트
-          }
-          return detail; // 다른 detail은 그대로 유지
-        });
-        return { ...row, details: updatedDetails }; // 행 업데이트
-      }
-      return row; // 다른 행은 그대로 유지
+    setRows(prevRows => {
+      const updatedRows = prevRows.map(row => {
+        if (row.id === rowId) {
+          const updatedDetails = row.details.map(detail => {
+            // 현재 선택된 공급자에 맞는 detail만 업데이트
+            if (detail.supplier === row.selectedSupplier) {
+              const updatedAmount = formatPrice(detail.price, newQuantity, detail.unit); // 새 amount 계산
+              return {
+                ...detail,
+                quantity: newQuantity, // quantity 업데이트
+                amount: updatedAmount, // amount 업데이트
+              };
+            }
+            return detail; // 업데이트하지 않은 detail은 그대로 반환
+          });
+  
+          // 총 amount 계산
+          const newAmount = updatedDetails.reduce((total, detail) => {
+            return total + parseFloat(detail.amount.replace(/[₩$, ¥, €]/g, '').replace(',', '')); // 각 detail의 amount 합산
+          }, 0);
+  
+          return {
+            ...row,
+            details: updatedDetails,
+            amount: newAmount, // 업데이트된 amount 설정
+          };
+        }
+        return row; // 업데이트하지 않은 row는 그대로 반환
+      });
+  
+      // 체크된 행의 ID를 가져오기
+      const selectedRowIds = updatedRows.filter(row => row.selected).map(row => row.id);
+      // 선택된 행의 총합계 계산
+      const newTotals = calculateTotal(selectedRowIds, updatedRows); // updatedRows를 인자로 전달
+      setTotal(newTotals); // 총합계 업데이트
+  
+      return updatedRows; // 업데이트된 rows 반환
     });
-  
-    // 상태 업데이트
-    setRows(updatedRows);
-    setQuantityState(prev => ({ ...prev, [itemid]: newQuantity }));
-  
-    // 선택한 itemid를 calculateTotalAmount에 전달
-    calculateTotalAmount(rowid, [itemid]);
   };
   
-  // const handleQnt = (e, itemid) => {
-  //   const newQuantity = e.target.value;
-  // console.log('화긴해봐',itemid)
-  //   // rows에서 해당 행을 찾아 수량과 amount 업데이트
-  //   const updatedRows = rows.map(row => {
-  //     if (row.itemid === itemid) {
-  //       const newAmount = formatPrice(row.price ,newQuantity,row.unit); // 수량에 따라 amount 재계산
-  //       return { ...row, quantity: newQuantity, amount: newAmount }; // 수량과 amount 업데이트
-  //     }
-  //     return row;
-  //   });
-  
-  //   // 상태 업데이트
-  //   setRows(updatedRows);
-  //   setQuantityState(prev => ({ ...prev, [itemid]: newQuantity }));
-  //   calculateTotalAmount(selrow,itemid)
-  // };
-  
-  
+
+  useEffect(() => {
+//     console.log("Rows updated:", rows); // rows의 현재 상태
+    // const newTotals = calculateTotal(selrow);
+    // console.log("New totals:", newTotals); // 계산된 총합
+//     setTotal(newTotals);
+}, [rows, selrow]);  // rows가 변경될 때마다 total을 계산
+
 
   // 행 삭제
   const handleDelete = async (id) => {
@@ -488,8 +515,8 @@ console.log('rows',rows)
   const handleSelectionChange = (newSelection) => {
     const selectedItemIds = newSelection.map((rowId) => {
       // 선택된 rowId를 가진 행을 찾기
-      const selectedRow = rows.find(row => row.id === rowId); 
-      console.log('sR',selectedRow.details); // 확인용
+      const selectedRow = rows.find(row => row.id === rowId);
+      console.log('sR', selectedRow.details); // 확인용
       if (selectedRow) {
         // 현재 선택된 공급자에 해당하는 detail 찾기
         const selectedDetail = selectedRow.details.find(detail => detail.supplier === selectedRow.selectedSupplier);
@@ -497,25 +524,34 @@ console.log('rows',rows)
       }
       return null; // rowId에 해당하는 행이 없으면 null 반환
     }).filter(Boolean); // null 제거하여 유효한 itemid만 반환
-  
-    console.log(selectedItemIds); // 확인용
+
+    console.log('체크박스로우', newSelection); // 확인용
+    console.log('체크박스', selectedItemIds); // 확인용
+    // rows의 선택 상태 업데이트
+    setRows(prevRows => {
+      return prevRows.map(row => ({
+        ...row,
+        selected: newSelection.includes(row.id) // 선택된 행인지 확인
+      }));
+    });
     setSelrow(selectedItemIds);
-    calculateTotalAmount(newSelection,selectedItemIds);
-    getDetaildata(newSelection,selectedItemIds);
+    getDetaildata(newSelection, selectedItemIds);
+    const newTotals = calculateTotal(newSelection,rows);
+    setTotal(newTotals);
   };
-  
+
 
   // 체크된 행 데이터 처리 및 정보 추출
-  const getDetaildata = (rowid,selectedIds) => {
+  const getDetaildata = (rowid, selectedIds) => {
 
     // console.log('ri',rowid)
     const senddata = rows.filter(row => rowid.includes(row.id)) // rowid가 포함된 행 필터링
-                        .map(detail => detail.details) // 각 행의 details 가져오기
-                        .flatMap(detailsArray => detailsArray.map(dt => ({
-                          itemid: dt.itemid,
-                          orderdetailid: dt.orderdetailid,
-                          quantity: dt.quantity
-                        }))).filter(i => selectedIds.includes(i.itemid));
+      .map(detail => detail.details) // 각 행의 details 가져오기
+      .flatMap(detailsArray => detailsArray.map(dt => ({
+        itemid: dt.itemid,
+        orderdetailid: dt.orderdetailid,
+        quantity: dt.quantity
+      }))).filter(i => selectedIds.includes(i.itemid));
     // console.log('발주할 데이터',senddata)
     setSelectrowforordering(senddata)
   }
@@ -608,11 +644,11 @@ console.log('rows',rows)
               'Content-Type': 'application/json',
             }
           })
-          if (!response.ok) {
-            throw new Error("Changeitem response was not ok");
-          }
-          // 선택한 행을 해제
-          setClickrow(null); 
+        if (!response.ok) {
+          throw new Error("Changeitem response was not ok");
+        }
+        // 선택한 행을 해제
+        setClickrow(null);
         fetchOrderDetails();
       } catch (e) {
         console.error('Failed to fetch Changeitem :', e)
@@ -831,11 +867,7 @@ console.log('rows',rows)
                 <div className='flex'>
                   <h2 className='font-semibold'>총 주문금액: </h2>
                   <div className='ml-2'>
-                    {Object.entries(totalAmounts).map(([unit, amount]) => (
-                      <div key={unit}>
-                        {amount == null ? '-' : `${getCurrencySymbol(unit)} ${amount.toLocaleString()}`}
-                      </div>
-                    ))}
+                    {formatTotal(total)}
                   </div>
                 </div>
                 <div>

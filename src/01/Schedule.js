@@ -1,33 +1,37 @@
 import React, { useEffect, useState, useRef } from "react";
+import Loading from '../Compo/Loading';
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import "../assets/theme/Schedule.scss";
+import { styled } from '@mui/material/styles';
 import Modal from "../Compo/Modal";
+import Collapse from '@mui/material/Collapse';
+import IconButton from '@mui/material/IconButton';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-// endDate에 1일 더하기 함수 > 그래야 enddate까지 화면에 출력됨!
-const addOneDay = (date) => {
-  const newDate = new Date(date);
-  newDate.setDate(newDate.getDate() + 1);
-  return newDate.toISOString().split("T")[0]; // YYYY-MM-DD 형식으로 반환
-};
-const eventcolors = [
-  "#F8FF95",
-  "#B2A4FF",
-  "#FCA3CC",
-  "#9BE3DE",
-  "#A9ECA2",
-  "#FFA952",
-];
+//////////////////////
+//    확장 아이콘    //
+//////////////////////
+const ExpandMore = styled((props) => {
+  const { expand, ...other } = props;
+  return <IconButton {...other} />;
+})(({ theme }) => ({
+  marginLeft: 'auto',
+  transition: theme.transitions.create('transform', {
+    duration: theme.transitions.duration.shortest,
+  }),
+  transform: (props) => (props.expand ? 'rotate(180deg)' : 'rotate(0deg)'),
+}));
 
 const ChangeData = (events) => {
   let eventcolorsindex = 0;
   return events.map((event) => {
-    const eventColor = eventcolors[eventcolorsindex % eventcolors.length];
-    eventcolorsindex += 1;
+    // const eventColor = eventcolors[eventcolorsindex % eventcolors.length];
+    // eventcolorsindex += 1;
 
     // const enddate = (event.end).split("T")[0];
     // const startdate = (event.start).split("T")[0];
-    const enddate = event.end;
+    const enddate = event.start;
     const startdate = event.start;
     console.log("enddate", enddate);
     console.log("startdate", startdate);
@@ -35,18 +39,17 @@ const ChangeData = (events) => {
     return {
       ...event,
       start: startdate,
-      end: addOneDay(enddate),
-      backgroundColor: eventColor,
-      borderColor: "white",
+      end: enddate,
+      // backgroundColor: eventColor,
+      // borderColor: "white",
     };
   });
 };
 export default function Schedule() {
+  const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("token");
   useEffect(() => {
     fetchScheduleData(); //전체 스케줄 api 호출
-  }, []);
-  useEffect(() => {
-    const token = localStorage.getItem("token");
   }, []);
   //  =====================
   // | 전체 스케줄 목록 api |
@@ -56,52 +59,52 @@ export default function Schedule() {
     // const schedules = [
     //   {
     //     orderId: 1,
-    //     listName: '혜인발주',
-    //     alias: '유승호',
-    //     bestOrderDate: '2024-08-03T15:00:00.000+00:00',
-    //     releaseDate: '2024-08-10T15:00:00.000+00:00'
+    //     alias: 'AWS',
+    //     requestDate: '2024-08-03',
+    //     releaseDate: '2024-08-10'
     //   },
     //   {
     //     orderId: 2,
-    //     listName: '20240912 AWS발주',
-    //     alias: '유승호',
-    //     bestOrderDate: '2024-09-03T15:00:00.000+00:00',
-    //     releaseDate: '2024-09-10T15:00:00.000+00:00'
+    //     alias: 'AWS',
+    //     requestDate: '2024-09-03',
+    //     releaseDate: '2024-09-10'
     //   },
     //   {
     //     orderId: 3,
-    //     alias: '유승호',
-    //     listName: 'Event 3',
-    //     bestOrderDate: '2024-09-16T15:00:00.000+00:00',
-    //     releaseDate: '2024-09-18T15:00:00.000+00:00'
+    //     alias: 'AWS',
+    //     requestDate: '2024-09-16',
+    //     releaseDate: '2024-09-18'
     //   },
     //   {
     //     orderId: 4,
-    //     alias: '유승호',
-    //     listName: 'Event 4',
-    //     bestOrderDate: '2024-09-17T15:00:00.000+00:00',
-    //     releaseDate: '2024-10-16T15:00:00.000+00:00'
+    //     alias: 'AWS',
+    //     requestDate: '2024-09-17',
+    //     releaseDate: '2024-10-16'
     //   },
     // ];
+    setLoading(true)
     try {
-      const response = await fetch(
-        "/schedule"
-        // {
-        // headers: {
-        //   'Authorization': `Bearer ${token}`,
-        // }
-        // }
+      const response = await fetch("schedule",
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
       );
       if (!response.ok) {
         throw new Error("schdule response was not ok");
       }
       const schedules = await response.json();
-      const events = schedules.map((schedule) => ({
+      console.log('ss', schedules)
+      const events = schedules.map((schedule, index) => ({
         orderId: schedule.orderId,
         alias: schedule.alias,
-        title: schedule.listName,
-        start: schedule.bestOrderDate,
-        end: schedule.releaseDate,
+        username: schedule.username,
+        title: schedule.requestDate + schedule.alias,
+        start: schedule.requestDate,
+        className: 'color-' + (index % 6 + 1)
+        // start: schedule.requestDate,
+        // end: schedule.releaseDate,
       }));
       console.log("events", events);
       //데이터에 색상추가 & 날짜시간 분리
@@ -110,264 +113,70 @@ export default function Schedule() {
       setFilteredData(changeDatas);
     } catch (error) {
       console.error("Failed to fetch scheduleData:", error);
+    } finally {
+      setLoading(false)
     }
   };
   //  =====================
   // |  스케줄 detail api   |
   //  =====================
   const fetchScheduleDetail = async (orderId) => {
-    // const details = [
-    //   {
-    //     orderDetailId: 1,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 A",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 2,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 A",
-    //     category1Name: "패션",
-    //     category2Name: "남성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 220,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 3,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 B",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 3,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 B",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 3,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 B",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 3,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 B",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 3,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 B",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 3,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 B",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 3,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 B",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 3,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 B",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 3,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 B",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 3,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 B",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 3,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 B",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 3,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 B",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 3,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 B",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 3,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 B",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    //   {
-    //     orderDetailId: 3,
-    //     listName: "20240912 AWS발주",
-    //     supplierName: "패션하우스 B",
-    //     category1Name: "패션",
-    //     category2Name: "여성의류",
-    //     category3Name: "바지",
-    //     itemName: "청바지",
-    //     quantity: 320,
-    //     price: 45000.00,
-    //     unit: "KRW",
-    //     alias: "유승호"
-    //   },
-    // ];
+    //  const details = [
+    // //   {
+    // //     "orderId": 130,
+    // //     "username": "정해인",
+    // //     "alias": "해운선사_신입",
+    // //     "requestDate": "2024-09-27",
+    // //     "releaseDate": "2024-10-01",
+    // //     "memo": "가쟈",
+    // //     "groupedOrderDetails": {
+    // //         "2024-09-29": [
+    // //             {
+    // //                 "orderDetailId": 278,
+    // //                 "itemsId": 9,
+    // //                 "itemName": "청바지",
+    // //                 "part1": "스키니",
+    // //                 "price": 68000.00,
+    // //                 "unit": "KRW",
+    // //                 "quantity": 13,
+    // //                 "username": "민주샵",
+    // //                 "alias": "minjoo",
+    // //                 "orderDate": "2024-09-29"
+    // //             }
+    // //         ]
+    // //     }
+    // // }
+    //  ];
+     setLoading(true)
     try {
-      const response = await fetch(`/schedule?orderId=${orderId}`, {
-        // headers: {
-        //   'Authorization': `Bearer ${token}`,
-        // }
+      const response = await fetch(`details/${orderId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
       });
       if (!response.ok) {
         throw new Error("schdule detail response was not ok");
       }
       const details = await response.json();
-      const detailevents = details.map((detail) => ({
-        detailId: detail.orderDetailId,
-        title: detail.listName,
-        spname: detail.supplierName,
-        c1name: detail.category1Name,
-        c2name: detail.category2Name,
-        c3name: detail.category3Name,
-        itemname: detail.itemName,
-        quantity: detail.quantity,
-        price: detail.price,
-        unit: detail.unit,
-        alias: detail.alias,
+      console.log('ddddd', details)
+      const detailevents = [details].map((detail) => ({
+        id : detail.orderId,
+        title: `${detail.requestDate} ${detail.alias}`,
+        releaseDate: detail.releaseDate,
+        username: detail.username,
+        memo: detail.memo,
+        gods: detail.groupedOrderDetails,
       }));
-
+      console.log('확인111', detailevents)
       setDetaildatas(detailevents);
+      console.log('시간 확인', detaildatas)
     } catch (error) {
       console.error("Failed to fetch scheduleData:", error);
+    } finally {
+      setLoading(false)
     }
   };
+
   const [scheduledatas, setScheduledatas] = useState([]);
   const [detaildatas, setDetaildatas] = useState([]);
   const [filteredData, setFilteredData] = useState([]); //검색용 데이터
@@ -375,6 +184,7 @@ export default function Schedule() {
   const calendarRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [modalData, setModalData] = useState(null); //모달에 넣을 데이터
+  const [expanded, setExpanded] = useState({});
 
   const searchlistName = () => {
     const filterData = scheduledatas.filter((event) =>
@@ -399,109 +209,127 @@ export default function Schedule() {
     }
   };
 
+  //////////////////////
+  //  통화 화폐 함수   //
+  //////////////////////
+
+  const getCurrencySymbol = (currencyCode) => {
+    switch (currencyCode) {
+      case 'KRW': return '₩ ';
+      case 'USD': return '$ ';
+      case 'JPY': return '¥ ';
+      case 'EUR': return '€ ';
+      default: return '';
+    }
+  };
+
+  //////////////////////
+  //  카드 확장 함수   //
+  //////////////////////
+
+  const handleExpandClick = (dateKey) => () => {
+    setExpanded((prevState) => ({
+      ...prevState,
+      [dateKey]: !prevState[dateKey],
+    }));
+  };
+
   //////////
   // Modal//
   /////////
 
   const handleeventclick = async (e) => {
     console.log("e.event", e.event);
-    const eventid = e.event.extendedProps.orderId;
+    const eventid = e.event._def.extendedProps.orderId;
     console.log("eventid", eventid);
 
     // 이벤트 아이디를 백으로 넘겨줘서 데이터 받아오기
     await fetchScheduleDetail(eventid);
 
-    // 받아온 데이터를 들고오기
-    const eventDetail = detaildatas;
-    console.log("eventdetail", eventDetail);
+     // 받아온 데이터가 업데이트될 때 모달을 생성
+  setTimeout(() => {
+    const eventDetails = detaildatas;
+    console.log("eventdetail", eventDetails);
+    if (eventDetails) {
+      const modalContent = generateModalContent(eventDetails);
+      setModalData(modalContent);
+      setOpen(true); // 모달 열기
+    }
+  }, 500); // 데이터를 받아오는 데 시간차가 있을 수 있으니 타이머 추가
 
+    // 받아온 데이터를 들고오기
+    // const eventDetails = detaildatas;
     // Modal 콘텐츠 생성 함수
     const generateModalContent = (eventDetails) => {
-      // 공급자별로 카테고리와 아이템을 정리
-      const suppliers = eventDetails.reduce((acc, detail) => {
-        const { spname, c1name, c2name, c3name, itemname, quantity } = detail;
-
-        if (!acc[spname]) {
-          acc[spname] = [];
-        }
-
-        acc[spname].push({
-          category1: c1name,
-          category2: c2name,
-          category3: c3name,
-          itemName: itemname,
-          quantity: quantity,
-        });
-
-        return acc;
-      }, {});
+      console.log("Filtered keys:", Object.keys(eventDetails[0]).filter(key => eventDetails[0][key] && Array.isArray(eventDetails[0][key])));
 
       return (
-        <div className="p-6 w-4/5 mx-auto bg-white rounded-lg shadow-lg">
+        <div className="p-6 w-4/5 mx-auto rounded-lg shadow-lg text-white">
           <div className="flex justify-between mb-6">
             <h1 className="text-2xl font-bold">{eventDetails[0].title}</h1>
             <h2 className="text-xl font-semibold">
-              담당자: {eventDetails[0].alias}
+              희망입고일: {eventDetails[0].releaseDate}
             </h2>
           </div>
-          {Object.keys(suppliers).map((supplier, index) => (
-            <div key={index} className="mb-6">
-              <h4 className="text-lg font-semibold mb-2">발주처: {supplier}</h4>
-              <table className="w-full min-w-full divide-y divide-gray-200 border border-gray-300">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                      Category 1
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                      Category 2
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                      Category 3
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                      Item Name
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                      Quantity
-                    </th>
+
+          {Object.keys(eventDetails[0].gods).map((dateKey, index) => (
+        <div key={index} className="mb-6 p-3 border border-[#58575C] rounded-md">
+          <div className="flex justify-between items-center">
+            <h4 className="text-lg font-semibold mb-2">발주일: {dateKey}</h4>
+            <IconButton
+              onClick={handleExpandClick(dateKey)}
+              aria-expanded={expanded[dateKey] || false}
+              aria-label="show more"
+              className={`transition-transform ${expanded[dateKey] ? 'rotate-180' : ''}`}
+              sx={{ color: 'white', marginLeft: 'auto' }}
+            >
+              <ExpandMoreIcon />
+            </IconButton>
+          </div>
+          <Collapse in={!!expanded[dateKey]} timeout="auto" unmountOnExit>
+            <table className="w-full min-w-full divide-y divide-[#17161D]">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-medium bg-[#47454F] text-white">No.</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium bg-[#47454F] text-white">Item Name</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium bg-[#47454F] text-white">Quantity</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium bg-[#47454F] text-white">Price</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium bg-[#47454F] text-white">Supplier</th>
+                </tr>
+              </thead>
+              <tbody className="bg-67666E divide-y divide-[#17161D]">
+                {eventDetails[0].gods[dateKey].map((detail, idx) => (
+                  <tr key={detail.orderDetailId}>
+                    <td className="px-6 py-2 text-sm bg-[#67666E] text-white">{idx + 1}</td>
+                    <td className="px-6 py-2 text-sm bg-[#67666E] text-white">{detail.itemName}</td>
+                    <td className="px-6 py-2 text-sm bg-[#67666E] text-white">{detail.quantity}</td>
+                    <td className="px-6 py-2 text-sm bg-[#67666E] text-white">{getCurrencySymbol(detail.unit) + detail.price}</td>
+                    <td className="px-6 py-2 text-sm bg-[#67666E] text-white">{detail.username}</td>
                   </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {suppliers[supplier].map((item, itemIndex) => (
-                    <tr key={itemIndex}>
-                      <td className="px-6 py-2 text-sm text-gray-600">
-                        {item.category1}
-                      </td>
-                      <td className="px-6 py-2 text-sm text-gray-600">
-                        {item.category2}
-                      </td>
-                      <td className="px-6 py-2 text-sm text-gray-600">
-                        {item.category3}
-                      </td>
-                      <td className="px-6 py-2 text-sm text-gray-600">
-                        {item.itemName}
-                      </td>
-                      <td className="px-6 py-2 text-sm text-gray-600">
-                        {item.quantity}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
+                ))}
+              </tbody>
+            </table>
+          </Collapse>
+        </div>
+      ))}
+          <div>
+            <h1 className="text-white">비고</h1>
+            <div className="border border-[#58575C] rounded-md p-2">{eventDetails[0].memo}</div>
+          </div>
+          <div className="flex justify-end">
+            <h1>구매자: {eventDetails[0].username}</h1>
+          </div>
         </div>
       );
     };
+    // if (eventDetails) {
+    //   const modalContent = generateModalContent(eventDetails);
 
-    if (eventDetail) {
-      const modalContent = generateModalContent(eventDetail);
-
-      setModalData(<div className="p-4">{modalContent}</div>);
-      setOpen(true);
-    }
+    //   setModalData(<div className="p-4">{modalContent}</div>);
+    //   setOpen(true);
+    // }
   };
+
 
   return (
     <div className="flex flex-col p-6 h-full">
@@ -521,11 +349,12 @@ export default function Schedule() {
         </div>
       </div>
       <FullCalendar
-        // defaultView="dayGridMonth"
         plugins={[dayGridPlugin]}
+        initialView="dayGridMonth" // 기본 보기를 월간으로 설정
         events={scheduledatas}
+        eventDisplay="block" // 리스트 항목 형태로 표시
         locale={"ko"}
-        ref={calendarRef} // FullCalendar ref 설정 검색시 이동
+        ref={calendarRef}
         eventClick={handleeventclick}
       />
       <Modal
@@ -533,7 +362,7 @@ export default function Schedule() {
         setOpen={setOpen}
         title={
           <div>
-            <h2>발주 상세 내역</h2>
+            <h2 className="text-white">발주 상세 내역</h2>
           </div>
         }
       >
