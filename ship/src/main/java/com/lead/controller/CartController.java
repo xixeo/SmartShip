@@ -77,30 +77,29 @@ public class CartController {
 
 	// 장바구니 아이템을 Orders로 저장
 	@PostMapping("/saveToOrder/{releaseDate}")
-    public ResponseEntity<String> saveCartItemsToOrder(
-            @PathVariable String releaseDate,
-            @PathVariable String selectedDay,
-            @RequestBody CartRequestDTO cartRequestDTO // CartRequestDTO 사용
-    ) {
-        try {
-            LocalDate parsedReleaseDate = LocalDate.parse(releaseDate);
-                        
-            // CartItemRequestDTO -> CartItemDTO 변환
-            List<CartItemDTO> cartItems = cartRequestDTO.getCartItems().stream()
-                .map(cartItemRequest -> CartItemDTO.builder()
-                    .itemsId(cartItemRequest.getItemsId())
-                    .quantity(cartItemRequest.getQuantity())
-                    .build()
-                ).collect(Collectors.toList());
+	public ResponseEntity<String> saveCartItemsToOrder(
+	        @PathVariable String releaseDate,
+	        @RequestBody CartRequestDTO cartRequestDTO // CartRequestDTO 사용
+	) {
+	    try {
+	        LocalDate parsedReleaseDate = LocalDate.parse(releaseDate);
 
-            // CartItemDTO와 memo를 서비스로 전달
-            cartService.saveCartItemsToOrder(cartItems, parsedReleaseDate, cartRequestDTO.getMemo(), cartRequestDTO.getSelectedDay());
+	        // CartItemRequestDTO -> CartItemDTO 변환
+	        List<CartItemDTO> cartItems = cartRequestDTO.getCartItems().stream()
+	            .map(cartItemRequest -> CartItemDTO.builder()
+	                .itemsId(cartItemRequest.getItemsId())
+	                .quantity(cartItemRequest.getQuantity())
+	                .build()
+	            ).collect(Collectors.toList());
 
-            System.out.println("===========================물건 주문 한다");
-            return ResponseEntity.ok("주문이 성공적으로 저장되었습니다.");
-        } catch (Exception e) {
-            System.err.println("주문을 저장하는 중 오류 :" + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("주문을 저장하는 중 오류가 발생했습니다: " + e.getMessage());
-        }
-    }
+	        // CartItemDTO와 memo, selectedDay를 서비스로 전달
+	        cartService.saveCartItemsToOrder(cartItems, parsedReleaseDate, cartRequestDTO.getMemo(), cartRequestDTO.getSelectedDay());
+
+	        System.out.println("===========================물건 주문 한다");
+	        return ResponseEntity.ok("주문이 성공적으로 저장되었습니다.");
+	    } catch (Exception e) {
+	        System.err.println("주문을 저장하는 중 오류 :" + e.getMessage());
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("주문을 저장하는 중 오류가 발생했습니다: " + e.getMessage());
+	    }
+	}
 }
