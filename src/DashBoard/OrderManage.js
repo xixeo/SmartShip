@@ -367,7 +367,7 @@ export default function OrderTest() {
     {
       field: 'Pastlead', headerName: 'Past Lead Time', width: 130, renderCell: (params) => (
         <div onClick={(e) => { e.stopPropagation() }}>
-          <Button className='greenbutton'>과거리드타임</Button>
+          <Button className='greenbutton' onClick={()=>setPastleadOpen(true)}>과거리드타임</Button>
         </div>
       )
     },
@@ -548,10 +548,10 @@ export default function OrderTest() {
     const senddata = rows.filter(row => rowid.includes(row.id)) // rowid가 포함된 행 필터링
       .map(detail => detail.details) // 각 행의 details 가져오기
       .flatMap(detailsArray => detailsArray.map(dt => ({
-        itemid: dt.itemid,
-        orderdetailid: dt.orderdetailid,
+        itemsId: dt.itemid,
+        orderDetailId: dt.orderdetailid,
         quantity: dt.quantity
-      }))).filter(i => selectedIds.includes(i.itemid));
+      }))).filter(i => selectedIds.includes(i.itemsId));
     // console.log('발주할 데이터',senddata)
     setSelectrowforordering(senddata)
   }
@@ -598,7 +598,7 @@ export default function OrderTest() {
   const handlePerchase = () => {
     const fetchOrdering = async () => {
       const preordering = selectrowforordering;
-      // console.log('peeeeeee', preordering)
+      console.log('peeeeeee', preordering)
       try {
         const response = await fetch(`/orderUpdate`, {
           method: 'PUT',
@@ -1019,6 +1019,30 @@ export default function OrderTest() {
           <div>
             <h1 className='text-white text-2xl font-bold'> 장바구니에 있는 상품입니다.</h1>
           </div>
+        </Box>
+      </Modal>
+      <Modal open={pastleadopen} onClose={()=>setPastleadOpen(false)}>
+      <Box
+          className="modalContent"
+          sx={{
+            color: 'black',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'absolute', // 또는 'fixed'로 설정
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)', // 중앙 정렬
+            width: '400px',  // 원하는 너비로 설정
+            height: '200px', // 원하는 높이로 설정
+            bgcolor: '#17161D', // 배경색 설정 (선택 사항)
+            p: 3, // 패딩 설정 (선택 사항)
+            borderRadius: 2, // 모서리 둥글기 (선택 사항)
+            boxShadow: 24, // 그림자 (선택 사항)
+          }}
+        >
+        <h1 className='text-white'>과거리드타임차트,, 어케들고오냐</h1>
         </Box>
       </Modal>
     </div>
