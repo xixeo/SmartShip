@@ -17,6 +17,7 @@ import {
     Modal,
     Box,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 // import Modal from '@mui/material/Modal'
 import "../assets/theme/table.scss";
 
@@ -29,6 +30,7 @@ export default function Announcement() {
     const [currentPage, setCurrentPage] = useState(1);
     const { showAlert } = useAlert(); // useAlert 훅 사용
     const { setLoading } = useLoading();
+    const navigate = useNavigate();
 
     // useEffect를 사용하여 컴포넌트가 마운트될 때 초기 데이터를 설정
     // 조회버튼을 누르지 않아도 초기에 전체 데이터 한번 렌더링 시키기
@@ -420,7 +422,11 @@ export default function Announcement() {
                         shape="rounded"
                     />
                 </div>
-                <button className="blue-btn2">글쓰기</button>
+                {role === "ROLE_ADMIN" ? (
+                                        <button className="blue-btn2" onClick={(e) => navigate(`/AnnounceWrite`)}>글쓰기</button>
+                                    ) : (
+                                        ""
+                                    )}
             </div>
         </div>
     );
