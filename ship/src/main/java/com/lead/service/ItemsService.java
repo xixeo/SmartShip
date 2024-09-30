@@ -18,6 +18,8 @@ import com.lead.entity.Category3;
 import com.lead.entity.Items;
 import com.lead.entity.Leadtime;
 import com.lead.entity.Member;
+import com.lead.entity.Season;
+import com.lead.entity.SelectedDay;
 import com.lead.repository.Category3Repo;
 import com.lead.repository.ItemsRepo;
 import com.lead.repository.LeadtimeRepo;
@@ -192,13 +194,26 @@ public class ItemsService {
 
 		// 물품 저장
 		Items savedItem = itemsRepo.save(newItem);
+		
+		 // 모든 season과 selectedDay에 대해 Leadtime 저장
+	    for (Season season : Season.values()) {  // Season ENUM 순회
+	        for (SelectedDay selectedDay : SelectedDay.values()) {  // SelectedDay ENUM 순회
+	            Leadtime leadtime = new Leadtime();
+	            leadtime.setItems(savedItem);
+	            leadtime.setLeadtime(itemsDTO.getLeadtime());
+	            leadtime.setSeason(season);  // 각 시즌에 대해 설정
+	            leadtime.setSelectedDay(selectedDay);  // 각 요일에 대해 설정
+
+	            leadtimeRepo.save(leadtime);  // 리드타임 저장
+	        }
+	    }
 
 		// Leadtime 저장
-		Leadtime leadtime = new Leadtime();
-		leadtime.setItems(savedItem);
-		leadtime.setLeadtime(itemsDTO.getLeadtime());
-
-		leadtimeRepo.save(leadtime);
+//		Leadtime leadtime = new Leadtime();
+//		leadtime.setItems(savedItem);
+//		leadtime.setLeadtime(itemsDTO.getLeadtime());
+//
+//		leadtimeRepo.save(leadtime);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////// 상품
