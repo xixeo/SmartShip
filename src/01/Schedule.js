@@ -6,8 +6,8 @@ import "../assets/theme/Schedule.scss";
 import { styled } from '@mui/material/styles';
 import Modal from "../Compo/Modal";
 import Collapse from '@mui/material/Collapse';
-import IconButton from '@mui/material/IconButton';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Accordion, AccordionSummary, AccordionDetails, IconButton, Typography } from '@mui/material';
 
 //////////////////////
 //    확장 아이콘    //
@@ -177,19 +177,21 @@ export default function Schedule() {
       setLoading(false)
     }
   };
-
+  
   const [scheduledatas, setScheduledatas] = useState([]);
   const [detaildatas, setDetaildatas] = useState([]);
   const [filteredData, setFilteredData] = useState([]); //검색용 데이터
   const [searchEvent, setSearchEvent] = useState("");
   const calendarRef = useRef(null);
+  const [modalContent, setModalContent] = useState(null);
   const [open, setOpen] = useState(false);
   const [modalData, setModalData] = useState(null); //모달에 넣을 데이터
   const [expanded, setExpanded] = useState({});
 
   const searchlistName = () => {
     const filterData = scheduledatas.filter((event) =>
-      event.listName.toLowerCase().includes(searchEvent.toLowerCase())
+      // console.log('검색클릭',event.title)
+      event.title.toLowerCase().includes(searchEvent.toLowerCase())
     );
     setFilteredData(filterData);
     console.log("검색", filterData);
@@ -210,6 +212,114 @@ export default function Schedule() {
     }
   };
 
+     ////////////////////////
+    //  달력 이벤트 커스텀 //
+   ///////////////////////
+    const renderEventContent = (eventInfo) => (
+      <div>
+        <span className="event-dot"></span>
+        <span>{eventInfo.timeText} {eventInfo.event.title}</span>
+      </div>
+    );
+
+     // 이벤트 클릭
+  const handleeventclick = async (e) => {
+    const eventid = e.event._def.extendedProps.orderId;
+    
+    // 이벤트 아이디를 백으로 넘겨줘서 데이터 받아오기
+    const eventDetails = await fetchScheduleDetail(eventid);
+    if (Object.keys(eventDetails[0].gods).length > 0) {
+      setModalData(eventDetails); // 모달 데이터만 설정
+      setOpen(true);
+    }
+  };
+  
+  //////////////////////
+  //  카드 확장 함수   //
+  //////////////////////
+  
+  const handleExpandClick = (key) => () => {
+    setExpanded((prevState) => {
+      const newState = {
+        ...prevState,
+        [key]: !prevState[key],
+      };
+      console.log('Updated expanded state:', newState);
+      return newState;
+    });
+  };
+  console.log('확장상태', expanded)
+  
+  // 카드 확장 상태 감시
+  useEffect(() => {
+    if (modalData) {
+      const content = generateModalContent(modalData);
+      setModalContent(content);
+    }
+  }, [modalData, expanded]); // expanded를 의존성 배열에 추가
+  
+  //////////////////
+  //  MODAL 생성  //
+  //////////////////
+    
+  const generateModalContent = (eventDetails) => {
+    return (
+      <div className="p-6 w-4/5 mx-auto rounded-lg shadow-lg text-white">
+        <div className="flex justify-between mb-6">
+          <h1 className="text-2xl font-bold">{eventDetails[0].title}</h1>
+          <h2 className="text-xl font-semibold">희망입고일: {eventDetails[0].releaseDate}</h2>
+        </div>
+        {Object.keys(eventDetails[0].gods).map((dateKey, index) => (
+          <div key={index} className="mb-6 p-3 border border-[#58575C] rounded-md">
+            <Accordion expanded={!!expanded[dateKey]} onChange={handleExpandClick(dateKey)}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls={`${dateKey}-content`}
+                id={`${dateKey}-header`}
+                sx={{ bg: '#17161D' }}
+              >
+                <Typography variant="h6" sx={{ flexGrow: 1, bg: '#17161D', color: "white" }}>
+                  발주일: {dateKey}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <table className="w-full min-w-full divide-y divide-[#17161D]">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-sm font-medium bg-[#47454F] text-white">No.</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium bg-[#47454F] text-white">Item Name</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium bg-[#47454F] text-white">Quantity</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium bg-[#47454F] text-white">Price</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium bg-[#47454F] text-white">Supplier</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-67666E divide-y divide-[#17161D]">
+                    {eventDetails[0].gods[dateKey].map((detail, idx) => (
+                      <tr key={detail.orderDetailId}>
+                        <td className="px-6 py-2 text-sm bg-[#67666E] text-white">{idx + 1}</td>
+                        <td className="px-6 py-2 text-sm bg-[#67666E] text-white">{detail.itemName}</td>
+                        <td className="px-6 py-2 text-sm bg-[#67666E] text-white">{detail.quantity}</td>
+                        <td className="px-6 py-2 text-sm bg-[#67666E] text-white">{getCurrencySymbol(detail.unit) + (detail.price * detail.quantity).toLocaleString()}</td>
+                        <td className="px-6 py-2 text-sm bg-[#67666E] text-white">{detail.username}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </AccordionDetails>
+            </Accordion>
+          </div>
+        ))}
+        <div>
+          <h1 className="text-white">비고</h1>
+          <div className="border border-[#58575C] rounded-md p-2">{eventDetails[0].memo}</div>
+        </div>
+        <div className="flex justify-end">
+          <h1>구매자: {eventDetails[0].username}</h1>
+        </div>
+      </div>
+    );
+  };
+  
   //////////////////////
   //  통화 화폐 함수   //
   //////////////////////
@@ -223,114 +333,6 @@ export default function Schedule() {
       default: return '';
     }
   };
-
-  //////////////////////
-  //  카드 확장 함수   //
-  //////////////////////
-
-  const handleExpandClick = (dateKey) => () => {
-    setExpanded((prevState) => ({
-      ...prevState,
-      [dateKey]: !prevState[dateKey],
-    }));
-  };
-
-  // 이벤트 커스텀 렌더링
-  const renderEventContent = (eventInfo) => (
-    <div>
-      <span className="event-dot"></span>
-      <span>{eventInfo.timeText} {eventInfo.event.title}</span>
-    </div>
-  );
-
-  //////////
-  // Modal//
-  /////////
-
-  const handleeventclick = async (e) => {
-    console.log("e.event", e.event);
-    const eventid = e.event._def.extendedProps.orderId;
-    console.log("eventid", eventid);
-
-    // 이벤트 아이디를 백으로 넘겨줘서 데이터 받아오기
-    const eventDetails = await fetchScheduleDetail(eventid);
-    console.log('받아온 애', eventDetails)
-    console.log('받아온 애', Object.keys(eventDetails[0].gods).length > 0)
-    if (Object.keys(eventDetails[0].gods).length > 0) {
-      const modalContent = generateModalContent(eventDetails);
-
-      setModalData(<div className="p-4">{modalContent}</div>);
-      setOpen(true);
-    } else {
-      // 알람띄우자 아니야 모달을 띄울까? 발주하러가기로 이동하게? 이건 선택사항인듯
-    }
-  };
-    // 받아온 데이터를 들고오기
-    // const eventDetails = detaildatas;
-    // Modal 콘텐츠 생성 함수
-    const generateModalContent = (eventDetails) => {
-      console.log("Filtered keys:", Object.keys(eventDetails[0]).filter(key => eventDetails[0][key] && Array.isArray(eventDetails[0][key])));
-
-      return (
-        <div className="p-6 w-4/5 mx-auto rounded-lg shadow-lg text-white">
-          <div className="flex justify-between mb-6">
-            <h1 className="text-2xl font-bold">{eventDetails[0].title}</h1>
-            <h2 className="text-xl font-semibold">
-              희망입고일: {eventDetails[0].releaseDate}
-            </h2>
-          </div>
-
-          {Object.keys(eventDetails[0].gods).map((dateKey, index) => (
-        <div key={index} className="mb-6 p-3 border border-[#58575C] rounded-md">
-          <div className="flex justify-between items-center">
-            <h4 className="text-lg font-semibold mb-2">발주일: {dateKey}</h4>
-            <IconButton
-              onClick={handleExpandClick(dateKey)}
-              aria-expanded={expanded[dateKey] || false}
-              aria-label="show more"
-              className={`transition-transform ${expanded[dateKey] ? 'rotate-180' : ''}`}
-              sx={{ color: 'white', marginLeft: 'auto' }}
-            >
-              <ExpandMoreIcon />
-            </IconButton>
-          </div>
-          <Collapse in={!!expanded[dateKey]} timeout="auto" unmountOnExit>
-            <table className="w-full min-w-full divide-y divide-[#17161D]">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-6 py-3 text-left text-sm font-medium bg-[#47454F] text-white">No.</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium bg-[#47454F] text-white">Item Name</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium bg-[#47454F] text-white">Quantity</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium bg-[#47454F] text-white">Price</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium bg-[#47454F] text-white">Supplier</th>
-                </tr>
-              </thead>
-              <tbody className="bg-67666E divide-y divide-[#17161D]">
-                {eventDetails[0].gods[dateKey].map((detail, idx) => (
-                  <tr key={detail.orderDetailId}>
-                    <td className="px-6 py-2 text-sm bg-[#67666E] text-white">{idx + 1}</td>
-                    <td className="px-6 py-2 text-sm bg-[#67666E] text-white">{detail.itemName}</td>
-                    <td className="px-6 py-2 text-sm bg-[#67666E] text-white">{detail.quantity}</td>
-                    <td className="px-6 py-2 text-sm bg-[#67666E] text-white">{getCurrencySymbol(detail.unit) + detail.price}</td>
-                    <td className="px-6 py-2 text-sm bg-[#67666E] text-white">{detail.username}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Collapse>
-        </div>
-      ))}
-          <div>
-            <h1 className="text-white">비고</h1>
-            <div className="border border-[#58575C] rounded-md p-2">{eventDetails[0].memo}</div>
-          </div>
-          <div className="flex justify-end">
-            <h1>구매자: {eventDetails[0].username}</h1>
-          </div>
-        </div>
-      );
-    };
-  
 
 
   return (
@@ -361,6 +363,7 @@ export default function Schedule() {
         eventContent={renderEventContent}
       />
       <Modal
+      // key={JSON.stringify(expanded)} // expanded 상태가 변경될 때마다 리렌더링
         open={open}
         setOpen={setOpen}
         title={
@@ -369,7 +372,8 @@ export default function Schedule() {
           </div>
         }
       >
-        {modalData}
+        {/* {modalData} */}
+        {modalContent}
       </Modal>
     </div>
   );
