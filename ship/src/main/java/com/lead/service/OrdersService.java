@@ -171,28 +171,34 @@ public class OrdersService {
 
 	// 발주 신청 내역 조회 - ROLE_USER
 	public List<UserOrderDTO> getUserOrders(Authentication authentication) {
-		// JWT 토큰에서 사용자 정보 추출
-		String username = authentication.getName(); // 토큰에서 username 추출
+	    // JWT 토큰에서 사용자 ID 추출 (id로 변경)
+	    String userId = authentication.getName(); // 토큰에서 id 추출
 
-		// 해당 사용자의 주문만 조회
-		List<Orders> orders = ordersRepo.findByMemberUsername(username); // username으로 필터링
+	    // 해당 사용자의 주문만 조회 (id로 필터링)
+	    List<Orders> orders = ordersRepo.findByMemberId(userId); // id로 필터링
 
-		return orders.stream().map(order -> {
-			// OrderDetail 조회
-			List<OrderDetail> orderDetails = orderDetailRepo.findByOrderOrderId(order.getOrderId());
+	    return orders.stream().map(order -> {
+	        // OrderDetail 조회
+	        List<OrderDetail> orderDetails = orderDetailRepo.findByOrderOrderId(order.getOrderId());
 
-			// OrderDetail을 UserOrderDetailDTO로 변환
-			List<UserOrderDetailDTO> orderDetailDTOs = convertOrderDetailToUserOrderDetailDTO(orderDetails);
+	        // OrderDetail을 UserOrderDetailDTO로 변환
+	        List<UserOrderDetailDTO> orderDetailDTOs = convertOrderDetailToUserOrderDetailDTO(orderDetails);
 
-			// 상태 계산
-			String state = calculateOrderState(orderDetails);
+	        // 상태 계산
+	        String state = calculateOrderState(orderDetails);
 
-			// UserOrderDTO 반환
-			return new UserOrderDTO(order.getOrderId(), order.getMember().getUsername(), order.getMember().getAlias(),
-					order.getRequestDate(), order.getReleaseDate(), order.getMemo(), state, // 상태 필드 추가
-					orderDetailDTOs // 변환된 주문 상세 정보
-			);
-		}).collect(Collectors.toList());
+	        // UserOrderDTO 반환
+	        return new UserOrderDTO(
+	                order.getOrderId(),
+	                order.getMember().getId(), // userId를 반환
+	                order.getMember().getAlias(),
+	                order.getRequestDate(),
+	                order.getReleaseDate(),
+	                order.getMemo(),
+	                state, // 상태 필드 추가
+	                orderDetailDTOs // 변환된 주문 상세 정보
+	        );
+	    }).collect(Collectors.toList());
 	}
 
 	// OrderDetail을 UserOrderDetailDTO로 변환하는 메서드

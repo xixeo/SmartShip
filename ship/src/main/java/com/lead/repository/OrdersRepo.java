@@ -11,4 +11,6 @@ import com.lead.entity.Orders;
 public interface OrdersRepo extends JpaRepository<Orders, Integer> {
 	
 	List<Orders> findByMemberUsername(String username);
+	
+	 List<Orders> findByMemberId(String memberId);
 }
