@@ -344,7 +344,7 @@ export default function Announcement() {
                     <TableBody>
                         {paginatedRows.map((row) => (
                             <React.Fragment key={row.noticeId}>
-                                <TableRow>
+                                <TableRow onClick={() => navigate(`/AnnounceEdit/${row.noticeId}`)}>
                                     {role === "ROLE_ADMIN" ? (
                                         <TableCell style={{ width: "50px" }}>
                                             <Checkbox
@@ -423,7 +423,7 @@ export default function Announcement() {
                     />
                 </div>
                 {role === "ROLE_ADMIN" ? (
-                                        <button className="blue-btn2" onClick={(e) => navigate(`/AnnounceWrite`)}>글쓰기</button>
+                                        <button className="blue-btn2" onClick={() => navigate(`/AnnounceWrite`)}>글쓰기</button>
                                     ) : (
                                         ""
                                     )}
