@@ -11,6 +11,7 @@ import './OrderManage.scss';
 
 export default function OrderTest() {
   const { orderId } = useParams(); // URL에서 orderId 가져오기
+  const [oriData, setOriData] = useState([]);
   const [purDetails, setPurDetails] = useState([]);
   const [purDetails2, setPurDetails2] = useState([]);
   const [quantityState, setQuantityState] = useState({});
@@ -113,6 +114,9 @@ export default function OrderTest() {
       }
       const details = await response.json();
       console.log('od목록', details)
+      setOriData(details)
+      console.log('odddddddd', oriData.map(d => d.orderDetails).length == 0)
+      console.log('호라아아아앙아아', Array.isArray(oriData))
       // 서버에서 받은 데이터를 rows 형식에 맞게 변환해서 저장
       const formattedData = (Array.isArray(details) ? details : [details]).flatMap((order) =>
         order.orderDetails.map((detail) => ({
@@ -187,6 +191,7 @@ export default function OrderTest() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchOrderDetails();
   }, [orderId]);
@@ -258,7 +263,7 @@ export default function OrderTest() {
       JPY: 0,
       EUR: 0,
     };
-  
+
     // 선택된 행의 amount를 더함
     selectedRowIds.forEach(rowId => {
       const row = updatedRows.find(r => r.id === rowId); // updatedRows에서 가져옴
@@ -286,11 +291,11 @@ export default function OrderTest() {
         }
       }
     });
-  
+
     return totals; // 통화별 합계를 반환
   };
-  
-  
+
+
   console.log('total', total)
 
   //////////////////////
@@ -321,27 +326,29 @@ export default function OrderTest() {
     {
       field: 'quantity', headerName: 'Quantity', width: 80, renderCell: (params) => {
         return params.row.details
-        .filter(detail => detail.supplier === params.row.selectedSupplier) // 현재 선택된 공급자에 맞는 detail만 필터링
-        .map((detail) => (
-          <div onClick={(e) => { e.stopPropagation()}}>
-          <input
-            key={detail.itemid}
-            type='number'
-            min={1}
-            value={quantityState[detail.itemid] || detail.quantity}
-            onChange={(e) => handleQnt(e, params.row.id, detail.itemid)}
-            className={`bg-[#67666E] w-10 ${isDisabledRow(params.row.BestOrderDate) ? 'text-[#868686]' : 'text-white'}`}
-            disabled={isDisabledRow(params.row.BestOrderDate)}
-          />
-          </div>
-        ));
+          .filter(detail => detail.supplier === params.row.selectedSupplier) // 현재 선택된 공급자에 맞는 detail만 필터링
+          .map((detail) => (
+            <div onClick={(e) => { e.stopPropagation() }}>
+              <input
+                key={detail.itemid}
+                type='number'
+                min={1}
+                value={quantityState[detail.itemid] || detail.quantity}
+                onChange={(e) => handleQnt(e, params.row.id, detail.itemid)}
+                className={`bg-[#67666E] w-10 ${isDisabledRow(params.row.BestOrderDate) ? 'text-[#868686]' : 'text-white'}`}
+                disabled={isDisabledRow(params.row.BestOrderDate)}
+              />
+            </div>
+          ));
       }
     },
-    { field: 'amount', headerName: 'Amount', width: 130, renderCell: (params) => {
-      // 현재 선택된 공급자에 맞는 detail만 찾아서 amount 표시
-      const currentDetail = params.row.details.find(detail => detail.supplier === params.row.selectedSupplier);
-      return currentDetail ? formatPrice(currentDetail.price, currentDetail.quantity, currentDetail.unit) : 0;
-    } },
+    {
+      field: 'amount', headerName: 'Amount', width: 130, renderCell: (params) => {
+        // 현재 선택된 공급자에 맞는 detail만 찾아서 amount 표시
+        const currentDetail = params.row.details.find(detail => detail.supplier === params.row.selectedSupplier);
+        return currentDetail ? formatPrice(currentDetail.price, currentDetail.quantity, currentDetail.unit) : 0;
+      }
+    },
     { field: 'BestOrderDate', headerName: 'Best Order Date', width: 130 },
     {
       field: 'suppliers', headerName: 'Supplier', width: 130, renderCell: (params) => {
@@ -367,7 +374,7 @@ export default function OrderTest() {
     {
       field: 'Pastlead', headerName: 'Past Lead Time', width: 130, renderCell: (params) => (
         <div onClick={(e) => { e.stopPropagation() }}>
-          <Button className='greenbutton' onClick={()=>setPastleadOpen(true)}>과거리드타임</Button>
+          <Button className='greenbutton' onClick={() => setPastleadOpen(true)}>과거리드타임</Button>
         </div>
       )
     },
@@ -436,7 +443,7 @@ export default function OrderTest() {
   // 수량 변경 함수
   const handleQnt = (e, rowId, itemid) => {
     const newQuantity = Number(e.target.value); // 입력된 수량을 숫자로 변환
-  
+
     setRows(prevRows => {
       const updatedRows = prevRows.map(row => {
         if (row.id === rowId) {
@@ -452,12 +459,12 @@ export default function OrderTest() {
             }
             return detail; // 업데이트하지 않은 detail은 그대로 반환
           });
-  
+
           // 총 amount 계산
           const newAmount = updatedDetails.reduce((total, detail) => {
             return total + parseFloat(detail.amount.replace(/[₩$, ¥, €]/g, '').replace(',', '')); // 각 detail의 amount 합산
           }, 0);
-  
+
           return {
             ...row,
             details: updatedDetails,
@@ -466,24 +473,24 @@ export default function OrderTest() {
         }
         return row; // 업데이트하지 않은 row는 그대로 반환
       });
-  
+
       // 체크된 행의 ID를 가져오기
       const selectedRowIds = updatedRows.filter(row => row.selected).map(row => row.id);
       // 선택된 행의 총합계 계산
       const newTotals = calculateTotal(selectedRowIds, updatedRows); // updatedRows를 인자로 전달
       setTotal(newTotals); // 총합계 업데이트
-  
+
       return updatedRows; // 업데이트된 rows 반환
     });
   };
-  
+
 
   useEffect(() => {
-//     console.log("Rows updated:", rows); // rows의 현재 상태
+    //     console.log("Rows updated:", rows); // rows의 현재 상태
     // const newTotals = calculateTotal(selrow);
     // console.log("New totals:", newTotals); // 계산된 총합
-//     setTotal(newTotals);
-}, [rows, selrow]);  // rows가 변경될 때마다 total을 계산
+    //     setTotal(newTotals);
+  }, [rows, selrow]);  // rows가 변경될 때마다 total을 계산
 
 
   // 행 삭제
@@ -536,7 +543,7 @@ export default function OrderTest() {
     });
     setSelrow(selectedItemIds);
     getDetaildata(newSelection, selectedItemIds);
-    const newTotals = calculateTotal(newSelection,rows);
+    const newTotals = calculateTotal(newSelection, rows);
     setTotal(newTotals);
   };
 
@@ -766,113 +773,27 @@ export default function OrderTest() {
 
   return (
     <div>
-      {loading ? (<Loading />) : (
-        <div className="flex-col text-white OrderManage">
-          <div className='flex m-2 items-center'>
-            <h4 className='font-bold text-xl m-2'>창고 출고 예정일 </h4>
-            <div className='text-2xl font-bold'>{purDetails2.length > 0 ? purDetails2[0].releaseDate : ' '}</div>
-          </div>
-          <div className="bg-[#162136] m-5 p-5 rounded-lg">
-            <div className='flex justify-between'>
-              <div>
-                <h1 className='font-bold text-xl'>요청 물품 목록</h1>
-              </div>
-              <div className='flex justify-between m-2 p-2'>
-                <Button className='bluebutton' onClick={() => setPreleadOpen(true)} >차트보기</Button>
-                <Modal open={preleadopen} setOpen={() => setPreleadOpen} onClose={() => setPreleadOpen(false)}>
-                  <Box
-                    className="modalContent"
-                    sx={{
-                      color: 'black',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      position: 'absolute', // 또는 'fixed'로 설정
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)', // 중앙 정렬
-                      width: '400px',  // 원하는 너비로 설정
-                      height: '200px', // 원하는 높이로 설정
-                      bgcolor: '#17161D', // 배경색 설정 (선택 사항)
-                      p: 3, // 패딩 설정 (선택 사항)
-                      borderRadius: 2, // 모서리 둥글기 (선택 사항)
-                      boxShadow: 24, // 그림자 (선택 사항)
-                    }}
-                  >
-                    <Box sx={{ marginBottom: 2, fontSize: 'large', fontWeight: 'bold', color: 'white' }}>여기 차트 올거임</Box>
-                  </Box>
-                </Modal>
-              </div>
+      <div className="flex-col text-white OrderManage">
+        <div className='flex m-2 items-center'>
+          <h4 className='font-bold text-xl m-2'>창고 출고 예정일 </h4>
+          <div className='text-2xl font-bold'>{purDetails2.length > 0 ? purDetails2[0].releaseDate : ' '}</div>
+        </div>
+        <div className="bg-[#162136] m-5 p-5 rounded-lg">
+          {(Array.isArray(oriData) ? oriData : [oriData]).every(d => d.orderDetails.length === 0) ? (
+            <div className='flex justify-center text-2xl font-semibold'>
+              모든 물품을 발주 하였습니다.
             </div>
-            <div className='p-6'>
-              <DataGrid
-                columns={col}
-                rows={rows}
-                getRowId={(row) => row.id}
-                pageSizeOptions={[10, 25, 50, 100]}
-                checkboxSelection
-                onRowSelectionModelChange={handleSelectionChange}
-                onRowClick={handleRowclick}
-                disableRowSelectionOnClick
-                isRowSelectable={(purDetails) => {
-                  const bestOrderDate = new Date(purDetails.row.BestOrderDate); // BestOrderDate를 Date 객체로 변환
-                  const currentDate = new Date(); // 현재 날짜
-
-                  // BestOrderDate가 현재 날짜보다 이전이면 행 선택을 막기 (체크박스 비활성화)
-                  return bestOrderDate >= currentDate;
-                }}
-                getRowClassName={(purDetails) => {
-                  const bestOrderDate = new Date(purDetails.row.BestOrderDate); // BestOrderDate를 Date 객체로 변환
-                  const currentDate = new Date(); // 현재 날짜
-
-                  // BestOrderDate가 현재 날짜보다 이전인 경우 'overdate' 클래스 적용
-                  return bestOrderDate < currentDate ? 'overdate' : '';
-                }}
-                sx={{
-                  color: 'white',
-                  fontWeight: 'semi-bold',
-                  border: 'none',
-                  alignItems: 'center',
-                  '--DataGrid-containerBackground': '#47454F',
-                  ' --DataGrid-rowBorderColor': '#272530',
-                  '--unstable_DataGrid-headWeight': '',
-                  '& .MuiCheckbox-root.Mui-disabled': {
-                    color: '#868686', // 비활성화된 체크박스 색상
-                    '& svg': {
-                      fill: '#868686', // SVG 아이콘 색상 변경
-                    },
-                  },
-                  '& .MuiTablePagination-root, .css-rm9hue-MuiSvgIcon-root-MuiSelect-icon, .css-1kcqes5-MuiButtonBase-root-MuiIconButton-root.Mui-disabled, .css-20bmp1-MuiSvgIcon-root, .css-18w7uxr-MuiSvgIcon-root': {
-                    color: 'white',
-                  },
-                  '& .css-wop1k0-MuiDataGrid-footerContainer': {
-                    borderTop: 'none',
-                  },
-                  '& .css-s1v7zr-MuiDataGrid-virtualScrollerRenderZone': {
-                    backgroundColor: '#67666E',
-                  },
-                  '& .MuiDataGrid-filler': {
-                    display: 'none', // 요소 숨기기
-                    // height: '100px', // 높이 조정
-                  },
-                }}
-              />
-            </div>
-            <div className='p-2'>
-              <h2 className='text-[#FFCC6F] font-semibold'>
-                예상 리드타임 : {selrow.length > 0 ? getLongestCheckedLeadTime(selrow) : '-'}
-              </h2>
-              <div className='flex justify-between items-center'>
-                <div className='flex'>
-                  <h2 className='font-semibold'>총 주문금액: </h2>
-                  <div className='ml-2'>
-                    {formatTotal(total)}
-                  </div>
-                </div>
+          ) : (
+            <>
+              <div className='flex justify-between'>
                 <div>
-                  <Button className='bluebutton2' onClick={() => setPerchasopen(true)}>발주</Button>
-                  <Modal open={perchasopen} setOpen={() => setPerchasopen}>
+                  <h1 className='font-bold text-xl'>요청 물품 목록</h1>
+                </div>
+                <div className='flex justify-between m-2 p-2'>
+                  <Button className='bluebutton' onClick={() => setPreleadOpen(true)}>
+                    차트보기
+                  </Button>
+                  <Modal open={preleadopen} onClose={() => setPreleadOpen(false)}>
                     <Box
                       className="modalContent"
                       sx={{
@@ -881,94 +802,183 @@ export default function OrderTest() {
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        position: 'absolute', // 또는 'fixed'로 설정
+                        position: 'absolute',
                         top: '50%',
                         left: '50%',
-                        transform: 'translate(-50%, -50%)', // 중앙 정렬
-                        width: '400px',  // 원하는 너비로 설정
-                        height: '200px', // 원하는 높이로 설정
-                        bgcolor: '#17161D', // 배경색 설정 (선택 사항)
-                        p: 3, // 패딩 설정 (선택 사항)
-                        borderRadius: 2, // 모서리 둥글기 (선택 사항)
-                        boxShadow: 24, // 그림자 (선택 사항)
+                        transform: 'translate(-50%, -50%)',
+                        width: '400px',
+                        height: '200px',
+                        bgcolor: '#17161D',
+                        p: 3,
+                        borderRadius: 2,
+                        boxShadow: 24,
                       }}
                     >
-                      <Box
-                        sx={{
-                          marginBottom: 2,
-                          fontSize: 'large',
-                          fontWeight: 'bold',
-                          color: 'white',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center', // 수평 중앙 정렬
-                          justifyContent: 'center', // 수직 중앙 정렬
-                        }}
-                      >
-                        발주하시겠습니까?
-                      </Box>
-                      <Box sx={{ display: 'flex', gap: 2 }}>
-                        <Button sx={{ color: 'white', bgcolor: '#43C5FE' }}
-                          onClick={() => {
-                            setPerchasopen(false);
-                            handlePerchase();
-                          }}>
-                          확인
-                        </Button>
-                        <Button className='graybutton' sx={{ color: 'white', bgcolor: '#BFBFBF' }}
-                          onClick={() => {
-                            setPerchasopen(false);
-                          }}>
-                          취소
-                        </Button>
+                      <Box sx={{ marginBottom: 2, fontSize: 'large', fontWeight: 'bold', color: 'white' }}>
+                        여기 차트 올거임
                       </Box>
                     </Box>
                   </Modal>
                 </div>
               </div>
+
+              <div className='p-6'>
+                <DataGrid
+                  columns={col}
+                  rows={rows}
+                  getRowId={(row) => row.id}
+                  pageSizeOptions={[10, 25, 50, 100]}
+                  checkboxSelection
+                  onRowSelectionModelChange={handleSelectionChange}
+                  onRowClick={handleRowclick}
+                  disableRowSelectionOnClick
+                  isRowSelectable={(purDetails) => {
+                    const bestOrderDate = new Date(purDetails.row.BestOrderDate);
+                    const currentDate = new Date();
+                    return bestOrderDate >= currentDate;
+                  }}
+                  getRowClassName={(purDetails) => {
+                    const bestOrderDate = new Date(purDetails.row.BestOrderDate);
+                    const currentDate = new Date();
+                    return bestOrderDate < currentDate ? 'overdate' : '';
+                  }}
+                  sx={{
+                    color: 'white',
+                    fontWeight: 'semi-bold',
+                    border: 'none',
+                    alignItems: 'center',
+                    '--DataGrid-containerBackground': '#47454F',
+                    '--DataGrid-rowBorderColor': '#272530',
+                    '& .MuiCheckbox-root.Mui-disabled': {
+                      color: '#868686',
+                      '& svg': { fill: '#868686' },
+                    },
+                    '& .MuiTablePagination-root, .MuiIconButton-root.Mui-disabled': {
+                      color: 'white',
+                    },
+                    '& .MuiDataGrid-virtualScrollerRenderZone': {
+                      backgroundColor: '#67666E',
+                    },
+                    '& .MuiDataGrid-filler': { display: 'none' },
+                    '& .css-20bmp1-MuiSvgIcon-root' : {fill:'white'},
+                    '& .MuiDataGrid-withBorderColor' : { borderColor: 'black'}
+                  }}
+                />
+              </div>
+
+              <div className='p-2'>
+                <h2 className='text-[#FFCC6F] font-semibold'>
+                  예상 리드타임 : {selrow.length > 0 ? getLongestCheckedLeadTime(selrow) : '-'}
+                </h2>
+                <div className='flex justify-between items-center'>
+                  <div className='flex'>
+                    <h2 className='font-semibold'>총 주문금액: </h2>
+                    <div className='ml-2'>{formatTotal(total)}</div>
+                  </div>
+                  <div>
+                    <Button className='bluebutton2' onClick={() => setPerchasopen(true)}>
+                      발주
+                    </Button>
+                    <Modal open={perchasopen} onClose={() => setPerchasopen(false)}>
+                      <Box
+                        className="modalContent"
+                        sx={{
+                          color: 'black',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          width: '400px',
+                          height: '200px',
+                          bgcolor: '#17161D',
+                          p: 3,
+                          borderRadius: 2,
+                          boxShadow: 24,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            marginBottom: 2,
+                            fontSize: 'large',
+                            fontWeight: 'bold',
+                            color: 'white',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          발주하시겠습니까?
+                        </Box>
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                          <Button
+                            sx={{ color: 'white', bgcolor: '#43C5FE' }}
+                            onClick={() => {
+                              setPerchasopen(false);
+                              handlePerchase();
+                            }}
+                          >
+                            확인
+                          </Button>
+                          <Button
+                            className='graybutton'
+                            sx={{ color: 'white', bgcolor: '#BFBFBF' }}
+                            onClick={() => setPerchasopen(false)}
+                          >
+                            취소
+                          </Button>
+                        </Box>
+                      </Box>
+                    </Modal>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+        {/* 추천상품 시작 */}
+        {disablerowcount > 0 ? <div>
+          <div className='flex items-center justify-center'>
+            <h2 className='font-bold'>창고 출고 예정일까지 수령 불가능한 상품이 있습니다.</h2>
+            <h2 className='ml-2 text-[#5BF4FF]'>({disablerowcount}건)</h2>
+          </div>
+          <div className="bg-[#162136] m-5 p-5 rounded-lg">
+            <div className='flex items-center ml-3'>
+              <h4 className='text-[#5BF4FF] text-xl font-bold'>{selectrowitemname || " "}</h4>
+              {selectrowitemname ? <h4 className='font-bold text-base ml-2'>대체 추천 상품</h4> : " "}
+            </div>
+            <div className='flex items-center justify-start'>
+              {
+                clickrow && recommendItem.length === 0 ?
+                  <div className='w-full'>
+                    <div className='flex items-end'>
+                      <h1 className='mt-5 ml-5 text-rose-500 font-bold text-2xl'> 대체 가능한 상품이 없습니다.</h1>
+                    </div>
+                    <h1 className='mt-2 ml-5 text-xl font-bold'>구매자 : {purDetails2[0].username + ` (${purDetails2[0].alias})`} {formatPhoneNumber(purDetails2[0].tel)}</h1>
+                  </div>
+                  :
+                  recommendItem.map(detail => (
+                    <div key={detail.itemsId} className='bg-[#373640] border-[#373640] rounded-lg w-1/4 m-3 p-3' onClick={() => handleRecommend(detail.itemsId)}>
+                      <div className='text-xl font-bold m-2'>{detail.itemName}</div>
+                      <div className='flex justify-between items-center m-2'>
+                        <div className='text-lg font-bold'>{detail.supplierName}</div>
+                        <div className='text-base font-bold'>{getCurrencySymbol(detail.unit)} {detail.price}</div>
+                      </div>
+                      <div className='flex justify-between items-center m-2'>
+                        <div className='text-base font-bold'>{detail.recommendedOrderDate}</div>
+                        <div className='text-[#bebebe] text-sm'>(예상 리드타임 : {detail.leadtime}일)</div>
+                      </div>
+                    </div>)
+                  )
+              }
             </div>
           </div>
-          {/* 추천상품 시작 */}
-          {disablerowcount > 0 ? <div>
-            <div className='flex items-center justify-center'>
-              <h2 className='font-bold'>창고 출고 예정일까지 수령 불가능한 상품이 있습니다.</h2>
-              <h2 className='ml-2 text-[#5BF4FF]'>({disablerowcount}건)</h2>
-            </div>
-            <div className="bg-[#162136] m-5 p-5 rounded-lg">
-              <div className='flex items-center ml-3'>
-                <h4 className='text-[#5BF4FF] text-xl font-bold'>{selectrowitemname || " "}</h4>
-                {selectrowitemname ? <h4 className='font-bold text-base ml-2'>대체 추천 상품</h4> : " "}
-              </div>
-              <div className='flex items-center justify-start'>
-                {
-                  clickrow && recommendItem.length === 0 ?
-                    <div className='w-full'>
-                      <div className='flex items-end'>
-                        <h1 className='mt-5 ml-5 text-rose-500 font-bold text-2xl'> 대체 가능한 상품이 없습니다.</h1>
-                      </div>
-                      <h1 className='mt-2 ml-5 text-xl font-bold'>구매자 : {purDetails2[0].username + ` (${purDetails2[0].alias})`} {formatPhoneNumber(purDetails2[0].tel)}</h1>
-                    </div>
-                    :
-                    recommendItem.map(detail => (
-                      <div key={detail.itemsId} className='bg-[#373640] border-[#373640] rounded-lg w-1/4 m-3 p-3' onClick={() => handleRecommend(detail.itemsId)}>
-                        <div className='text-xl font-bold m-2'>{detail.itemName}</div>
-                        <div className='flex justify-between items-center m-2'>
-                          <div className='text-lg font-bold'>{detail.supplierName}</div>
-                          <div className='text-base font-bold'>{getCurrencySymbol(detail.unit)} {detail.price}</div>
-                        </div>
-                        <div className='flex justify-between items-center m-2'>
-                          <div className='text-base font-bold'>{detail.recommendedOrderDate}</div>
-                          <div className='text-[#bebebe] text-sm'>(예상 리드타임 : {detail.leadtime}일)</div>
-                        </div>
-                      </div>)
-                    )
-                }
-              </div>
-            </div>
-          </div> : null}
-        </div>
-      )}
-
+        </div> : null}
+      </div>
       <Modal open={recoal} onClose={handleclo}>
         <Box
           className="modalContent"
@@ -1021,8 +1031,8 @@ export default function OrderTest() {
           </div>
         </Box>
       </Modal>
-      <Modal open={pastleadopen} onClose={()=>setPastleadOpen(false)}>
-      <Box
+      <Modal open={pastleadopen} onClose={() => setPastleadOpen(false)}>
+        <Box
           className="modalContent"
           sx={{
             color: 'black',
@@ -1042,7 +1052,7 @@ export default function OrderTest() {
             boxShadow: 24, // 그림자 (선택 사항)
           }}
         >
-        <h1 className='text-white'>과거리드타임차트,, 어케들고오냐</h1>
+          <h1 className='text-white'>과거리드타임차트,, 어케들고오냐</h1>
         </Box>
       </Modal>
     </div>
