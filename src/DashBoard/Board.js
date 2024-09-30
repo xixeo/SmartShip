@@ -1,5 +1,6 @@
 import React from 'react';
 import './Board.css';
+import PurchaseRequest from './PurchaseRequestForDash';
 
 function Board() {
   return (
@@ -45,7 +46,10 @@ function Board() {
             </div>
         </div>
             {/* 구매 요청 */}
-            <div className="right-side text-lg font-bold">구매 요청</div>
+            <div className="right-side text-lg font-bold">
+                <h1>구매 요청</h1>
+                <PurchaseRequest/>
+            </div>
       </div>
             {/* 물품 구매 추이 */}
       <div className="bottom-section text-lg font-bold">물품 구매 추이</div>

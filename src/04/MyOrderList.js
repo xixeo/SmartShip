@@ -283,9 +283,16 @@ export default function MyOrderList() {
           throw new Error("myorderlist response was not ok");
         }
         const myorderlist = await response.json();
-        const sortdata = myorderlist.sort(
-          (a, b) => new Date(b.requestDate) - new Date(a.requestDate)
-        );
+        const sortdata = myorderlist.sort((a, b) => {
+          const dateA = new Date(a.requestDate);
+          const dateB = new Date(b.requestDate);
+        
+          // 날짜가 같으면 시간으로 비교
+          if (dateA.toDateString() === dateB.toDateString()) {
+            return dateB - dateA; // 시간 기준으로 내림차순 정렬
+          }
+          return dateB - dateA; // 날짜 기준으로 내림차순 정렬
+        });
         setListdata(sortdata);
       } catch (e) {
         console.log("Failed to fetch getMyOrderList", e);
