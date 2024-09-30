@@ -186,7 +186,7 @@ function SignUp({ setIsAuthenticated }) {
               <button
                 type="button"
                 onClick={checkId}
-                className="w-1/5 check-btn ml-1 text-sm"
+                className="w-1/5 blue-btn ml-1 text-sm"
               >
                 중복확인
               </button>

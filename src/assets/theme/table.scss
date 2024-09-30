@@ -12,11 +12,13 @@
   th {
     background: $table-header !important;
     font-weight: 600;
+    height: 50px;
   }
 
   td {
     background: $table-body !important;
     font-weight: 400;
+    height: 41.5px;
   }
 
   .MuiTableRow-root:last-child {
@@ -29,18 +31,6 @@
     color: #fff;
   }
 
-  // switch 동그라미
-  .MuiSwitch-root {
-    .Mui-checked + .MuiSwitch-track {
-      opacity: 1 !important;
-    }
-    .Mui-checked {
-      color: $blue-btn !important;
-    }
-    .MuiSwitch-track {
-      background-color: #46465c !important;
-    }
-  }
 }
 
 .MuiTableContainer-root {
