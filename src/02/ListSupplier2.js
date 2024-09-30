@@ -1,5 +1,3 @@
-// 새로고침해야 DB 받아옴 ,, 
-
 import React, { useState, useMemo, useEffect } from "react";
 import {
     Checkbox,
@@ -20,44 +18,60 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
-import Modal3 from "../Compo/Modal3";
 import Pagination from "@mui/material/Pagination";
-
-const username = localStorage.getItem("username") || "Guest";
-const alias = localStorage.getItem("alias") || "Guest";
-const token = localStorage.getItem("token");
+import PredictionModal from "./PredictionModal";
+import Loading from "../Compo/Loading";
 
 const ListSupplier2 = () => {
+    const [token, setToken] = useState(null); // 초기 토큰 상태
+    const [alias, setAlias] = useState(localStorage.getItem("alias") || "Guest");
     // 각 행의 카테고리 선택
     const [category1Map, setCategory1Map] = useState([]);
     const [category2Map, setCategory2Map] = useState(new Map());
     const [category3Map, setCategory3Map] = useState(new Map());
+    const [loading, setLoading] = useState(true);
 
     ////////////////////////////////
     // 공급업체의 아이템만 가져오기 //
     ////////////////////////////////
 
-    const fetchLeadTime = async (itemId) => {
-        try {
-            const response = await fetch(`/finditem/${itemId}`);
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            const data = await response.json();
-            return data.leadtime || null; // leadtime을 가져옵니다.
-        } catch (error) {
-            console.error("Failed to fetch lead time:", error);
-            return null; // 오류 발생 시 null 반환
-        }
-    };
+    // const fetchLeadTime = async (itemId) => {
+    //    setLoading(true);
+    //     try {
+    //         const response = await fetch(`/finditem/${itemId}`);
+    //         if (!response.ok) {
+    //             throw new Error("Network response was not ok");
+    //         }
+    //         const data = await response.json();
+    //         return data.leadtime || null;
+    //     } catch (error) {
 
-    // useEffect(() => {
-    //     // 페이지가 로드될 때 데이터 새로고침
-    //     window.location.reload();
-    // }, []);
+    //         console.error("Failed to fetch lead time:", error);
+    //         return null; // 오류 발생 시 null 반환
+
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+
+// 토큰을 로컬 스토리지에서 가져오는 useEffect
+useEffect(() => {
+    const storedToken = localStorage.getItem("token"); // 예시: 로컬 스토리지에서 토큰 가져오기
+    setLoading(false); // 초기 로딩 상태 설정
+    if (storedToken) {
+        setToken(storedToken);
+    } else {
+        setLoading(false); // 토큰이 없을 경우 로딩 상태 해제
+    }
+}, []);
 
     useEffect(() => {
         const fetchData = async () => {
+            // token이 없으면 fetch하지 않음
+            if (!token) {
+                setLoading(true); // token이 없을 경우 로딩 해제
+                return; // token이 없으면 함수를 종료
+            }
             try {
                 const response = await fetch("/finditem", {
                     headers: {
@@ -67,8 +81,6 @@ const ListSupplier2 = () => {
                 if (!response.ok)
                     throw new Error("Network response was not ok");
                 const data = await response.json();
-
-                console.log("Fetched data:", data);
 
                 const processedData = data.map((item) => ({
                     ...item,
@@ -109,17 +121,18 @@ const ListSupplier2 = () => {
 
                         return acc;
                     },
-                    {}
                 );
 
                 setSelectedCategories(initialSelectedCategories);
             } catch (error) {
                 console.error("데이터 로딩 중 오류 발생:", error);
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchData();
-    }, [category1Map, category2Map, category3Map]);
+    }, [token, category1Map, category2Map, category3Map]);
 
     ////////////////////////////
     // 카테고리선택, 물품명검색 //
@@ -240,6 +253,10 @@ const ListSupplier2 = () => {
                 fetchCategories("/category2"),
                 fetchCategories("/category3"),
             ]);
+
+            console.log("Category 1 Data:", data1);
+            console.log("Category 2 Data:", data2);
+            console.log("Category 3 Data:", data3);
 
             const category2Map = new Map();
             data2.forEach((item) => {
@@ -560,6 +577,11 @@ const ListSupplier2 = () => {
     };
 
     return (
+    <div>
+        {/* Loading이 true면 컴포넌트를 띄우고, false면 null(빈 값)처리 하여 컴포넌트 숨김 */}
+        {loading ? (
+          <Loading />
+        ) : (
         <div className="list-table-root flex flex-col p-6">
             {/* 공급업체의 아이템 중 <Select> */}
             <div className="text-xl font-semibold text-white mb-4">{`[ ${alias} ] 물품 관리`}</div>
@@ -660,7 +682,7 @@ const ListSupplier2 = () => {
                     >
                         등록
                     </button>
-                    <Modal3
+                    <PredictionModal
                         open={isModalOpen}
                         setOpen={setIsModalOpen}
                         title="신규 상품 등록"
@@ -870,7 +892,6 @@ const ListSupplier2 = () => {
                                 <TableCell
                                     sx={{ width: "16%" }}
                                     align="center"
-                                    className="item-cell"
                                 >
                                     <TextField
                                         className="custom-quantity"
@@ -887,7 +908,6 @@ const ListSupplier2 = () => {
                                 <TableCell
                                     sx={{ width: "13%" }}
                                     align="center"
-                                    className="item-cell"
                                 >
                                     <TextField
                                         className="custom-quantity"
@@ -975,7 +995,9 @@ const ListSupplier2 = () => {
                 </div>
             </div>
         </div>
-    );
-};
-
+    )
+}
+</div>
+  );
+}
 export default ListSupplier2;
