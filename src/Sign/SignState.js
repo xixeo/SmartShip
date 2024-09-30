@@ -33,10 +33,10 @@ const SignState = () => {
         <div className="flex items-center space-x-2 pt-4 text-white">
           <Person width="20" height="20" />
           <div className="flex items-center space-x-2">
-            <h1 className="text-white">{alias || "alias"} </h1>
             <h1 className="font-semibold text-white">
               {username || "username"}
             </h1>
+            <h1 className="text-white">{alias || "alias"} </h1>
             <h1>님</h1>
           </div>
           <button
