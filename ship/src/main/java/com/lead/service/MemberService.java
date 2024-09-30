@@ -130,5 +130,11 @@ public class MemberService {
 		// 회원 정보 저장
 		memberRepo.save(member);
 	}
-
+	
+///////////////////////////////////////////////////////// 회원 공지 조회
+	 // username을 통해 userId를 조회하는 메서드
+	  public Member findMemberById(String id) {
+	        return memberRepo.findById(id)
+	                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. ID: " + id));
+	    }
 }

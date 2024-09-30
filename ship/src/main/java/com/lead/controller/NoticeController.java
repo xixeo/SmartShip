@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,11 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.lead.dto.NoticeDTO;
+import com.lead.entity.Member;
 import com.lead.service.FileService;
+import com.lead.service.MemberService;
 import com.lead.service.NoticeService;
 
+
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class NoticeController {
+	
+	@Autowired
+	private MemberService memberService;
 
 	@Autowired
 	private NoticeService noticeService;
@@ -91,6 +99,7 @@ public class NoticeController {
 		}
 	}
 
+	// 공지 등록
 	@PostMapping("/notice")
 	public ResponseEntity<String> createNotice(@RequestParam("title") String title,
 			@RequestParam("content") String content,
@@ -109,25 +118,28 @@ public class NoticeController {
 	}
 
 	// 공지사항 삭제
-	@DeleteMapping("/notice/{noticeId}")
-	public ResponseEntity<String> deleteNotice(@RequestBody List<Integer> noticeId) {
+	@DeleteMapping("/noticeDelete")
+	public ResponseEntity<String> deleteNotice(@RequestBody List<Integer> noticeIds) {
 
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String username = authentication.getName(); // 토큰에서 username 추출
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    String userId = authentication.getName(); // 토큰에서 String 타입의 사용자 id 추출
 
-		try {
-			// 공지사항 삭제 로직 호출
-			noticeService.deleteNotice(noticeId, username);
-			System.out.println("===========================공지 삭제 한다");
-			
-			return ResponseEntity.ok("공지사항이 성공적으로 삭제되었습니다.");
-		} catch (RuntimeException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("공지사항을 찾을 수 없습니다: " + e.getMessage());
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("공지사항 삭제 중 오류가 발생했습니다." + e.getMessage());
-		}
+	    try {
+	        // String 타입의 userId로 사용자를 조회
+	        Member member = memberService.findMemberById(userId);
+
+	        // 공지사항 삭제 로직 호출
+	        noticeService.deleteNotice(noticeIds, member.getId()); // userId가 String 타입이면 그대로 사용
+	        System.out.println("===========================공지 삭제 한다");
+	        
+	        return ResponseEntity.ok("공지사항이 성공적으로 삭제되었습니다.");
+	    } catch (RuntimeException e) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("공지사항을 찾을 수 없습니다: " + e.getMessage());
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("공지사항 삭제 중 오류가 발생했습니다: " + e.getMessage());
+	    }
 	}
-	
+
 	//공지사항 수정
 	@PutMapping("/notice/{noticeId}")
 	public ResponseEntity<String> updateNotice(@PathVariable Integer noticeId,
