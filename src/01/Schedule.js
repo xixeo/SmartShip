@@ -228,10 +228,8 @@ export default function Schedule() {
     
     // 이벤트 아이디를 백으로 넘겨줘서 데이터 받아오기
     const eventDetails = await fetchScheduleDetail(eventid);
-    if (Object.keys(eventDetails[0].gods).length > 0) {
-      setModalData(eventDetails); // 모달 데이터만 설정
-      setOpen(true);
-    }
+    setModalData(eventDetails); // 모달 데이터만 설정
+    setOpen(true);
   };
   
   //////////////////////
@@ -269,7 +267,7 @@ export default function Schedule() {
           <h1 className="text-2xl font-bold">{eventDetails[0].title}</h1>
           <h2 className="text-xl font-semibold">희망입고일: {eventDetails[0].releaseDate}</h2>
         </div>
-        {Object.keys(eventDetails[0].gods).map((dateKey, index) => (
+        { Object.keys(eventDetails[0].gods).length > 0 ? Object.keys(eventDetails[0].gods).map((dateKey, index) => (
           <div key={index} className="mb-6 p-3 border border-[#58575C] rounded-md">
             <Accordion expanded={!!expanded[dateKey]} onChange={handleExpandClick(dateKey)}>
               <AccordionSummary
@@ -308,7 +306,11 @@ export default function Schedule() {
               </AccordionDetails>
             </Accordion>
           </div>
-        ))}
+        )) 
+        : <div className="mb-6 p-3 border border-[#58575C] rounded-md flex justify-center">
+            <h1 className='text-2xl font-semibold'>현재 발주한 품목이 없습니다.</h1>
+          </div>
+        }
         <div>
           <h1 className="text-white">비고</h1>
           <div className="border border-[#58575C] rounded-md p-2">{eventDetails[0].memo}</div>
