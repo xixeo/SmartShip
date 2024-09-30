@@ -3,7 +3,6 @@ import { styled } from "@mui/material/styles";
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import { ReactComponent as ArrowDown } from "../assets/icons/svg/arrowDown.svg";
-// import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import {
   Table,
   TableBody,
@@ -13,6 +12,7 @@ import {
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Loading from "../Compo/Loading";
+import ReactPaginate from "react-paginate"; 
 
 //////////////////////
 //    확장 아이콘    //
@@ -31,243 +31,246 @@ const ExpandMore = styled((props) => {
 export default function MyOrderList() {
   const [expanded, setExpanded] = useState({});
   const [listdata, setListdata] = useState([]);
+  const [currentItems, setCurrentItems] = useState([]); // 현재 페이지에 표시할 아이템
+  const [itemOffset, setItemOffset] = useState(0); // 현재 페이지의 시작 인덱스
+  const [itemsPerPage, setItemsPerPage] = useState(6);
   const token = localStorage.getItem("token");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     const fetchMyorderdata = async () => {
-      // const myorderlist = [
-      //     {
-      //         "orderId": 1,
-      //         "username": "AWS선박",
-      //         "alias": "유승호",
-      //         "releaseDate": "2024-05-04",
-      //         "bestOrderDate": "2024-01-21",
-      //         "requestDate": "2024-09-06",
-      //         "memo": "테스트",
-      //         "orderstate": "발주 완료",
-      //         "orderDetails": [
-      //             {
-      //                 "orderDetailId": 1,
-      //                 "category1Name": "패션의류",
-      //                 "category2Name": "여성패션",
-      //                 "category3Name": "팬츠",
-      //                 "itemsId": 1,
-      //                 "itemName": "치마",
-      //                 "quantity": 10,
-      //                 "price": 1200.99,
-      //                 "unit": "JPY",
-      //                 "username": "민주샵",
-      //                 "recommendedorder.orderdate": null,
-      //                 "ordering": false
-      //             },
-      //             {
-      //                 "orderDetailId": 7,
-      //                 "category1Name": "패션의류",
-      //                 "category2Name": "여성패션",
-      //                 "category3Name": "팬츠",
-      //                 "itemsId": 1,
-      //                 "itemName": "치마",
-      //                 "quantity": 5,
-      //                 "price": 1200.99,
-      //                 "unit": "JPY",
-      //                 "username": "민주샵",
-      //                 "recommendedorder.orderdate": null,
-      //                 "ordering": false
-      //             },
-      //             {
-      //                 "orderDetailId": 8,
-      //                 "category1Name": "패션의류",
-      //                 "category2Name": "여성패션",
-      //                 "category3Name": "팬츠",
-      //                 "itemsId": 2,
-      //                 "itemName": "청바지",
-      //                 "quantity": 10,
-      //                 "price": 40100.00,
-      //                 "unit": "KRW",
-      //                 "username": "수플린",
-      //                 "recommendedorder.orderdate": null,
-      //                 "ordering": false
-      //             }
-      //         ]
-      //     },
-      //     {
-      //         "orderId": 7,
-      //         "username": "AWS선박",
-      //         "alias": "유승호",
-      //         "releaseDate": "2024-09-25",
-      //         "bestOrderDate": "2024-09-18",
-      //         "requestDate": "2024-09-18",
-      //         "memo": "다시 테스트",
-      //         "orderstate": "발주 예정",
-      //         "orderDetails": [
-      //             {
-      //                 "orderDetailId": 5,
-      //                 "category1Name": "패션의류",
-      //                 "category2Name": "여성패션",
-      //                 "category3Name": "팬츠",
-      //                 "itemsId": 1,
-      //                 "itemName": "치마",
-      //                 "quantity": 5,
-      //                 "price": 1200.99,
-      //                 "unit": "JPY",
-      //                 "username": "민주샵",
-      //                 "recommendedorder.orderdate": null,
-      //                 "ordering": false
-      //             },
-      //             {
-      //                 "orderDetailId": 6,
-      //                 "category1Name": "패션의류",
-      //                 "category2Name": "여성패션",
-      //                 "category3Name": "팬츠",
-      //                 "itemsId": 2,
-      //                 "itemName": "청바지",
-      //                 "quantity": 10,
-      //                 "price": 40100.00,
-      //                 "unit": "KRW",
-      //                 "username": "수플린",
-      //                 "recommendedorder.orderdate": null,
-      //                 "ordering": false
-      //             },
-      //             {
-      //                 "orderDetailId": 9,
-      //                 "category1Name": "패션의류",
-      //                 "category2Name": "여성패션",
-      //                 "category3Name": "팬츠",
-      //                 "itemsId": 1,
-      //                 "itemName": "치마",
-      //                 "quantity": 7,
-      //                 "price": 1200.99,
-      //                 "unit": "JPY",
-      //                 "username": "민주샵",
-      //                 "recommendedorder.orderdate": null,
-      //                 "ordering": false
-      //             },
-      //             {
-      //                 "orderDetailId": 10,
-      //                 "category1Name": "패션의류",
-      //                 "category2Name": "여성패션",
-      //                 "category3Name": "팬츠",
-      //                 "itemsId": 2,
-      //                 "itemName": "청바지",
-      //                 "quantity": 12,
-      //                 "price": 40100.00,
-      //                 "unit": "KRW",
-      //                 "username": "수플린",
-      //                 "recommendedorder.orderdate": null,
-      //                 "ordering": false
-      //             }
-      //         ]
-      //     },
-      //     {
-      //         "orderId": 8,
-      //         "username": "민주샵",
-      //         "alias": "minjoo",
-      //         "releaseDate": "2024-09-25",
-      //         "bestOrderDate": "2024-09-18",
-      //         "requestDate": "2024-09-09",
-      //         "memo": "질러볼까",
-      //         "orderstate": "발주 예정",
-      //         "orderDetails": [
-      //             {
-      //                 "orderDetailId": 17,
-      //                 "category1Name": "뷰티",
-      //                 "category2Name": "향수",
-      //                 "category3Name": "여성향수",
-      //                 "itemsId": 6,
-      //                 "itemName": "NO.5",
-      //                 "quantity": 3,
-      //                 "price": 299000.00,
-      //                 "unit": "KRW",
-      //                 "username": "첼시마켓",
-      //                 "recommendedorder.orderdate": null,
-      //                 "ordering": false
-      //             },
-      //             {
-      //                 "orderDetailId": 18,
-      //                 "category1Name": "뷰티",
-      //                 "category2Name": "향수",
-      //                 "category3Name": "캔들/디퓨저",
-      //                 "itemsId": 7,
-      //                 "itemName": "양키캔들",
-      //                 "quantity": 3,
-      //                 "price": 49900.00,
-      //                 "unit": "KRW",
-      //                 "username": "첼시마켓",
-      //                 "recommendedorder.orderdate": null,
-      //                 "ordering": false
-      //             }
-      //         ]
-      //     },
-      //     {
-      //         "orderId": 10,
-      //         "username": "minju",
-      //         "alias": "minju",
-      //         "releaseDate": "2024-10-01",
-      //         "bestOrderDate": "2024-09-10",
-      //         "requestDate": "2024-09-10",
-      //         "memo": null,
-      //         "orderstate": "발주 진행",
-      //         "orderDetails": [
-      //             {
-      //                 "orderDetailId": 20,
-      //                 "category1Name": "패션의류",
-      //                 "category2Name": "여성패션",
-      //                 "category3Name": "팬츠",
-      //                 "itemsId": 1,
-      //                 "itemName": "치마",
-      //                 "quantity": 10,
-      //                 "price": 1200.99,
-      //                 "unit": "JPY",
-      //                 "username": "민주샵",
-      //                 "recommendedorder.orderdate": null,
-      //                 "ordering": false
-      //             },
-      //             {
-      //                 "orderDetailId": 21,
-      //                 "category1Name": "패션의류",
-      //                 "category2Name": "남성패션",
-      //                 "category3Name": "팬츠",
-      //                 "itemsId": 3,
-      //                 "itemName": "청바지",
-      //                 "quantity": 10,
-      //                 "price": 39800.00,
-      //                 "unit": "KRW",
-      //                 "username": "민주샵",
-      //                 "recommendedorder.orderdate": null,
-      //                 "ordering": false
-      //             },
-      //             {
-      //                 "orderDetailId": 22,
-      //                 "category1Name": "패션의류",
-      //                 "category2Name": "캐주얼/유니섹스",
-      //                 "category3Name": "팬츠",
-      //                 "itemsId": 4,
-      //                 "itemName": "청바지",
-      //                 "quantity": 10,
-      //                 "price": 38800.00,
-      //                 "unit": "KRW",
-      //                 "username": "쿠팡",
-      //                 "recommendedorder.orderdate": null,
-      //                 "ordering": false
-      //             },
-      //             {
-      //                 "orderDetailId": 23,
-      //                 "category1Name": "뷰티",
-      //                 "category2Name": "향수",
-      //                 "category3Name": "여성향수",
-      //                 "itemsId": 6,
-      //                 "itemName": "NO.5",
-      //                 "quantity": 10,
-      //                 "price": 299000.00,
-      //                 "unit": "KRW",
-      //                 "username": "첼시마켓",
-      //                 "recommendedorder.orderdate": null,
-      //                 "ordering": false
-      //             }
-      //         ]
-      //     },
-      // ];
+       const myorderlist = [
+          // {
+          //     "orderId": 1,
+          //     "username": "AWS선박",
+          //     "alias": "유승호",
+          //     "releaseDate": "2024-05-04",
+          //     "bestOrderDate": "2024-01-21",
+          //     "requestDate": "2024-09-06",
+          //     "memo": "테스트",
+          //     "orderstate": "complete",
+          //     "orderDetails": [
+          //         {
+          //             "orderDetailId": 1,
+          //             "category1Name": "패션의류",
+          //             "category2Name": "여성패션",
+          //             "category3Name": "팬츠",
+          //             "itemsId": 1,
+          //             "itemName": "치마",
+          //             "quantity": 10,
+          //             "price": 1200.99,
+          //             "unit": "JPY",
+          //             "username": "민주샵",
+          //             "recommendedorder.orderdate": null,
+          //             "ordering": false
+          //         },
+          //         {
+          //             "orderDetailId": 7,
+          //             "category1Name": "패션의류",
+          //             "category2Name": "여성패션",
+          //             "category3Name": "팬츠",
+          //             "itemsId": 1,
+          //             "itemName": "치마",
+          //             "quantity": 5,
+          //             "price": 1200.99,
+          //             "unit": "JPY",
+          //             "username": "민주샵",
+          //             "recommendedorder.orderdate": null,
+          //             "ordering": false
+          //         },
+          //         {
+          //             "orderDetailId": 8,
+          //             "category1Name": "패션의류",
+          //             "category2Name": "여성패션",
+          //             "category3Name": "팬츠",
+          //             "itemsId": 2,
+          //             "itemName": "청바지",
+          //             "quantity": 10,
+          //             "price": 40100.00,
+          //             "unit": "KRW",
+          //             "username": "수플린",
+          //             "recommendedorder.orderdate": null,
+          //             "ordering": false
+          //         }
+          //     ]
+          // },
+          // {
+          //     "orderId": 7,
+          //     "username": "AWS선박",
+          //     "alias": "유승호",
+          //     "releaseDate": "2024-09-25",
+          //     "bestOrderDate": "2024-09-18",
+          //     "requestDate": "2024-09-18",
+          //     "memo": "다시 테스트",
+          //     "orderstate": "ready",
+          //     "orderDetails": [
+          //         {
+          //             "orderDetailId": 5,
+          //             "category1Name": "패션의류",
+          //             "category2Name": "여성패션",
+          //             "category3Name": "팬츠",
+          //             "itemsId": 1,
+          //             "itemName": "치마",
+          //             "quantity": 5,
+          //             "price": 1200.99,
+          //             "unit": "JPY",
+          //             "username": "민주샵",
+          //             "recommendedorder.orderdate": null,
+          //             "ordering": false
+          //         },
+          //         {
+          //             "orderDetailId": 6,
+          //             "category1Name": "패션의류",
+          //             "category2Name": "여성패션",
+          //             "category3Name": "팬츠",
+          //             "itemsId": 2,
+          //             "itemName": "청바지",
+          //             "quantity": 10,
+          //             "price": 40100.00,
+          //             "unit": "KRW",
+          //             "username": "수플린",
+          //             "recommendedorder.orderdate": null,
+          //             "ordering": false
+          //         },
+          //         {
+          //             "orderDetailId": 9,
+          //             "category1Name": "패션의류",
+          //             "category2Name": "여성패션",
+          //             "category3Name": "팬츠",
+          //             "itemsId": 1,
+          //             "itemName": "치마",
+          //             "quantity": 7,
+          //             "price": 1200.99,
+          //             "unit": "JPY",
+          //             "username": "민주샵",
+          //             "recommendedorder.orderdate": null,
+          //             "ordering": false
+          //         },
+          //         {
+          //             "orderDetailId": 10,
+          //             "category1Name": "패션의류",
+          //             "category2Name": "여성패션",
+          //             "category3Name": "팬츠",
+          //             "itemsId": 2,
+          //             "itemName": "청바지",
+          //             "quantity": 12,
+          //             "price": 40100.00,
+          //             "unit": "KRW",
+          //             "username": "수플린",
+          //             "recommendedorder.orderdate": null,
+          //             "ordering": false
+          //         }
+          //     ]
+          // },
+          // {
+          //     "orderId": 8,
+          //     "username": "민주샵",
+          //     "alias": "minjoo",
+          //     "releaseDate": "2024-09-25",
+          //     "bestOrderDate": "2024-09-18",
+          //     "requestDate": "2024-09-09",
+          //     "memo": "질러볼까",
+          //     "orderstate": "ready",
+          //     "orderDetails": [
+          //         {
+          //             "orderDetailId": 17,
+          //             "category1Name": "뷰티",
+          //             "category2Name": "향수",
+          //             "category3Name": "여성향수",
+          //             "itemsId": 6,
+          //             "itemName": "NO.5",
+          //             "quantity": 3,
+          //             "price": 299000.00,
+          //             "unit": "KRW",
+          //             "username": "첼시마켓",
+          //             "recommendedorder.orderdate": null,
+          //             "ordering": false
+          //         },
+          //         {
+          //             "orderDetailId": 18,
+          //             "category1Name": "뷰티",
+          //             "category2Name": "향수",
+          //             "category3Name": "캔들/디퓨저",
+          //             "itemsId": 7,
+          //             "itemName": "양키캔들",
+          //             "quantity": 3,
+          //             "price": 49900.00,
+          //             "unit": "KRW",
+          //             "username": "첼시마켓",
+          //             "recommendedorder.orderdate": null,
+          //             "ordering": false
+          //         }
+          //     ]
+          // },
+          // {
+          //     "orderId": 10,
+          //     "username": "minju",
+          //     "alias": "minju",
+          //     "releaseDate": "2024-10-01",
+          //     "bestOrderDate": "2024-09-10",
+          //     "requestDate": "2024-09-10",
+          //     "memo": null,
+          //     "orderstate": "progressing",
+          //     "orderDetails": [
+          //         {
+          //             "orderDetailId": 20,
+          //             "category1Name": "패션의류",
+          //             "category2Name": "여성패션",
+          //             "category3Name": "팬츠",
+          //             "itemsId": 1,
+          //             "itemName": "치마",
+          //             "quantity": 10,
+          //             "price": 1200.99,
+          //             "unit": "JPY",
+          //             "username": "민주샵",
+          //             "recommendedorder.orderdate": null,
+          //             "ordering": false
+          //         },
+          //         {
+          //             "orderDetailId": 21,
+          //             "category1Name": "패션의류",
+          //             "category2Name": "남성패션",
+          //             "category3Name": "팬츠",
+          //             "itemsId": 3,
+          //             "itemName": "청바지",
+          //             "quantity": 10,
+          //             "price": 39800.00,
+          //             "unit": "KRW",
+          //             "username": "민주샵",
+          //             "recommendedorder.orderdate": null,
+          //             "ordering": false
+          //         },
+          //         {
+          //             "orderDetailId": 22,
+          //             "category1Name": "패션의류",
+          //             "category2Name": "캐주얼/유니섹스",
+          //             "category3Name": "팬츠",
+          //             "itemsId": 4,
+          //             "itemName": "청바지",
+          //             "quantity": 10,
+          //             "price": 38800.00,
+          //             "unit": "KRW",
+          //             "username": "쿠팡",
+          //             "recommendedorder.orderdate": null,
+          //             "ordering": false
+          //         },
+          //         {
+          //             "orderDetailId": 23,
+          //             "category1Name": "뷰티",
+          //             "category2Name": "향수",
+          //             "category3Name": "여성향수",
+          //             "itemsId": 6,
+          //             "itemName": "NO.5",
+          //             "quantity": 10,
+          //             "price": 299000.00,
+          //             "unit": "KRW",
+          //             "username": "첼시마켓",
+          //             "recommendedorder.orderdate": null,
+          //             "ordering": false
+          //         }
+          //     ]
+          // },
+       ];
       setLoading(true);
       try {
         const response = await fetch(`userOrders`, {
@@ -352,6 +355,11 @@ export default function MyOrderList() {
     }
   };
 
+  const handlePageClick = (event) => {
+    const newOffset = (event.selected * itemsPerPage) % listdata.length;
+    setItemOffset(newOffset);
+  };
+
   return (
     <div>
       {/* Loading이 true면 컴포넌트를 띄우고, false면 null(빈 값)처리 하여 컴포넌트 숨김 */}
@@ -406,7 +414,7 @@ export default function MyOrderList() {
                 timeout="auto"
                 unmountOnExit
               >
-                <div className="w-full px-6 pt-0 pb-5">
+                <div className="w-full px-6 pt-0 pb-5 max-h-40 overflow-auto">
                   <Table>
                     <TableHead>
                       <TableRow
@@ -415,6 +423,9 @@ export default function MyOrderList() {
                             color: "white",
                             fontWeight: "bold",
                             border: "none",
+                            position: 'sticky',
+                            top: 0,
+                            zIndex: 1,
                           },
                         }}
                       >
@@ -445,7 +456,7 @@ export default function MyOrderList() {
                                   color: "white",
                                 }}
                               >
-                                -
+                                {detail.quantity}
                               </TableCell>
                               <TableCell
                                 align="center"
@@ -524,7 +535,27 @@ export default function MyOrderList() {
               </Collapse>
             </div>
           ))}
-        </div>
+          <div className="flex justify-center">
+                <ReactPaginate
+                  breakLabel="..."
+                  nextLabel="다음 >"
+                  onPageChange={handlePageClick}
+                  pageRangeDisplayed={3}
+                  pageCount={Math.ceil(listdata.length / itemsPerPage)} // 필터된 데이터에 따라 페이지 수 결정
+                  previousLabel="< 이전"
+                  renderOnZeroPageCount={null}
+                  containerClassName="pagination"
+                  pageClassName="page-item"
+                  pageLinkClassName="page-link"
+                  previousClassName="page-item"
+                  previousLinkClassName="page-link"
+                  nextClassName="page-item"
+                  nextLinkClassName="page-link"
+                  activeClassName="active"
+                  className="text-white w-80 flex justify-around fixed bottom-20 left-1/2 transform -translate-x-1/2"
+                />
+          </div>
+        </div>        
       )}
     </div>
   );
