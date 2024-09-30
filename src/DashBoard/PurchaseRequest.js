@@ -42,9 +42,6 @@ export default function PurchaseRequest() {
         throw new Error("purchaserequestlist response was not ok");
       }
       const purreq = await response.json();
-      // const sortdata = purreq.sort(
-      //   (a, b) => new Date(b.requestDate) - new Date(a.requestDate)
-      // );
       const sortdata = purreq.sort((a, b) => {
         const dateA = new Date(a.requestDate);
         const dateB = new Date(b.requestDate);
@@ -58,7 +55,7 @@ export default function PurchaseRequest() {
       // 모든 카드 확장 상태를 true로 설정
       const initialExpanded = {};
       sortdata.forEach((order) => {
-        initialExpanded[order.orderId] = true; // 모든 카드가 확장된 상태
+        initialExpanded[order.orderId] = true;
       });
       setExpanded(initialExpanded);
       setListdata(sortdata);
@@ -69,6 +66,8 @@ export default function PurchaseRequest() {
       console.log("Failed to fetch PurchaseRequestlist", e);
     }
   };
+  
+  console.log('데이터확인', listdata)
 
   useEffect(() => {
     fetchpurcheslist();
@@ -160,19 +159,13 @@ export default function PurchaseRequest() {
                       </div>
                     </div>
                     <div className="w-full flex justify-between items-center">
-                      <div className="flex items-baseline">
                         <h1 className="text-xl font-bold text-[#A276FF]">
                           {order.username}
                         </h1>
-                        <div className="flex ml-2 text-[#ffffffc9]">
-                          <h1 className="mr-2">희망입고일 : </h1>
-                          <h1>{order.releaseDate}</h1>
-                        </div>
-                      </div>
-                      <div className="flex items-end">
-                        <h1 className="mr-3 text-sm">발주예정일</h1>
-                        <h1 className="ml-2 text-xl font-bold text-[#3af0ff]">
-                          {order.bestOrderDate}
+                      <div className="flex items-center">
+                        <h1 className="mr-3 text-sm">희망입고일 :</h1>
+                        <h1 className="ml-2 text-xl font-bold text-[#A276FF]">
+                          {order.releaseDate}
                         </h1>
                       </div>
                     </div>

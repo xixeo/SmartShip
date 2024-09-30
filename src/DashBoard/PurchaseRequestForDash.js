@@ -65,19 +65,13 @@ export default function PurchaseRequest() {
                       </div>
                     </div>
                     <div className="w-full flex justify-between items-center">
-                      <div className="flex items-baseline">
                         <h1 className="text-xl font-bold text-[#A276FF]">
                           {order.username}
                         </h1>
-                        <div className="flex ml-2 text-[#ffffffc9]">
-                          <h1 className="mr-2">희망입고일 : </h1>
-                          <h1>{order.releaseDate}</h1>
-                        </div>
-                      </div>
-                      <div className="flex items-end">
-                        <h1 className="mr-3 text-sm">발주예정일</h1>
-                        <h1 className="ml-2 text-xl font-bold text-[#3af0ff]">
-                          {order.bestOrderDate}
+                      <div className="flex items-center">
+                        <h1 className="mr-3 text-sm">희망입고일 :</h1>
+                        <h1 className="ml-2 text-xl font-bold text-[#A276FF]">
+                          {order.releaseDate}
                         </h1>
                       </div>
                     </div>
