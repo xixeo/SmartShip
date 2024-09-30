@@ -13,9 +13,10 @@ import {
 import Box from "@mui/material/Box";
 import Loading from "../Compo/Loading";
 import ReactPaginate from "react-paginate"; 
+import './MyOrderList.scss'
 
-//////////////////////
-//    확장 아이콘    //
+  //////////////////////
+ //    확장 아이콘    //
 //////////////////////
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -286,9 +287,10 @@ export default function MyOrderList() {
           (a, b) => new Date(b.requestDate) - new Date(a.requestDate)
         );
         setListdata(sortdata);
-        setLoading(false);
       } catch (e) {
         console.log("Failed to fetch getMyOrderList", e);
+      } finally {
+        setLoading(false);
       }
     };
     fetchMyorderdata();
@@ -359,13 +361,9 @@ export default function MyOrderList() {
     const newOffset = (event.selected * itemsPerPage) % listdata.length;
     setItemOffset(newOffset);
   };
-
+console.log('취소확인',updateListdata.map((order, index) => (order.orderDetails.map((detail) => (detail.cancel)))))
   return (
     <div>
-      {/* Loading이 true면 컴포넌트를 띄우고, false면 null(빈 값)처리 하여 컴포넌트 숨김 */}
-      {loading ? (
-        <Loading />
-      ) : (
         <div className="flex-col text-white MyOrderList">
           <h2 className="text-2xl font-semibold text-white mb-10 ml-5">
             구매요청 내역
@@ -437,7 +435,7 @@ export default function MyOrderList() {
                     </TableHead>
                     <TableBody>
                       {order.orderDetails.map((detail) => (
-                        <TableRow key={detail.orderDetailId}>
+                        <TableRow key={detail.orderDetailId} sx={{ backgroundColor: detail.cancel ? '#ca4242' : '#69686f'}}>
                           {order.state !== "발주 완료" ? (
                             <>
                               <TableCell
@@ -556,7 +554,6 @@ export default function MyOrderList() {
                 />
           </div>
         </div>        
-      )}
     </div>
   );
 }
