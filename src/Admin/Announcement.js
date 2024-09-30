@@ -234,7 +234,7 @@ export default function Announcement() {
 
     return (
         <div className="flex flex-col p-6 h-full list-table-root">
-            // 모달 컴포넌트 부분 수정
+           {/* 모달 */}
             <div className="flex justify-between m-2 p-2">
                 <Modal open={preleadopen} onClose={() => setPreleadOpen(false)}>
                     <Box

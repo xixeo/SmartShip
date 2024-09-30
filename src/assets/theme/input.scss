@@ -48,15 +48,30 @@
     }
   }
 
-.check-btn {
-  border: 1px solid $check-btn;
-  color: $check-btn;
+.inner-btn {
+  background: $inner-btn;
+    color: #fff;
+    border: 1px solid $inner-btn;
+    padding: 6px 16px;
+   
+    border-radius: 4px;
+    outline: 0 !important;
+  
+    &:hover {
+      background:#268b68;
+      transition: all 0.3s;
+    }
+}
+
+.inner-btn2 {
+  border: 1px solid $inner-btn;
+  color: $inner-btn;
   border-radius: 4px;
   outline: 0 !important;
   padding: 6px 16px;
 
   &:hover {
-    background: $check-btn;
+    background: $inner-btn;
     color: #fff;
     transition: all 0.3s;
   }
@@ -68,3 +83,26 @@
 
   max-width: 180px !important;
 }
+
+  // switch 동그라미
+  .MuiSwitch-root {
+    .Mui-checked + .MuiSwitch-track {
+      opacity: 1 !important;
+    }
+    .Mui-checked {
+      color: $blue-btn !important;
+    }
+    .MuiSwitch-track {
+      background-color: #46465c !important;
+    }
+  }
+
+  .MuiMenu-list{
+    background-color: #7669b3;
+    color: #fff;
+
+
+    li{
+      font-size: 0.9rem !important;
+    }
+  }
