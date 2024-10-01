@@ -13,12 +13,18 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
   const [remember, setRemember] = useState(false); // 아이디 저장할지 체크박스 상태
   const navigate = useNavigate();
 
-  window.addEventListener('beforeunload', () => {
-    localStorage.removeItem('token'); // 브라우저 종료 시 토큰 삭제
-    localStorage.removeItem('alias'); 
-    localStorage.removeItem('username');
-    localStorage.removeItem('role');
-    localStorage.removeItem('id');
+  // storage 이벤트 리스너 추가 (다른 탭에서 토큰이 변경되면 호출됨)
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'token') {
+      const newToken = event.newValue;
+      if (newToken) {
+        // 새로운 토큰이 있으면, 세션 스토리지에 저장
+        sessionStorage.setItem('token', newToken);
+      } else {
+        // 토큰이 삭제된 경우 (로그아웃 시), 세션 스토리지에서도 삭제
+        sessionStorage.removeItem('token');
+      }
+    }
   });
 
   // 컴포넌트가 마운트될 때 로컬 스토리지에서 아이디를 가져와서 설정
@@ -63,6 +69,7 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
         const role = decodedToken.role;
 
         localStorage.setItem("token", cleanedToken);
+        sessionStorage.setItem('token', cleanedToken);
         localStorage.setItem("id", id);
         localStorage.setItem("username", username);
         localStorage.setItem("alias", alias);

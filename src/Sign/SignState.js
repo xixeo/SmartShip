@@ -9,6 +9,15 @@ import { ReactComponent as Person } from "../assets/icons/svg/person.svg";
 const SignState = () => {
   const [isLogoutVisible, setIsLogoutVisible] = useState(false);
 
+  window.addEventListener('load', () => {
+    const token = localStorage.getItem('token');
+
+    // sessionStorage에 토큰이 없다면 로그아웃 처리
+    if (token && !sessionStorage.getItem('token')) {
+      handleLogout()
+    }
+  });
+
   const handleToggle = () => {
     setIsLogoutVisible((prevState) => !prevState);
   };
@@ -23,6 +32,7 @@ const SignState = () => {
     localStorage.removeItem("alias");
     localStorage.removeItem("role");
     localStorage.removeItem("token");
+    sessionStorage.removeItem('token');
     navigate("/signin");
     window.location.reload();
   };
@@ -47,9 +57,8 @@ const SignState = () => {
           </button>
         </div>
         <div
-          className={`logout-button-container ${
-            isLogoutVisible ? "show" : "hide"
-          }`}
+          className={`logout-button-container ${isLogoutVisible ? "show" : "hide"
+            }`}
         >
           <button onClick={handleLogout} className="logout-button mr-2">
             <SvgIcon className="text-white mr-2" width="17" height="17" />
