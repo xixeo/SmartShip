@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/theme/Navi.scss";
-import { Button } from "@mui/material";
+import { Button, Box } from "@mui/material";
 import logo from "../assets/img/logo.png";
 import { ReactComponent as Side01 } from "../assets/icons/svg/side01.svg";
 import { ReactComponent as Side02 } from "../assets/icons/svg/side02.svg";
@@ -14,6 +14,7 @@ import { ReactComponent as Side08 } from "../assets/icons/svg/side08.svg";
 import { ReactComponent as Side09 } from "../assets/icons/svg/side09.svg";
 import { ReactComponent as ArrowR } from "../assets/icons/svg/arrowR.svg";
 import Modal2 from "./Modal2";
+import { Padding } from "@mui/icons-material";
 
 const Navi = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -25,17 +26,20 @@ const Navi = () => {
     setIsCollapsed(!isCollapsed);
   };
 
-  // 회원탈퇴 모달
+  // 회원탈퇴 메시지 여부
+  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // // 회원탈퇴 모달
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
+  // const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  // const handleOpenModal = () => {
+  //   setIsModalOpen(true);
+  // };
+
+  // const handleCloseModal = () => {
+  //   setIsModalOpen(false);
+  // };
 
   // 회원탈퇴 후 로그아웃처리, 로그인 페이지로 이동
   const handleLogout = () => {
@@ -169,21 +173,63 @@ const Navi = () => {
         </ul>
       </div>
       <div className="withdrawal-button items-center">
-        <button
+        {/* <button
           className="blue-btn items-center"
           variant="contained"
           color="error"
-          onClick={handleWithdrawal}
+          onClick={handleOpenModal}
           style={{ margin: "10px" }} // 원하는 스타일 추가
         >
           회원 탈퇴
         </button>
         <Modal2
+          sx={{ zIndex: 9999, display: 'absolute' }}
           open={isModalOpen}
           setOpen={setIsModalOpen}
           title="정말 탈퇴하시겠습니까?"
           onConfirm={handleWithdrawal}
-        />
+        /> */}
+        <Box sx={{ textAlign: 'center', margin: '20px' }}>
+          {isConfirmVisible ? (
+            <div>
+              <p className="text-white">정말 탈퇴하시겠습니까?</p>
+              <button
+                className="blue-btn"
+                style={{
+                  margin: '10px'
+                }}
+                onClick={handleWithdrawal}
+              >
+                확인
+              </button>
+              <button
+                className="blue-btn"
+                style={{
+                  margin: '10px'
+                }}
+                onClick={() => setIsConfirmVisible(false)} // 취소 클릭 시 버튼으로 돌아감
+              >
+                취소
+              </button>
+            </div>
+          ) : (
+            <button
+              className="blue-btn items-center"
+              variant="contained"
+              onClick={() => setIsConfirmVisible(true)} // 확인 메시지 표시
+              sx={{
+                margin: "10px", // 원하는 스타일 추가
+                backgroundColor: "#9c87ff", // 버튼 색상
+                color: "white", // 텍스트 색상
+                '&:hover': {
+                  backgroundColor: "#8a76e0", // 마우스 오버 시 색상 변경
+                },
+              }}
+            >
+              회원 탈퇴
+            </button>
+          )}
+        </Box>
       </div>
       <div className="toggle-btn" onClick={toggleSidebar}>
         <span className="arrow">{isCollapsed ? "→" : "←"}</span>
