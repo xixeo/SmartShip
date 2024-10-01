@@ -278,39 +278,30 @@ export default function OrderTest() {
 
     // 검색 처리 함수
     const [searchQuery, setSearchQuery] = useState("");
-    const [appliedSearchQuery, setAppliedSearchQuery] = useState("");
     const [filteredData, setFilteredData] = useState(listdatas);
+    const [appliedSearchQuery, setAppliedSearchQuery] = useState("");
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
     };
+
     const handleSearchReset = () => {
         setSearchQuery("");
-        setAppliedSearchQuery("");
+        setAppliedSearchQuery(""); // 검색어 초기화
+        setFilteredData(listdatas); // 검색어를 초기화하면 전체 데이터를 보여줌
     };
+
     const handleSearchButtonClick = () => {
-        // 검색어가 있는 경우 필터링 실행
-        if (searchQuery.trim() !== "") {
-            const filtered = listdatas.filter((row) =>
-                row.itemName.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            setFilteredData(filtered);
-        } else {
-            // 검색어가 비어 있으면 전체 데이터 표시
-            setFilteredData(listdatas);
-        }
-    
-        // 현재 페이지를 초기화 (원하는 경우)
-        // setCurrentPage(1);
+        setAppliedSearchQuery(searchQuery);
     };
 
      // 검색어가 적용된 경우 필터링
      useEffect(() => {
         if (appliedSearchQuery) {
-            const filtered = listdatas.filter((row) =>
+            const newFilteredData  = listdatas.filter((row) =>
                 row.itemName.toLowerCase().includes(appliedSearchQuery.toLowerCase())
             );
-            setFilteredData(filtered);
+            setFilteredData(newFilteredData);
         } else {
             setFilteredData(listdatas);
         }
@@ -496,7 +487,7 @@ export default function OrderTest() {
              <div className="text-xl font-semibold text-white mb-2">
                 장바구니
             </div>
-            <div className="flex justify-end items-center mb-2">
+            <div className="flex justify-end items-center mb-5">
                 <h4 className="font-semibold text-white mr-2">창고 출고 예정일</h4>
                 <BasicDatePicker
                     onDateAccept={(date) => setSelectedDate(date)}
