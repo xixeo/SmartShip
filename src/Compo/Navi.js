@@ -189,6 +189,7 @@ const Navi = () => {
           title="정말 탈퇴하시겠습니까?"
           onConfirm={handleWithdrawal}
         /> */}
+        {!isCollapsed && 
         <Box sx={{ textAlign: 'center', margin: '20px' }}>
           {isConfirmVisible ? (
             <div>
@@ -230,6 +231,7 @@ const Navi = () => {
             </button>
           )}
         </Box>
+        }{" "}
       </div>
       <div className="toggle-btn" onClick={toggleSidebar}>
         <span className="arrow">{isCollapsed ? "→" : "←"}</span>

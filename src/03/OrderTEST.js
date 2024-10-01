@@ -31,6 +31,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Pagination from "@mui/material/Pagination";
 import Modal2 from "../Compo/Modal2";
 import { useNavigate } from "react-router-dom";
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function OrderTest() {
     const navigate = useNavigate();
@@ -121,10 +122,6 @@ export default function OrderTest() {
         // 새로고침 시 localStorage 비우기
         localStorage.removeItem("selectedDate");
     }, []);
-
-    useEffect(() => {
-        setFilteredData(listdatas);
-    }, [listdatas]);
 
     //////////////////////
     //  수량 변경 함수   //
@@ -281,25 +278,61 @@ export default function OrderTest() {
 
     // 검색 처리 함수
     const [searchQuery, setSearchQuery] = useState("");
+    const [appliedSearchQuery, setAppliedSearchQuery] = useState("");
     const [filteredData, setFilteredData] = useState(listdatas);
 
-    const handleSearch = () => {
-        if (searchQuery.trim() === "") {
-            // 검색 쿼리가 비어 있으면 전체 데이터 표시
-            setFilteredData(listdatas);
-        } else {
-            const filtered = listdatas.filter((item) =>
-                item.itemName.toLowerCase().includes(searchQuery.toLowerCase())
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value);
+    };
+    const handleSearchReset = () => {
+        setSearchQuery("");
+        setAppliedSearchQuery("");
+    };
+    const handleSearchButtonClick = () => {
+        // 검색어가 있는 경우 필터링 실행
+        if (searchQuery.trim() !== "") {
+            const filtered = listdatas.filter((row) =>
+                row.itemName.toLowerCase().includes(searchQuery.toLowerCase())
             );
             setFilteredData(filtered);
+        } else {
+            // 검색어가 비어 있으면 전체 데이터 표시
+            setFilteredData(listdatas);
         }
+    
+        // 현재 페이지를 초기화 (원하는 경우)
+        // setCurrentPage(1);
     };
 
-    // X 버튼 핸들러
-    const handleClearSearch = () => {
-        setSearchQuery("");
-        setFilteredData(listdatas);
-    };
+     // 검색어가 적용된 경우 필터링
+     useEffect(() => {
+        if (appliedSearchQuery) {
+            const filtered = listdatas.filter((row) =>
+                row.itemName.toLowerCase().includes(appliedSearchQuery.toLowerCase())
+            );
+            setFilteredData(filtered);
+        } else {
+            setFilteredData(listdatas);
+        }
+    }, [appliedSearchQuery, listdatas]);
+
+    // const handleSearch = () => {
+    //     if (searchQuery.trim() === "") {
+    //         // 검색 쿼리가 비어 있으면 전체 데이터 표시
+    //         setFilteredData(listdatas);
+    //     } else {
+    //         const filtered = listdatas.filter((item) =>
+    //             item.itemName.toLowerCase().includes(searchQuery.toLowerCase())
+    //         );
+    //         setFilteredData(filtered);
+    //     }
+    // };
+
+    // // X 버튼 핸들러
+    // const handleClearSearch = () => {
+    //     setSearchQuery("");
+    //     setFilteredData(listdatas);
+    // };
 
     /////////////////////////////
     //  페이지네이션 관련 함수   //
@@ -479,7 +512,7 @@ export default function OrderTest() {
                         <div className=" gap-2 flex items-center">
                             <TextField
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onChange={handleSearchChange}
                                 placeholder="물품명 검색"
                                 size="small"
                                 InputProps={{
@@ -493,24 +526,29 @@ export default function OrderTest() {
                                             />
                                         </InputAdornment>
                                     ),
-                                    endAdornment: searchQuery && (
+                                    endAdornment: (
                                         <InputAdornment position="end">
-                                            <IconButton
-                                                onClick={handleClearSearch}
-                                                edge="end"
-                                                sx={{ color: "white" }}
-                                            >
-                                                <ClearOutlinedIcon
-                                                    sx={{ fontSize: 20 }}
-                                                />
-                                            </IconButton>
+                                            {searchQuery && (
+                                                <IconButton
+                                                    onClick={handleSearchReset}
+                                                    edge="end"
+                                                    sx={{ color: "white" }}
+                                                >
+                                                    <CloseIcon
+                                                        sx={{
+                                                            color: "white",
+                                                            fontSize: 20,
+                                                        }}
+                                                    />
+                                                </IconButton>
+                                            )}
                                         </InputAdornment>
                                     ),
                                 }}
                                 className="custom-textfield items-center"
                             />
                             <button
-                                onClick={handleSearch}
+                                onClick={handleSearchButtonClick}
                                 variant="contained"
                                 className="blue-btn items-center"
                             >
@@ -726,10 +764,7 @@ export default function OrderTest() {
                             <div className="flex bottomWrap mt-6">
                                 <div className="pagination-container">
                                     <Pagination
-                                        count={Math.ceil(
-                                            currentItem2Array.length /
-                                                itemsPerPage
-                                        )}
+                                        count={totalPages}
                                         page={currentPage}
                                         onChange={(event, value) =>
                                             setCurrentPage(value)
