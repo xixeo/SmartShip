@@ -13,6 +13,14 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
   const [remember, setRemember] = useState(false); // 아이디 저장할지 체크박스 상태
   const navigate = useNavigate();
 
+  window.addEventListener('beforeunload', () => {
+    localStorage.removeItem('token'); // 브라우저 종료 시 토큰 삭제
+    localStorage.removeItem('alias'); 
+    localStorage.removeItem('username');
+    localStorage.removeItem('role');
+    localStorage.removeItem('id');
+  });
+
   // 컴포넌트가 마운트될 때 로컬 스토리지에서 아이디를 가져와서 설정
   React.useEffect(() => {
     const storedId = localStorage.getItem("storedId");
@@ -77,6 +85,7 @@ function SignIn({ setIsAuthenticated, setRedirectPath }) {
     } catch (error) {
       setLoginError(error.message);
     }
+
   };
 
   return (

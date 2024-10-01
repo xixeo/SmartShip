@@ -41,15 +41,19 @@ function App() {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        if (token) {
-            setIsAuthenticated(true);
+        const isAuthenticatedNow = !!token; 
+        if (isAuthenticatedNow !== isAuthenticated) {
+            setIsAuthenticated(isAuthenticatedNow); 
         }
-    }, []);
+    }, [isAuthenticated]);
+    
 
     const PrivateRoute = ({ element }) => {
+        // setLoading(true)
         return isAuthenticated ? element : <Navigate to="/signin" />;
     };
 
+    console.log('인증확인', isAuthenticated)
     return (
         <ThemeProvider theme={theme}>
             <BrowserRouter>
@@ -69,7 +73,7 @@ function App() {
                                 element={
                                     <SignIn
                                         setIsAuthenticated={setIsAuthenticated}
-                                        setRedirectPath={setRedirectPath}
+                                        setRedirectPath={()=>setRedirectPath("/")}
                                     />
                                 }
                             />
@@ -78,10 +82,11 @@ function App() {
                                 element={
                                     <ListSupplier2
                                         setIsAuthenticated={setIsAuthenticated}
-                                        setRedirectPath={setRedirectPath}
+                                        setRedirectPath={()=>setRedirectPath("/")}
                                     />
                                 }
                             />
+                            <Route path="/" element={<PrivateRoute element={<MainApp />} />} />
                         </Routes>
                     ) : (
                         <div className="flex content-wrap w-full h-screen">
@@ -94,88 +99,24 @@ function App() {
                                         {/* 여기 로딩넣기 */}
                                         <LoadingProvider>
                                             <Routes>
-                                                <Route
-                                                    path="/"
-                                                    element={<MainApp />}
-                                                />
-                                                <Route
-                                                    path="/schedule"
-                                                    element={<Schedule />}
-                                                />
-                                                <Route
-                                                    path="/listtabledb"
-                                                    element={<ListTableDB />}
-                                                />
-                                                <Route
-                                                    path="/listsupplier"
-                                                    element={<ListSupplier />}
-                                                />
-                                                <Route
-                                                    path="/listsupplier2"
-                                                    element={<ListSupplier2 />}
-                                                />
-                                                <Route
-                                                    path="/order"
-                                                    element={<Order />}
-                                                />
-                                                <Route
-                                                    path="/ordertest"
-                                                    element={<OrderTEST />}
-                                                />
-                                                <Route
-                                                    path="/ordertest2"
-                                                    element={
-                                                        <BasicDatePicker />
-                                                    }
-                                                />
-                                                <Route
-                                                    path="/signstate"
-                                                    element={<SignState />}
-                                                />
-                                                <Route
-                                                    path="/Board"
-                                                    element={<Board />}
-                                                />
-                                                <Route
-                                                    path="/MyOrderList"
-                                                    element={<MyOrderList />}
-                                                />
-                                                <Route
-                                                    path="/AnnounceForEvery"
-                                                    element={
-                                                        <AnnounceForEvery />
-                                                    }
-                                                />
-                                                <Route
-                                                    path="/AnnounceWrite"
-                                                    element={<AnnounceWrite />}
-                                                />
-                                                <Route
-                                                    path="/AnnounceEdit/:noticeid"
-                                                    element={<AnnounceEdit/>}
-                                                />
-                                                <Route
-                                                    path="/Announcement"
-                                                    element={<Announcement />}
-                                                />
-                                                <Route
-                                                    path="/Membership"
-                                                    element={<Membership />}
-                                                />
-                                                <Route
-                                                    path="/SupplierBoard"
-                                                    element={<SupplierBoard />}
-                                                />
-                                                <Route
-                                                    path="/PurchaseRequest"
-                                                    element={
-                                                        <PurchaseRequest />
-                                                    }
-                                                />
-                                                <Route
-                                                    path="/getOrderDetail/:orderId"
-                                                    element={<OrderManage />}
-                                                />
+                                                <Route path="/schedule" element={<PrivateRoute element={<Schedule />} />} />
+                                                <Route path="/listtabledb" element={<PrivateRoute element={<ListTableDB />} />} />
+                                                <Route path="/listsupplier" element={<PrivateRoute element={<ListSupplier />} />} />
+                                                <Route path="/listsupplier2" element={<PrivateRoute element={<ListSupplier2 />} />} />
+                                                <Route path="/order" element={<PrivateRoute element={<Order />} />} />
+                                                <Route path="/ordertest" element={<PrivateRoute element={<OrderTEST />} />} />
+                                                <Route path="/ordertest2" element={<PrivateRoute element={<BasicDatePicker />} />} />
+                                                <Route path="/signstate" element={<PrivateRoute element={<SignState />} />} />
+                                                <Route path="/Board" element={<PrivateRoute element={<Board />} />} />
+                                                <Route path="/MyOrderList" element={<PrivateRoute element={<MyOrderList />} />} />
+                                                <Route path="/AnnounceForEvery" element={<PrivateRoute element={<AnnounceForEvery />} />} />
+                                                <Route path="/AnnounceWrite" element={<PrivateRoute element={<AnnounceWrite />} />} />
+                                                <Route path="/AnnounceEdit/:noticeid" element={<PrivateRoute element={<AnnounceEdit />} />} />
+                                                <Route path="/Announcement" element={<PrivateRoute element={<Announcement />} />} />
+                                                <Route path="/Membership" element={<PrivateRoute element={<Membership />} />} />
+                                                <Route path="/SupplierBoard" element={<PrivateRoute element={<SupplierBoard />} />} />
+                                                <Route path="/PurchaseRequest" element={<PrivateRoute element={<PurchaseRequest />} />} />
+                                                <Route path="/getOrderDetail/:orderId" element={<PrivateRoute element={<OrderManage />} />} />
                                             </Routes>
                                         </LoadingProvider>
                                     </AlertProvider>
