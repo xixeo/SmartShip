@@ -34,7 +34,7 @@ const Modal2 = ({ open, setOpen, title, onConfirm, orderDate }) => {
             >
                 <button
                     onClick={() => setOpen(false)}
-                    className="absolute top-3 right-3 text-white hover:text-gray-500"
+                    className="text-3xl absolute top-1 right-3 text-white hover:text-gray-500"
                 >
                     &times;
                 </button>
@@ -46,22 +46,22 @@ const Modal2 = ({ open, setOpen, title, onConfirm, orderDate }) => {
                 </Box>
 
                 {/* 확인 및 취소 버튼 */}
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Button
-                        sx={{ color: 'white', backgroundColor: '#43C5FE' }}
+                <Box  className="mt-3" sx={{ display: 'flex', gap: 2 }}>
+                    <button
+                       className='blue-btn2'
                         onClick={() => {
                             setOpen(false);
                             onConfirm();
                         }}
                     >
                         확인
-                    </Button>
-                    <Button
-                        sx={{ color: 'white', backgroundColor: '#BFBFBF' }}
+                    </button>
+                    <button
+                        className='blue-btn'
                         onClick={() => setOpen(false)}
                     >
                         취소
-                    </Button>
+                    </button>
                 </Box>
             </Box>
         </div>
