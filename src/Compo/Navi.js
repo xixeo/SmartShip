@@ -75,7 +75,7 @@ const Navi = () => {
   return (
     <div className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
       <div>
-        <div className="logo">
+        <div onClick={() => navigate("/Board")} className="logo cursor-pointer">
           <img src={logo} alt="Logo" className="logo-image" />
           {!isCollapsed && <span className="logo-text">SMARTSHIP</span>}{" "}
           {/* 축소 시 텍스트 숨기기 */}

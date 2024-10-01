@@ -1,6 +1,12 @@
 @import "../App.scss";
 
 .OrderBasket {
+
+
+  .MuiTableContainer-root{
+  min-height: calc(100vh - 650px) !important  
+}
+
   .activerow {
     td {
       background-color: #ca4242;
