@@ -20,6 +20,7 @@ import { Search as SearchIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Modal2 from "../Compo/Modal2";
 import "./ListTable.scss";
+import Loading from "../Compo/Loading";
 
 // 테이블 헤더 정의
 const headCells = [
@@ -89,6 +90,7 @@ function ListTableDB() {
   const [category3Name, setCategory3Name] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false); // 장바구니로 이동 물어보기 모달상태
+  const [loading, setLoading] = useState(true);
 
   // 사용자 이름을 로컬 스토리지에서 가져옴
   const username = localStorage.getItem("username") || "Guest";
@@ -99,6 +101,7 @@ function ListTableDB() {
   };
 
   useEffect(() => {
+    setLoading(true)
     const fetchData = async () => {
       try {
         const response = await fetch("/finditem", {
@@ -120,6 +123,8 @@ function ListTableDB() {
         setRows(processedData);
       } catch (error) {
         console.error("데이터 로딩 중 오류 발생:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -401,6 +406,7 @@ function ListTableDB() {
     console.log("전송할 장바구니 아이템:", cartItems);
 
     try {
+      setLoading(false); // 초기 로딩 상태 설정
       const response = await fetch("/goCart", {
         method: "POST",
         headers: {
@@ -418,6 +424,8 @@ function ListTableDB() {
       }
     } catch (error) {
       console.error("장바구니 추가 중 오류 발생:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -428,127 +436,120 @@ function ListTableDB() {
   };
 
   return (
-    <div className="list-table-root flex flex-col p-6">
-      <div className="text-xl font-semibold text-white mb-4">물품 리스트</div>
-      <div className="flex items-center justify-between gap-4 mb-4">
-        <div className="flex items-center gap-4">
-          <Select
-            value={category1Name}
-            onChange={handleCategory1Change}
-            displayEmpty
-            className="select-custom"
-          >
-            <MenuItem value="">
-              <div>Categories 1</div>
-            </MenuItem>
-            {category1Options.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-          <Select
-            value={category2Name}
-            onChange={handleCategory2Change}
-            displayEmpty
-            className="select-custom"
-          >
-            <MenuItem value="">
-              <div>Categories 2</div>
-            </MenuItem>
-            {category2Options.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-          <Select
-            value={category3Name}
-            onChange={handleCategory3Change}
-            displayEmpty
-            className="select-custom"
-          >
-            <MenuItem value="">
-              <div>Categories 3</div>
-            </MenuItem>
-            {category3Options.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-          <TextField
-            value={searchQuery}
-            onChange={handleSearchChange}
-            placeholder="물품명 검색"
-            size="small"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: "white", fontSize: 20 }} />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  {searchQuery && (
-                    <IconButton
-                      onClick={handleSearchReset}
-                      edge="end"
-                      sx={{ color: "white" }}
-                    >
-                      <CloseIcon
-                        sx={{
-                          color: "white",
-                          fontSize: 20,
-                        }}
-                      />
-                    </IconButton>
-                  )}
-                </InputAdornment>
-              ),
-            }}
-            className="custom-textfield"
-          />
-          <button
-            onClick={handleSearchButtonClick}
-            variant="contained"
-            className="blue-btn"
-          >
-            검색
-          </button>
-        </div>
-      </div>
+    <div>
+      {/* Loading이 true면 컴포넌트를 띄우고, false면 null(빈 값)처리 하여 컴포넌트 숨김 */}
+      {loading ? (
+        <Loading />
+      ) : (
+        <div className="list-table-root flex flex-col p-6">
+          <div className="text-xl font-semibold text-white mb-4">물품 리스트</div>
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-4">
+              <Select
+                value={category1Name}
+                onChange={handleCategory1Change}
+                displayEmpty
+                className="select-custom"
+              >
+                <MenuItem value="">
+                  <div>Categories 1</div>
+                </MenuItem>
+                {category1Options.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+              <Select
+                value={category2Name}
+                onChange={handleCategory2Change}
+                displayEmpty
+                className="select-custom"
+              >
+                <MenuItem value="">
+                  <div>Categories 2</div>
+                </MenuItem>
+                {category2Options.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+              <Select
+                value={category3Name}
+                onChange={handleCategory3Change}
+                displayEmpty
+                className="select-custom"
+              >
+                <MenuItem value="">
+                  <div>Categories 3</div>
+                </MenuItem>
+                {category3Options.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+              <TextField
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder="물품명 검색"
+                size="small"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: "white", fontSize: 20 }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      {searchQuery && (
+                        <IconButton
+                          onClick={handleSearchReset}
+                          edge="end"
+                          sx={{ color: "white" }}
+                        >
+                          <CloseIcon
+                            sx={{
+                              color: "white",
+                              fontSize: 20,
+                            }}
+                          />
+                        </IconButton>
+                      )}
+                    </InputAdornment>
+                  ),
+                }}
+                className="custom-textfield"
+              />
+              <button
+                onClick={handleSearchButtonClick}
+                variant="contained"
+                className="blue-btn"
+              >
+                검색
+              </button>
+            </div>
+          </div>
 
-      <TableContainer>
-        <Table stickyHeader>
-          <EnhancedTableHead
-            onSelectAllClick={handleSelectAllClick}
-            numSelected={selected.size}
-            rowCount={uniqueRows.length}
-            allRowsSelected={allRowsSelected}
-          />
-          <TableBody>
-            {filteredUniqueRows
-              .slice((page - 1) * rowsPerPage, page * rowsPerPage)
-              .map((row, index) => (
-                <TableRow
-                  key={generateKey(row)}
-                  hover
-                  tabIndex={-1}
-                  // 해당 uniqueRow에 속한 itemId들이 선택되었는지 확인
-                  selected={rows.some(
-                    (originalRow) =>
-                      selected.has(originalRow.itemId) &&
-                      originalRow.category1Name === row.category1Name &&
-                      originalRow.category2Name === row.category2Name &&
-                      originalRow.category3Name === row.category3Name &&
-                      originalRow.part1 === row.part1 &&
-                      originalRow.itemName === row.itemName
-                  )}
-                >
-                  <TableCell padding="checkbox" style={{ width: "5%" }}>
-                    <Checkbox
-                      checked={rows.some(
+          <TableContainer>
+            <Table stickyHeader>
+              <EnhancedTableHead
+                onSelectAllClick={handleSelectAllClick}
+                numSelected={selected.size}
+                rowCount={uniqueRows.length}
+                allRowsSelected={allRowsSelected}
+              />
+              <TableBody>
+                {filteredUniqueRows
+                  .slice((page - 1) * rowsPerPage, page * rowsPerPage)
+                  .map((row, index) => (
+                    <TableRow
+                      key={generateKey(row)}
+                      hover
+                      tabIndex={-1}
+                      // 해당 uniqueRow에 속한 itemId들이 선택되었는지 확인
+                      selected={rows.some(
                         (originalRow) =>
                           selected.has(originalRow.itemId) &&
                           originalRow.category1Name === row.category1Name &&
@@ -557,90 +558,104 @@ function ListTableDB() {
                           originalRow.part1 === row.part1 &&
                           originalRow.itemName === row.itemName
                       )}
-                      inputProps={{
-                        "aria-labelledby": row.itemId,
-                      }}
-                      onChange={(event) => handleClick(event, row)}
-                      color="default"
-                    />
-                  </TableCell>
-                  <TableCell align="center" className="item-cell">
-                    {(page - 1) * rowsPerPage + index + 1}
-                  </TableCell>
-                  <TableCell align="center" className="item-cell">
-                    {formatCellValue(row.category1Name)}
-                  </TableCell>
-                  <TableCell align="center" className="item-cell">
-                    {formatCellValue(row.category2Name)}
-                  </TableCell>
-                  <TableCell align="center" className="item-cell">
-                    {formatCellValue(row.category3Name)}
-                  </TableCell>
-                  <TableCell align="center" className="item-cell">
-                    {formatCellValue(row.itemName)}
-                  </TableCell>
-                  <TableCell align="center" className="item-cell">
-                    {formatCellValue(row.part1)}
-                  </TableCell>
-                  <TableCell align="center" className="item-cell">
-                    <TextField
-                      className="custom-quantity"
-                      type="number"
-                      value={row.quantity}
-                      onChange={(event) =>
-                        handleQuantityChange(row.itemId, event)
-                      }
-                      inputProps={{ min: 1 }}
-                      size="small"
-                      variant="outlined"
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            {emptyRows > 0 && (
-              <TableRow style={{ height: 53 * emptyRows }}></TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                    >
+                      <TableCell padding="checkbox" style={{ width: "5%" }}>
+                        <Checkbox
+                          checked={rows.some(
+                            (originalRow) =>
+                              selected.has(originalRow.itemId) &&
+                              originalRow.category1Name === row.category1Name &&
+                              originalRow.category2Name === row.category2Name &&
+                              originalRow.category3Name === row.category3Name &&
+                              originalRow.part1 === row.part1 &&
+                              originalRow.itemName === row.itemName
+                          )}
+                          inputProps={{
+                            "aria-labelledby": row.itemId,
+                          }}
+                          onChange={(event) => handleClick(event, row)}
+                          color="default"
+                        />
+                      </TableCell>
+                      <TableCell align="center" className="item-cell">
+                        {(page - 1) * rowsPerPage + index + 1}
+                      </TableCell>
+                      <TableCell align="center" className="item-cell">
+                        {formatCellValue(row.category1Name)}
+                      </TableCell>
+                      <TableCell align="center" className="item-cell">
+                        {formatCellValue(row.category2Name)}
+                      </TableCell>
+                      <TableCell align="center" className="item-cell">
+                        {formatCellValue(row.category3Name)}
+                      </TableCell>
+                      <TableCell align="center" className="item-cell">
+                        {formatCellValue(row.itemName)}
+                      </TableCell>
+                      <TableCell align="center" className="item-cell">
+                        {formatCellValue(row.part1)}
+                      </TableCell>
+                      <TableCell align="center" className="item-cell">
+                        <TextField
+                          className="custom-quantity"
+                          type="number"
+                          value={row.quantity}
+                          onChange={(event) =>
+                            handleQuantityChange(row.itemId, event)
+                          }
+                          inputProps={{ min: 1 }}
+                          size="small"
+                          variant="outlined"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 53 * emptyRows }}></TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-      <div className="flex justify-between items-center mt-6 bottomWrap">
-        <div className="flex gap-4">
-          {/* 페이지당 항목 수 선택 */}
-          <Select
-            value={rowsPerPage}
-            onChange={handleChangeRowsPerPage}
-            className="select-custom"
-          >
-            {[5, 10, 15].map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
+          <div className="flex justify-between items-center mt-6 bottomWrap">
+            <div className="flex gap-4">
+              {/* 페이지당 항목 수 선택 */}
+              <Select
+                value={rowsPerPage}
+                onChange={handleChangeRowsPerPage}
+                className="select-custom"
+              >
+                {[5, 10, 15].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </div>
+            <div className="pagination-container">
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={handleChangePage}
+                shape="rounded"
+              />
+            </div>
+            <div className="flex gap-4">
+              <Button className="bluebutton2" onClick={handleAddToCart}>
+                장바구니 담기
+              </Button>
+              <Modal2
+                open={isModalOpen}
+                setOpen={setIsModalOpen}
+                title="장바구니로 이동하시겠습니까?"
+                onConfirm={handleNavigateToCart}
+              />
+            </div>
+          </div>
         </div>
-        <div className="pagination-container">
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={handleChangePage}
-            shape="rounded"
-          />
-        </div>
-        <div className="flex gap-4">
-          <Button className="bluebutton2" onClick={handleAddToCart}>
-            장바구니 담기
-          </Button>
-          <Modal2
-            open={isModalOpen}
-            setOpen={setIsModalOpen}
-            title="장바구니로 이동하시겠습니까?"
-            onConfirm={handleNavigateToCart}
-          />
-        </div>
-      </div>
+      )
+      }
     </div>
   );
 }
-
 export default ListTableDB;

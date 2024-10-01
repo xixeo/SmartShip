@@ -32,9 +32,11 @@ import Pagination from "@mui/material/Pagination";
 import Modal2 from "../Compo/Modal2";
 import { useNavigate } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
+import Loading from "../Compo/Loading";
 
 export default function OrderTest() {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
     const [listdatas, setListdatas] = useState([]);
     const [selectedDate, setSelectedDate] = useState(() => {
         const savedDate = localStorage.getItem("selectedDate");
@@ -69,6 +71,7 @@ export default function OrderTest() {
     //  ==================
 
     const fetchorderlist = async (selectedDate) => {
+        setLoading(true)
         try {
             const response = await fetch(`getCart/${selectedDate}`, {
                 headers: {
@@ -101,6 +104,8 @@ export default function OrderTest() {
             setListdatas(basket.orderDetails); // orderDetails를 listdatas에 설정
         } catch (error) {
             console.error("Failed to fetch orderbasket:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -374,6 +379,7 @@ export default function OrderTest() {
         }
 
         try {
+            setLoading(false); // 초기 로딩 상태 설정
             const response = await fetch(`delItem`, {
                 method: "DELETE",
                 headers: {
@@ -394,6 +400,8 @@ export default function OrderTest() {
             fetchorderlist(selectedDate.format("YYYY-MM-DD"));
         } catch (error) {
             console.log(error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -407,6 +415,7 @@ export default function OrderTest() {
         }
 
         try {
+            setLoading(false); // 초기 로딩 상태 설정
             const response = await fetch(`delItem`, {
                 method: "DELETE",
                 headers: {
@@ -424,6 +433,8 @@ export default function OrderTest() {
             fetchorderlist(selectedDate.format("YYYY-MM-DD"));
         } catch (error) {
             console.log(error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -453,6 +464,8 @@ export default function OrderTest() {
             selectedDay: selectedDay || "",
         };
 
+        setLoading(false); // 초기 로딩 상태 설정
+
         try {
             console.log(
                 "Sending purchase data:",
@@ -480,10 +493,17 @@ export default function OrderTest() {
             navigate("/MyOrderList");
         } catch (error) {
             console.log("구매 중 오류 발생:", error);
+        } finally {
+            setLoading(false);
         }
-    };
+    }; 
 
     return (
+        <div>
+        {/* Loading이 true면 컴포넌트를 띄우고, false면 null(빈 값)처리 하여 컴포넌트 숨김 */}
+        {loading ? (
+          <Loading />
+        ) : (
         <div className="flex flex-col p-6 h-full list-table-root">
              <div className="text-xl font-semibold text-white mb-2">
                 장바구니
@@ -814,5 +834,8 @@ export default function OrderTest() {
                 </div>
             </div>
         </div>
-    );
+    )
+}
+</div>
+  );
 }
