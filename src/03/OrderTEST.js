@@ -292,6 +292,7 @@ export default function OrderTest() {
     };
 
     const handleSearchButtonClick = () => {
+        setCurrentPage(1);
         setAppliedSearchQuery(searchQuery);
     };
 
