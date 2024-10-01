@@ -216,13 +216,13 @@ const Navi = () => {
             <button
               className="blue-btn items-center"
               variant="contained"
-              onClick={() => setIsConfirmVisible(true)} // 확인 메시지 표시
+              onClick={() => setIsConfirmVisible(true)} 
               sx={{
-                margin: "10px", // 원하는 스타일 추가
-                backgroundColor: "#9c87ff", // 버튼 색상
-                color: "white", // 텍스트 색상
+                margin: "10px",
+                backgroundColor: "#9c87ff", 
+                color: "white", 
                 '&:hover': {
-                  backgroundColor: "#8a76e0", // 마우스 오버 시 색상 변경
+                  backgroundColor: "#8a76e0", 
                 },
               }}
             >

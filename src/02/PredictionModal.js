@@ -17,12 +17,30 @@ const PredictionModal = ({ open, setOpen, title }) => {
     const [assemblyOptions, setAssemblyOptions] = useState([]);
 
     const [selectedMajor, setSelectedMajor] = useState('');
-    const [selectedMachinery, setSelectedMachinery] = useState(''); 
-    const [selectedAssembly, setSelectedAssembly] = useState(''); 
+    const [selectedMachinery, setSelectedMachinery] = useState('');
+    const [selectedAssembly, setSelectedAssembly] = useState('');
 
     const [machineryVisible, setMachineryVisible] = useState(false);
     const [assemblyVisible, setAssemblyVisible] = useState(false);
     const token = localStorage.getItem('token');
+
+    useEffect(() => {
+        if (open) {
+            setFormData({
+                item: '',
+                supplier: localStorage.getItem('username') || '',
+                part_no: '',
+                price: '',
+                currency: 'USD',
+                leadtime: '',
+            });
+            setSelectedMajor(false);
+            setSelectedMachinery(false);
+            setSelectedAssembly(false);
+            setMachineryVisible(false);
+            setAssemblyVisible(false);
+        }
+    }, [open]);
 
     ///////////////////////////
     // Major=카테고리1 띄우기 //
@@ -43,6 +61,20 @@ const PredictionModal = ({ open, setOpen, title }) => {
 
     const handleClose = (e) => {
         if (e.target === e.currentTarget) {
+            // 상태 초기화
+            setFormData({
+                item: '',
+                supplier: localStorage.getItem('username') || '',
+                part_no: '',
+                price: '',
+                currency: 'USD',
+                leadtime: '',
+            });
+            setSelectedMajor('');
+            setSelectedMachinery('');
+            setSelectedAssembly('');
+            setMachineryVisible(false);
+            setAssemblyVisible(false);
             setOpen(false);
         }
     };
@@ -68,13 +100,13 @@ const PredictionModal = ({ open, setOpen, title }) => {
                 setMachineryVisible(true);
                 setAssemblyVisible(true);
 
-                 // 선택된 카테고리 상태를 업데이트
-            if (result.machinery_top_3.length > 0) {
-                setSelectedMachinery(result.machinery_top_3[0]); // 첫 번째 값을 선택
-            }
-            if (result.assembly_top_3.length > 0) {
-                setSelectedAssembly(result.assembly_top_3[0]); // 첫 번째 값을 선택
-            }
+                // 선택된 카테고리 상태를 업데이트
+                if (result.machinery_top_3.length > 0) {
+                    setSelectedMachinery(result.machinery_top_3[0]); // 첫 번째 값을 선택
+                }
+                if (result.assembly_top_3.length > 0) {
+                    setSelectedAssembly(result.assembly_top_3[0]); // 첫 번째 값을 선택
+                }
             })
             .catch((error) => {
                 console.error('Error during prediction:', error);
@@ -132,6 +164,20 @@ const PredictionModal = ({ open, setOpen, title }) => {
             console.log(result.message); // 응답 메시지 확인
         } catch (error) {
             console.error('등록 중 오류 발생:', error);
+            // 상태 초기화 (모달을 닫을 때와 동일하게)
+            setFormData({
+                item: '',
+                supplier: localStorage.getItem('username') || '',
+                part_no: '',
+                price: '',
+                currency: 'USD',
+                leadtime: '',
+            });
+            setSelectedMajor('');
+            setSelectedMachinery('');
+            setSelectedAssembly('');
+            setMachineryVisible(false);
+            setAssemblyVisible(false);
         }
     };
 
@@ -179,7 +225,7 @@ const PredictionModal = ({ open, setOpen, title }) => {
 
                 <form className="ui form mt-6" onSubmit={handleSubmit}>
                     <div className='flex items-center mb-5'>
-                        <p className="mr-10">다음 정보를 입력하여 Category 2 및 Category 3를 예측하세요.</p>
+                        <p className="mr-10">다음 정보를 입력하여 Category 2 및 Category 3를 선택하세요.</p>
                         <button className="blue-btn ml-auto" type="submit">검색</button>
                     </div>
 
@@ -286,26 +332,26 @@ const PredictionModal = ({ open, setOpen, title }) => {
                             onChange={(e) => setSelectedAssembly(e.target.value)}
                             label="Category 3"
                         />
-                    
+
                     )}
 
-{assemblyVisible && (
-                     <div className="field flex mb-4 mt-4 items-center px-4">
-                        <label className="text-white w-1/4">Leadtime</label>
-                        <div className='w-3/4 ml-auto flex'>
-                            <TextField
-                                name="leadtime"
-                                value={formData.leadtime}
-                                onChange={handleChange}
-                                placeholder="리드타임을 입력하세요"
-                                variant="outlined"
-                                size='small'
-                                className='custom-textfield'
-                                sx={{ flex: 1, maxWidth: '500px !important' }}
-                            />
+                    {assemblyVisible && (
+                        <div className="field flex mb-4 mt-4 items-center px-4">
+                            <label className="text-white w-1/4">Leadtime</label>
+                            <div className='w-3/4 ml-auto flex'>
+                                <TextField
+                                    name="leadtime"
+                                    value={formData.leadtime}
+                                    onChange={handleChange}
+                                    placeholder="리드타임을 입력하세요"
+                                    variant="outlined"
+                                    size='small'
+                                    className='custom-textfield'
+                                    sx={{ flex: 1, maxWidth: '500px !important' }}
+                                />
+                            </div>
                         </div>
-                    </div>
-)}
+                    )}
                 </form>
 
                 {assemblyVisible && (
@@ -329,7 +375,7 @@ const PredictionModal = ({ open, setOpen, title }) => {
                             sx={{
                                 color: 'white', backgroundColor: '#a3a3a3',
                                 '&:hover': {
-                                    backgroundColor: '#7a7a7a', 
+                                    backgroundColor: '#7a7a7a',
                                 },
                             }}
                             onClick={() => setOpen(false)}
