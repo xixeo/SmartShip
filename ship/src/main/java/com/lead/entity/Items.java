@@ -41,7 +41,7 @@ public class Items {
     @Column(nullable = false)
     private String part1;
     
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String part2;
     
     @Column(nullable = false, precision = 10, scale = 2)
