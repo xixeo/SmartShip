@@ -4,7 +4,7 @@ import { Button } from 'react-day-picker';
 import PredictionSelect from '../Compo/PredictionSelect';
 
 // const PredictionForm = ({ setAssemblyVisible, onSubmit }) => {
-const PredictionForm = () => {
+const PredictionForm = ({ setAssemblyVisible: propSetAssemblyVisible, onSubmit }) => {
     const [formData, setFormData] = useState({
         item: '',
         supplier: localStorage.getItem('username') || '', // 로컬스토리지의 username = 공급업체
@@ -17,20 +17,24 @@ const PredictionForm = () => {
     const [machineryOptions, setMachineryOptions] = useState([]);
     const [assemblyOptions, setAssemblyOptions] = useState([]);
 
-    const [machineryVisible, setMachineryVisible] = useState(true);
-    const [assemblyVisible, setAssemblyVisible] = useState(true);
+    const [machineryVisible, setMachineryVisible] = useState(false);    
+    const [assemblyVisible, setAssemblyVisible] = useState(false);
 
     const [selectedMajor, setSelectedMajor] = useState('');
     const [selectedMachinery, setSelectedMachinery] = useState('');
     const [selectedAssembly, setSelectedAssembly] = useState('');
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value
-        }));
-    };
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+    }));
+
+    if (name === 'major') setSelectedMajor(value);
+    if (name === 'machinery') setSelectedMachinery(value);
+    if (name === 'assembly') setSelectedAssembly(value);
+};
 
     ////////////////////////////////////////////////////////
     // flask 연결 (Machinery=카테고리2, Assembly=카테고리3) //
@@ -38,6 +42,7 @@ const PredictionForm = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        console.log("Form Data:", formData); // 요청 데이터 확인
         fetch('http://10.125.121.178:5000/predict_machinery', {
             method: 'POST',
             headers: {
@@ -47,10 +52,17 @@ const PredictionForm = () => {
         })
             .then((response) => response.json())
             .then((result) => {
+                console.log("Result:", result); // 결과 확인
                 setMachineryOptions(result.machinery_top_3);
                 setAssemblyOptions(result.assembly_top_3);
                 setMachineryVisible(true);
                 setAssemblyVisible(true);
+                propSetAssemblyVisible(true); // props로 전달된 함수 사용
+
+                 // Modal에 전달할 데이터
+                 if (onSubmit) {
+                    onSubmit(formData, selectedMajor, selectedMachinery, selectedAssembly);
+                }
             })
             .catch((error) => {
                 console.error('Error during prediction:', error);
@@ -65,6 +77,7 @@ const PredictionForm = () => {
         fetch('/category1')
             .then(response => response.json())
             .then(data => {
+                console.log('Fetched category1 data:', data);
                 setMajorOptions(data); // majorOptions에 데이터 저장
             })
             .catch(error => {
@@ -72,20 +85,14 @@ const PredictionForm = () => {
             });
     }, []);
 
-    // // 등록버튼 핸들러
-    // const handleRegistration = () => {
-    //     if (onSubmit) {
-    //         onSubmit(formData, selectedMajor, selectedMachinery, selectedAssembly);
-    //     }
-    // };
-
     return (
-        <div className="ui container text-white mt-6">
-            <div className='flex items-center'>
-                <p>다음 정보를 입력하여 Category 2 및 Category 3를 예측하세요.</p>
-                <button className="blue-btn  ml-auto">검색</button>
-            </div>
+        <div className="ui container text-white">
             <form className="ui form mt-6" onSubmit={handleSubmit}>
+                <div className='flex items-center mb-5'>
+                    <p>다음 정보를 입력하여 Category 2 및 Category 3를 예측하세요.</p>
+                    <button className="blue-btn  ml-auto" type="submit">검색</button>
+                </div>
+                {/* </form><form className="ui form mt-6" onSubmit={handleSubmit}> */}
                 <div className="field flex mb-4 items-center px-4">
                     <label className="text-white w-1/4">물품명</label>
                     <div className='w-3/4 ml-auto flex'>
@@ -193,24 +200,20 @@ const PredictionForm = () => {
                     </div>
                 </div>
 
-            </form>
-
             {machineryVisible && (
                 <PredictionSelect
-                options={majorOptions.map(option => ({
-                    value: option.category1Id,
-                    label: option.category1Name
-                }))}
-                value={selectedMajor}
-                onChange={(e) => setSelectedMajor(e.target.value)}
-                label="Category 1"
-            />
+                    options={majorOptions.map(option => option.category1Name)} // 옵션에 표시할 이름만 전달
+                    value={selectedMajor}
+                    onChange={(e) => setSelectedMajor(e.target.value)} // 상태 업데이트
+                    label="Category 1"
+                    placeholder="해당하는 카테고리1을 선택하세요"
+                />
             )}
 
             {machineryVisible && (
                 <PredictionSelect
                     options={machineryOptions}
-                    value={selectedMachinery}
+                    value={selectedMachinery || (machineryOptions.length > 0 ? machineryOptions[0] : '')} // 첫 번째 옵션을 기본값으로 설정
                     onChange={(e) => setSelectedMachinery(e.target.value)} // 상태 업데이트
                     label="Category 2"
                 />
@@ -219,11 +222,13 @@ const PredictionForm = () => {
             {assemblyVisible && (
                 <PredictionSelect
                     options={assemblyOptions}
-                    value={selectedAssembly}
+                    value={selectedAssembly || (assemblyOptions.length > 0 ? assemblyOptions[0] : '')} // 첫 번째 옵션을 기본값으로 설정
                     onChange={(e) => setSelectedAssembly(e.target.value)} // 상태 업데이트
                     label="Category 3"
                 />
             )}
+            </form>
+
         </div>
     );
 };

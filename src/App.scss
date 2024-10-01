@@ -107,3 +107,11 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+.withdrawal-button {
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+  margin-top: auto;       
+  margin-bottom: 15px;    
+}

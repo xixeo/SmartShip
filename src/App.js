@@ -21,6 +21,7 @@ import PurchaseRequest from "./DashBoard/PurchaseRequest";
 import OrderManage from "./DashBoard/OrderManage";
 import AnnounceForEvery from "./Compo/AnnounceForEvery";
 import AnnounceWrite from "./Admin/AnnounceWrite";
+import AnnounceEdit from "./Admin/AnnounceEdit";
 import Announcement from "./Admin/Announcement";
 import Membership from "./Admin/Membership";
 import SupplierBoard from "./DashBoard/SupplierBoard";
@@ -148,6 +149,10 @@ function App() {
                                                 <Route
                                                     path="/AnnounceWrite"
                                                     element={<AnnounceWrite />}
+                                                />
+                                                <Route
+                                                    path="/AnnounceEdit/:noticeid"
+                                                    element={<AnnounceEdit/>}
                                                 />
                                                 <Route
                                                     path="/Announcement"
