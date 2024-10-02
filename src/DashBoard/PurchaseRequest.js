@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import Loading from "../Compo/Loading";
 import { useNavigate } from "react-router-dom";
 import ReactPaginate from "react-paginate"; // 페이지네이션 라이브러리
-import { Select, MenuItem } from "@mui/material"; // 페이지당 게시글 수
+import { Select, Pagination, MenuItem } from "@mui/material"; // 페이지당 게시글 수
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -26,11 +26,12 @@ export default function PurchaseRequest() {
     const [listdata, setListdata] = useState([]);
     const [currentItems, setCurrentItems] = useState([]); // 현재 페이지에 표시할 아이템
     const [itemOffset, setItemOffset] = useState(0); // 현재 페이지의 시작 인덱스
-    const [itemsPerPage, setItemsPerPage] = useState(3);
+    const [itemsPerPage, setItemsPerPage] = useState(5);
     const [searchEvent, setSearchEvent] = useState("");
     const [filteredData, setFilteredData] = useState([]); // 검색된 데이터 저장
     const token = localStorage.getItem("token");
     const navigate = useNavigate();
+    const [currentPage, setCurrentPage] = useState(1);
 
     const fetchpurcheslist = async () => {
         setLoading(true);
@@ -55,7 +56,7 @@ export default function PurchaseRequest() {
             // 모든 카드 확장 상태를 true로 설정
             const initialExpanded = {};
             sortdata.forEach((order) => {
-                initialExpanded[order.orderId] = true;
+                initialExpanded[order.orderId] = false;
             });
             setExpanded(initialExpanded);
             setListdata(sortdata);
@@ -85,11 +86,17 @@ export default function PurchaseRequest() {
         });
     };
 
-    const handlePageClick = (event) => {
-        const newOffset = (event.selected * itemsPerPage) % filteredData.length;
-        setItemOffset(newOffset);
-    };
-
+    const handleRowsPerPageChange = (event) => {
+      setItemsPerPage(parseInt(event.target.value, 10));
+      setItemOffset(0);  // 페이지네이션 리셋
+      setCurrentPage(1); // 항상 첫 페이지로 리셋
+  };
+  
+  const handlePageClick = (event, value) => {
+      setCurrentPage(value);
+      const newOffset = (value - 1) * itemsPerPage;
+      setItemOffset(newOffset);
+  };
     const handleSearch = () => {
         const searchdata = listdata.filter((e) =>
             e.username.toLowerCase().includes(searchEvent.toLowerCase())
@@ -113,7 +120,7 @@ export default function PurchaseRequest() {
     };
 
     return (
-        <div>
+        <div className="list-table-root">
             {loading ? (
                 <Loading />
             ) : (
@@ -225,27 +232,31 @@ export default function PurchaseRequest() {
                             </div>
                         ))
                     )}
-                    <div className="flex justify-center">
-                        <ReactPaginate
-                            breakLabel="..."
-                            nextLabel="다음 >"
-                            onPageChange={handlePageClick}
-                            pageRangeDisplayed={3}
-                            pageCount={Math.ceil(
-                                filteredData.length / itemsPerPage
-                            )} // 필터된 데이터에 따라 페이지 수 결정
-                            previousLabel="< 이전"
-                            renderOnZeroPageCount={null}
-                            containerClassName="pagination"
-                            pageClassName="page-item"
-                            pageLinkClassName="page-link"
-                            previousClassName="page-item"
-                            previousLinkClassName="page-link"
-                            nextClassName="page-item"
-                            nextLinkClassName="page-link"
-                            activeClassName="active"
-                            className="text-white w-80 flex justify-around fixed bottom-24 left-1/2 transform -translate-x-1/2"
-                        />
+                     <div className="mt-6 flex justify-between items-center bottomWrap">
+                        <div className="flex items-center">
+                            <div className="flex gap-4">
+                                <Select
+                                    value={itemsPerPage}
+                                    onChange={handleRowsPerPageChange}
+                                    className="select-custom"
+                                >
+                                    {[5, 10, 15].map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                            {option} per page
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </div>
+                        </div>
+                        <div className="pagination-container">
+                            <Pagination
+                                count={Math.ceil(filteredData.length / itemsPerPage)}
+                                page={currentPage}
+                                onChange={handlePageClick}
+                                variant="outlined"
+                                shape="rounded"
+                            />
+                        </div>
                     </div>
                 </div>
             )}

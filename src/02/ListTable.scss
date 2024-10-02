@@ -224,52 +224,6 @@
     }
   }
 
-  .bottomWrap {
-    position: relative;
-  }
-
-  /* 페이지네이션 부분 */
-  .pagination-container {
-    position: absolute;
-    right: 50%;
-    transform: translateX(50%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    .MuiPagination-root {
-      color: white;
-
-      .MuiPagination-ul {
-        .MuiButtonBase-root {
-          color: white;
-          border-radius: 50%;
-
-          &.Mui-selected {
-            background-color: #ffffff2e;
-            color: white;
-          }
-
-          &:hover {
-            background-color: #ffffff0f;
-          }
-        }
-      }
-
-      .MuiPaginationItem-root {
-        color: white;
-
-        &.Mui-selected {
-          background-color: #47464f;
-          color: white;
-        }
-      }
-
-      .MuiPaginationItem-ellipsis {
-        color: white;
-      }
-    }
-  }
 
   .item-cell {
     color: white;
