@@ -23,6 +23,7 @@ import AnnounceWrite from "./Admin/AnnounceWrite";
 import AnnounceEdit from "./Admin/AnnounceEdit";
 import Announcement from "./Admin/Announcement";
 import Membership from "./Admin/Membership";
+import Charttest from "./DashBoard/charttest";
 import SupplierBoard from "./DashBoard/SupplierBoard";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { AlertProvider } from "./Compo/AlertContext";
@@ -92,7 +93,8 @@ function App() {
                                                 <Route path="/Schedule" element={<PrivateRoute element={<Schedule />} />} />
                                                 <Route path="/listTable" element={<PrivateRoute element={<ListTableDB />} />} />
                                                 <Route path="/listSupplier" element={<PrivateRoute element={<ListSupplier2 />} />} />
-                                                <Route path="/order" element={<PrivateRoute element={<Order />} />} />
+                                                {/* <Route path="/order" element={<PrivateRoute element={<Order />} />} /> */}
+                                                <Route path="/order" element={<PrivateRoute element={<Charttest />} />} />
                                                 <Route path="/Cart" element={<PrivateRoute element={<OrderTEST />} />} />
                                                 <Route path="/signstate" element={<PrivateRoute element={<SignState />} />} />
                                                 <Route path="/Board" element={<PrivateRoute element={<Board />} />} />

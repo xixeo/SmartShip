@@ -14,7 +14,7 @@ const SignState = () => {
 
     // sessionStorage에 토큰이 없다면 로그아웃 처리
     if (token && !sessionStorage.getItem('token')) {
-      handleLogout()
+     handleLogout()
     }
   });
 
