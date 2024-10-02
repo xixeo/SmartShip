@@ -19,6 +19,19 @@
   }
 }
 
+.textfieldRead {
+  border: 1px solid $read-input-color;
+  color: #a1a1a1;
+  border-radius: 4px;
+  outline: 0 !important;
+  background: #ffffff00;
+  padding: 6px 10px;
+
+  &:focus {
+    border-color: $blue-btn;
+  }
+}
+
 .blue-btn {
   border: 1px solid $blue-btn;
   color: $blue-btn;
