@@ -32,11 +32,11 @@ import Pagination from "@mui/material/Pagination";
 import Modal2 from "../Compo/Modal2";
 import { useNavigate } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
-import Loading from "../Compo/Loading";
+import { useLoading } from "../Compo/LoadingContext";;
 
 export default function OrderTest() {
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
+    const { setLoading } = useLoading();
     const [listdatas, setListdatas] = useState([]);
     const [selectedDate, setSelectedDate] = useState(() => {
         const savedDate = localStorage.getItem("selectedDate");
@@ -92,14 +92,14 @@ export default function OrderTest() {
                 orderDetails: orderbasket.cartItem.cartItems || [], // cartItems가 없으면 빈 배열
             };
 
-            const cartItems = orderbasket.cartItem.cartItems;
+            // const cartItems = orderbasket.cartItem.cartItems;
 
-            if (!Array.isArray(cartItems)) {
-                console.warn("cartItems는 배열이 아닙니다:", cartItems);
-            } else {
-                setListdatas(cartItems); // 정상적인 경우에만 리스트 데이터를 설정
-                console.log("cartItems : ", cartItems);
-            }
+            // if (!Array.isArray(cartItems)) {
+            //     console.warn("cartItems는 배열이 아닙니다:", cartItems);
+            // } else {
+            //     setListdatas(cartItems); // 정상적인 경우에만 리스트 데이터를 설정
+            //     console.log("cartItems : ", cartItems);
+            // }
 
             setListdatas(basket.orderDetails); // orderDetails를 listdatas에 설정
         } catch (error) {
@@ -501,9 +501,6 @@ export default function OrderTest() {
     return (
         <div>
         {/* Loading이 true면 컴포넌트를 띄우고, false면 null(빈 값)처리 하여 컴포넌트 숨김 */}
-        {loading ? (
-          <Loading />
-        ) : (
         <div className="flex flex-col p-6 h-full list-table-root">
              <div className="text-xl font-semibold text-white mb-2">
                 장바구니
@@ -834,8 +831,6 @@ export default function OrderTest() {
                 </div>
             </div>
         </div>
-    )
-}
 </div>
   );
 }
