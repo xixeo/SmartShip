@@ -2,86 +2,90 @@
 
 /** ✏️ TABLE CSS  */
 .MuiTable-root {
-  th,
-  td {
-    color: #fff;
-    border-bottom: 1px solid #ffffff2c;
-    padding: 4px;
-  }
-
-  th {
-    background: $table-header !important;
-    font-weight: 600;
-    height: 50px;
-  }
-
-  td {
-    background: $table-body !important;
-    font-weight: 400;
-    height: 41.5px;
-  }
-
-  .MuiTableRow-root:last-child {
+    th,
     td {
-      border-bottom: 0 !important;
+        color: #fff;
+        border-bottom: 1px solid #ffffff2c;
+        padding: 4px;
     }
-  }
 
-  .MuiCheckbox-root {
-    color: #fff;
-  }
+    th {
+        background: $table-header !important;
+        font-weight: 600;
+        height: 50px;
+    }
 
+    td {
+        background: $table-body !important;
+        font-weight: 400;
+        height: 41.5px;
+    }
+
+    .MuiTableRow-root:last-child {
+        td {
+            border-bottom: 0 !important;
+        }
+    }
+
+    .MuiCheckbox-root {
+        color: #fff;
+    }
 }
 
 .MuiTableContainer-root {
-  height: 100%;
-  overflow-x: hidden !important;
+    height: 100%;
+    overflow-x: hidden !important;
 }
 
-
 .bottomWrap {
-  position: relative;
+    position: relative;
 }
 
 /* 페이지네이션 부분 */
 .pagination-container {
-  position: absolute;
-  right: 50%;
-  transform: translateX(50%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    position: absolute;
+    right: 50%;
+    transform: translateX(50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-  .MuiPagination-root {
-    color: white;
-
-    .MuiPagination-ul {
-      .MuiButtonBase-root {
+    .MuiPagination-root {
         color: white;
-        border-radius: 50%;
 
-        &.Mui-selected {
-          background-color: #ffffff2e;
-          color: white;
+        .MuiPagination-ul {
+            .MuiButtonBase-root {
+                color: white;
+                border-radius: 50%;
+
+                &.Mui-selected {
+                    background-color: #ffffff2e;
+                    color: white;
+                }
+
+                &:hover {
+                    background-color: #ffffff0f;
+                }
+            }
         }
 
-        &:hover {
-          background-color: #ffffff0f;
+        .MuiPaginationItem-root {
+            color: white;
+
+            &.Mui-selected {
+                background-color: #47464f;
+                color: white;
+            }
         }
-      }
-    }
 
-    .MuiPaginationItem-root {
-      color: white;
-
-      &.Mui-selected {
-        background-color: #47464f;
-        color: white;
-      }
+        .MuiPaginationItem-ellipsis {
+            color: white;
+        }
     }
+}
 
-    .MuiPaginationItem-ellipsis {
-      color: white;
-    }
-  }
+//purchase request
+.card-wrap {
+    height: calc(100vh - 310px);
+    overflow-y: auto;
 }

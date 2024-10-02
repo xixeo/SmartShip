@@ -75,9 +75,9 @@ export default function PurchaseRequest() {
     }, []);
 
     useEffect(() => {
-        const endOffset = itemOffset + itemsPerPage;
-        setCurrentItems(filteredData.slice(itemOffset, endOffset)); // 필터된 데이터에 따라 현재 아이템 설정
-    }, [itemOffset, filteredData]);
+      const endOffset = itemOffset + itemsPerPage;
+      setCurrentItems(filteredData.slice(itemOffset, endOffset)); // 화면에 보여질 아이템들을 재설정
+  }, [itemOffset, itemsPerPage, filteredData]); // itemsPerPage가 변경될 때도 이 useEffect가 동작하도록 의존성 배열에 추가
 
     const handleExpandClick = (orderId) => () => {
         setExpanded({
@@ -87,16 +87,20 @@ export default function PurchaseRequest() {
     };
 
     const handleRowsPerPageChange = (event) => {
-      setItemsPerPage(parseInt(event.target.value, 10));
-      setItemOffset(0);  // 페이지네이션 리셋
-      setCurrentPage(1); // 항상 첫 페이지로 리셋
+      setItemsPerPage(event.target.value); // itemsPerPage 상태 업데이트
+      setItemOffset(0); // 첫 페이지의 아이템 offset으로 재설정
+      setCurrentPage(1); // 현재 페이지를 첫 페이지로 재설정
   };
-  
-  const handlePageClick = (event, value) => {
-      setCurrentPage(value);
-      const newOffset = (value - 1) * itemsPerPage;
-      setItemOffset(newOffset);
-  };
+
+    const handlePageClick = (event, value) => {
+        const newOffset = (value - 1) * itemsPerPage;
+        setCurrentPage(value);
+        setItemOffset(newOffset);
+        setCurrentItems(
+            filteredData.slice(newOffset, newOffset + itemsPerPage)
+        );
+    };
+
     const handleSearch = () => {
         const searchdata = listdata.filter((e) =>
             e.username.toLowerCase().includes(searchEvent.toLowerCase())
@@ -153,86 +157,102 @@ export default function PurchaseRequest() {
                     {currentItems.length === 0 ? (
                         <div className="text-white">검색 결과가 없습니다.</div>
                     ) : (
-                        currentItems.map((order) => (
-                            <div
-                                key={order.orderId}
-                                className="text-white rounded-lg mt-6 card-bg"
-                                onClick={(e) =>
-                                    navigate(`/getOrderDetail/${order.orderId}`)
-                                }
-                            >
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        alignItems: "end",
-                                        padding: "18px 24px",
-                                    }}
-                                >
-                                    <div className="w-full cursor-pointer">
-                                        <div className="w-full flex items-center mb-3">
-                                            <div className="flex text-sm mr-6 text-[#ffffff59]">
-                                                <h1 className="mr-2">
-                                                    주문일자 :{" "}
-                                                </h1>
-                                                <h1>{order.requestDate}</h1>
-                                            </div>
-                                        </div>
-                                        <div className="w-full flex justify-between items-center">
-                                            <h1 className="text-xl font-bold text-[#A276FF]">
-                                                {order.username}
-                                            </h1>
-                                            <div className="flex items-center">
-                                                <h1 className="mr-3 text-sm">
-                                                    희망입고일 :
-                                                </h1>
-                                                <h1 className="ml-2 text-xl font-bold text-[#A276FF]">
-                                                    {order.releaseDate}
-                                                </h1>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <IconButton
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleExpandClick(order.orderId)();
-                                        }}
-                                        aria-expanded={
-                                            expanded[order.orderId] || false
+                        <div className="card-wrap">
+                            {currentItems.map(
+                                (
+                                    order // 여기에 중괄호 추가
+                                ) => (
+                                    <div
+                                        key={order.orderId}
+                                        className="text-white rounded-lg mb-6 card-bg"
+                                        onClick={(e) =>
+                                            navigate(
+                                                `/getOrderDetail/${order.orderId}`
+                                            )
                                         }
-                                        aria-label="show more"
-                                        className={`transition-transform ${
-                                            expanded[order.orderId]
-                                                ? "rotate-180"
-                                                : ""
-                                        }`}
-                                        sx={{
-                                            color: "white",
-                                            marginLeft: "10px",
-                                            padding: "2px"
-                                        }}
                                     >
-                                        <ArrowDown height={"24px"} />
-                                    </IconButton>
-                                </Box>
-                                    <Collapse
-                                        in={expanded[order.orderId]}
-                                        timeout="auto"
-                                        unmountOnExit
-                                        className="p-6 pt-2"
+                                        <Box
+                                            sx={{
+                                                display: "flex",
+                                                alignItems: "end",
+                                                padding: "18px 24px",
+                                            }}
                                         >
-                                        <div>
-                                            <h1 className="mb-2 text-[#c4c4c4]">
-                                                비고
-                                            </h1>
-                                            <div className="mr-5 p-5 rounded-lg textfieldRead min-h-9">
-                                                {order.memo ? (order.memo) : "-"}
+                                            <div className="w-full cursor-pointer">
+                                                <div className="w-full flex items-center mb-3">
+                                                    <div className="flex text-sm mr-6 text-[#ffffff59]">
+                                                        <h1 className="mr-2">
+                                                            주문일자 :
+                                                        </h1>
+                                                        <h1>
+                                                            {order.requestDate}
+                                                        </h1>
+                                                    </div>
+                                                </div>
+                                                <div className="w-full flex justify-between items-center">
+                                                    <h1 className="text-xl font-bold text-[#A276FF]">
+                                                        {order.username}
+                                                    </h1>
+                                                    <div className="flex items-center">
+                                                        <h1 className="mr-3 text-sm">
+                                                            희망입고일 :
+                                                        </h1>
+                                                        <h1 className="ml-2 text-xl font-bold text-[#A276FF]">
+                                                            {order.releaseDate}
+                                                        </h1>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </Collapse>
-                            </div>
-                        ))
+                                            <IconButton
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleExpandClick(
+                                                        order.orderId
+                                                    )();
+                                                }}
+                                                aria-expanded={
+                                                    expanded[order.orderId] ||
+                                                    false
+                                                }
+                                                aria-label="show more"
+                                                className={`transition-transform ${
+                                                    expanded[order.orderId]
+                                                        ? "rotate-180"
+                                                        : ""
+                                                }`}
+                                                sx={{
+                                                    color: "white",
+                                                    marginLeft: "10px",
+                                                    padding: "2px",
+                                                }}
+                                            >
+                                                <ArrowDown height={"24px"} />
+                                            </IconButton>
+                                        </Box>
+                                        <Collapse
+                                            in={expanded[order.orderId]}
+                                            timeout="auto"
+                                            unmountOnExit
+                                            className="p-6 pt-2"
+                                        >
+                                            <div>
+                                                <h1 className="mb-2 text-[#c4c4c4]">
+                                                    비고
+                                                </h1>
+                                                <div className="mr-5 p-5 rounded-lg textfieldRead min-h-9">
+                                                    {order.memo
+                                                        ? order.memo
+                                                        : "-"}
+                                                </div>
+                                            </div>
+                                        </Collapse>
+                                    </div>
+                                )
+                            )}
+                        </div>
                     )}
-                     <div className="mt-6 flex justify-between items-center bottomWrap">
+
+                    <div className="mt-6 flex justify-between items-center bottomWrap">
                         <div className="flex items-center">
                             <div className="flex gap-4">
                                 <Select
@@ -242,7 +262,7 @@ export default function PurchaseRequest() {
                                 >
                                     {[5, 10, 15].map((option) => (
                                         <MenuItem key={option} value={option}>
-                                            {option} per page
+                                            {option}
                                         </MenuItem>
                                     ))}
                                 </Select>
@@ -250,7 +270,9 @@ export default function PurchaseRequest() {
                         </div>
                         <div className="pagination-container">
                             <Pagination
-                                count={Math.ceil(filteredData.length / itemsPerPage)}
+                                count={Math.ceil(
+                                    filteredData.length / itemsPerPage
+                                )}
                                 page={currentPage}
                                 onChange={handlePageClick}
                                 variant="outlined"
