@@ -88,6 +88,10 @@ const ListSupplier2 = () => {
                     ...item,
                     forSale: item.forSale ?? false,
                 }));
+                console.log("패치받아온 데이터:", processedData);
+                console.log("0번째 항목:", processedData[0]);
+                console.log("1번째 항목:", processedData[1]);
+                console.log("2번째 항목:", processedData[2]);
                 setRows(processedData);
 
                 // 각 행의 카테고리 값을 초기화
@@ -126,6 +130,9 @@ const ListSupplier2 = () => {
                 );
                 setSelectedCategories(initialSelectedCategories);
                 showAlert("조회에 성공했습니다.", "success");
+                console.log("Category 1 Map:", category1Map);
+console.log("Category 2 Map:", Array.from(category2Map.entries()));
+console.log("Category 3 Map:", Array.from(category3Map.entries()));
             } catch (error) {
                 console.error("데이터 로딩 중 오류 발생:", error);
                 showAlert("데이터 로딩 중 오류가 발생했습니다.", "error");
@@ -784,7 +791,7 @@ const ListSupplier2 = () => {
                                             className="item-cell"
                                             sx={{ width: "2%" }}
                                         >
-                                            {index + 1}
+                                            {(currentPage-1)*itemsPerPage+index + 1}
                                         </TableCell>
                                         {/* 전체 카테고리 목록 중 <Select> */}
                                         <TableCell sx={{ width: "13%" }}>

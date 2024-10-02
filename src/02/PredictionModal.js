@@ -378,7 +378,7 @@ const PredictionModal = ({ open, setOpen, title }) => {
                     <Box sx={{ display: "flex", marginTop: '20px', gap: 2 }}>
                         <Button onClick={() => {
                             handleRegistration(); // 등록 핸들러 호출
-                            setOpen(false); // 모달 닫기
+                            // setOpen(false); // 모달 닫기
                             // handleRegistration(formData, selectedMajor, selectedMachinery, selectedAssembly) // 데이터 전달
                             // 다시 랜더링 되도록해야
                         }}
