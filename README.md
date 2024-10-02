@@ -4,7 +4,7 @@
 - 이 서비스는 선용품의 리드타임을 정확히 예측하여 선박 운영의 안정성을 향상시키고, 불필요한 보관비용을 줄이는 것을 목표로 합니다.
 
 ## 📈 개발 기간
-- 2024.08.26 - 2024.0
+- 2024.08.26 - 2024.10.02.
 
 ## 🔧 개발 환경
 - Java: 17.0.10
@@ -13,7 +13,7 @@
 - IDE: STS4
 - Framework: Spring Boot 2.x
 - Database: MySQL 8.0.37
-- Deep Learning: Python (Pytorch), BERT, MLP, XGBoost
+- Deep Learning: Python (Pytorch), BERT, XGBoost, Lightbgm
 
 ## 📌 주요 기능
 #### 1. 카테고리 분류
@@ -22,7 +22,7 @@
 - 기술: BERT 임베딩을 활용하여 선용품의 텍스트 데이터를 분석하고, XGBoost로 최종 분류.
 - 성과 목표: F1 스코어 90% 이상 달성.
 #### 2. 리드타임 예측
-- 모델: MLP, LightGBM/XGBoost, BERT+파인튜닝
+- 모델: LightGBM/XGBoost, BERT+파인튜닝
 - 기능: 선용품의 리드타임을 예측하여 최적의 발주 시기를 제안.
 - 기술: BERT 임베딩, 발주처 원핫 인코딩, 발주수량과 발주금액 정규화를 통해 다양한 회귀 모델을 사용.
 - 성과 목표: RMSE 및 MAE 7 이하.
@@ -36,7 +36,7 @@
 ## 📊 데이터 분석
 ### 모델 선택 및 학습
 #### 카테고리 분류
-- BERT 임베딩: 'Machinery, Assembly, 청구품목, Part No.1, Part No.2' 결합하여 임베딩 생성.
+- BERT 임베딩: 'Machinery, Assembly, 청구품목, Part No.1' 결합하여 임베딩 생성.
 - XGBoost: 텍스트 데이터와 수치형 데이터를 결합하여 최적의 카테고리 분류 모델 생성.
 #### 리드타임 예측
 - 모델: MLP, LightGBM/XGBoost, BERT+파인튜닝 중 최적의 모델 선택.
