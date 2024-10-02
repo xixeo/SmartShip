@@ -6,10 +6,8 @@ import Collapse from '@mui/material/Collapse';
 import CloseIcon from '@mui/icons-material/Close';
 
 const AlertContext = createContext();
-
 export function AlertProvider({ children }) {
     const [alert, setAlert] = useState({});
-
     const showAlert = (message, severity = 'info') => { // severity가 전달되지 않으면 기본값 'info'가 사용됨
         setAlert({
             message,
@@ -47,4 +45,10 @@ export function AlertProvider({ children }) {
     );
 }
 
-export const useAlert = () => useContext(AlertContext);
+export const useAlert = () => {
+    const context = useContext(AlertContext);
+    if (!context) {
+        throw new Error('useAlert must be used within an AlertProvider');
+    }
+    return context;
+};

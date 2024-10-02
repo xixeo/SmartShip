@@ -89,28 +89,28 @@ const Navi = () => {
 
         {/* menu */}
         <ul className={`menu`}>
-          <li className="menu-item" onClick={() => navigate("/schedule")}>
+          <li className="menu-item" onClick={() => navigate("/Schedule")}>
             <Side02 className="icon" />
             <div className="menu-text flex justify-between items-center">
               {!isCollapsed && <span>일정 관리</span>}
               {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
             </div>
           </li>
-          <li className="menu-item" onClick={() => navigate("/listtabledb")}>
+          <li className="menu-item" onClick={() => navigate("/listTable")}>
             <Side05 className="icon" />
             <div className="menu-text flex justify-between items-center">
               {!isCollapsed && <span>선용품 리스트</span>}
               {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
             </div>
           </li>
-          <li className="menu-item" onClick={() => navigate("/listsupplier2")}>
+          <li className="menu-item" onClick={() => navigate("/listSupplier")}>
             <Side08 className="icon" />
             <div className="menu-text flex justify-between items-center">
               {!isCollapsed && <span>판매물품 리스트</span>}
               {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
             </div>
           </li>
-          <li className="menu-item" onClick={() => navigate("/ordertest")}>
+          <li className="menu-item" onClick={() => navigate("/Cart")}>
             <Side06 className="icon" />
             <div className="menu-text flex justify-between items-center">
               {!isCollapsed && <span>장바구니</span>}

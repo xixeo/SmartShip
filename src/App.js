@@ -76,15 +76,6 @@ function App() {
                                     />
                                 }
                             />
-                            <Route
-                                path="/ListSupplier2"
-                                element={
-                                    <ListSupplier2
-                                        setIsAuthenticated={setIsAuthenticated}
-                                        setRedirectPath={()=>setRedirectPath("/")}
-                                    />
-                                }
-                            />
                             <Route path="/" element={<PrivateRoute element={<MainApp />} />} />
                         </Routes>
                     ) : (
@@ -98,12 +89,11 @@ function App() {
                                         {/* 여기 로딩넣기 */}
                                         <LoadingProvider>
                                             <Routes>
-                                                <Route path="/schedule" element={<PrivateRoute element={<Schedule />} />} />
-                                                <Route path="/listtabledb" element={<PrivateRoute element={<ListTableDB />} />} />
-                                                <Route path="/listsupplier2" element={<PrivateRoute element={<ListSupplier2 />} />} />
+                                                <Route path="/Schedule" element={<PrivateRoute element={<Schedule />} />} />
+                                                <Route path="/listTable" element={<PrivateRoute element={<ListTableDB />} />} />
+                                                <Route path="/listSupplier" element={<PrivateRoute element={<ListSupplier2 />} />} />
                                                 <Route path="/order" element={<PrivateRoute element={<Order />} />} />
-                                                <Route path="/ordertest" element={<PrivateRoute element={<OrderTEST />} />} />
-                                                <Route path="/ordertest2" element={<PrivateRoute element={<BasicDatePicker />} />} />
+                                                <Route path="/Cart" element={<PrivateRoute element={<OrderTEST />} />} />
                                                 <Route path="/signstate" element={<PrivateRoute element={<SignState />} />} />
                                                 <Route path="/Board" element={<PrivateRoute element={<Board />} />} />
                                                 <Route path="/MyOrderList" element={<PrivateRoute element={<MyOrderList />} />} />
