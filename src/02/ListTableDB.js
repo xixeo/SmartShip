@@ -1,3 +1,5 @@
+import { useLoading } from "../Compo/LoadingContext";
+import { useAlert } from "../Compo/AlertContext";
 import React, { useState, useMemo, useEffect } from "react";
 import {
   Table,
@@ -20,7 +22,6 @@ import { Search as SearchIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Modal2 from "../Compo/Modal2";
 import "./ListTable.scss";
-import Loading from "../Compo/Loading";
 
 // 테이블 헤더 정의
 const headCells = [
@@ -90,7 +91,8 @@ function ListTableDB() {
   const [category3Name, setCategory3Name] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false); // 장바구니로 이동 물어보기 모달상태
-  const [loading, setLoading] = useState(true);
+  const { setLoading } = useLoading();
+  const { showAlert } = useAlert();
 
   // 사용자 이름을 로컬 스토리지에서 가져옴
   const username = localStorage.getItem("username") || "Guest";
@@ -121,8 +123,10 @@ function ListTableDB() {
         }));
         setInitialRows(processedData);
         setRows(processedData);
+        showAlert("조회에 성공했습니다.", "success");
       } catch (error) {
         console.error("데이터 로딩 중 오류 발생:", error);
+        showAlert("데이터를 가져오는 데 실패했습니다.", "error");
       } finally {
         setLoading(false);
       }
@@ -418,12 +422,14 @@ function ListTableDB() {
 
       if (response.ok) {
         console.log("장바구니 추가 성공");
+        showAlert("장바구니에 성공적으로 추가되었습니다.", "success");
         setIsModalOpen(true);
       } else {
         console.error("장바구니 추가 실패:", response.statusText);
       }
     } catch (error) {
       console.error("장바구니 추가 중 오류 발생:", error);
+      showAlert("장바구니 추가 중 오류가 발생했습니다.", "error");
     } finally {
       setLoading(false);
     }
@@ -437,10 +443,6 @@ function ListTableDB() {
 
   return (
     <div>
-      {/* Loading이 true면 컴포넌트를 띄우고, false면 null(빈 값)처리 하여 컴포넌트 숨김 */}
-      {loading ? (
-        <Loading />
-      ) : (
         <div className="list-table-root flex flex-col p-6">
           <div className="text-xl font-semibold text-white mb-4">물품 리스트</div>
           <div className="flex items-center justify-between gap-4 mb-4">
@@ -653,8 +655,6 @@ function ListTableDB() {
             </div>
           </div>
         </div>
-      )
-      }
     </div>
   );
 }

@@ -32,11 +32,13 @@ import Pagination from "@mui/material/Pagination";
 import Modal2 from "../Compo/Modal2";
 import { useNavigate } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
-import { useLoading } from "../Compo/LoadingContext";;
+import { useLoading } from "../Compo/LoadingContext";
+import { useAlert } from "../Compo/AlertContext";
 
 export default function OrderTest() {
     const navigate = useNavigate();
     const { setLoading } = useLoading();
+    const { showAlert } = useAlert();
     const [listdatas, setListdatas] = useState([]);
     const [selectedDate, setSelectedDate] = useState(() => {
         const savedDate = localStorage.getItem("selectedDate");
@@ -79,7 +81,7 @@ export default function OrderTest() {
                 },
             });
             if (!response.ok) {
-                throw new Error("orderbasket response was not ok");
+                throw new Error("Network response was not ok");
             }
             const orderbasket = await response.json();
 
@@ -102,7 +104,9 @@ export default function OrderTest() {
             // }
 
             setListdatas(basket.orderDetails); // orderDetails를 listdatas에 설정
+            showAlert("조회에 성공했습니다.", "success");
         } catch (error) {
+            showAlert("데이터를 가져오는 데 실패했습니다.", "error");
             console.error("Failed to fetch orderbasket:", error);
         } finally {
             setLoading(false);
@@ -374,7 +378,7 @@ export default function OrderTest() {
     const handleDelete = async () => {
         const itemsToDelete = Array.from(selectedItems);
         if (itemsToDelete.length === 0) {
-            alert("삭제할 항목을 선택해 주세요.");
+            showAlert("삭제할 항목을 선택해 주세요.", "warning"); 
             return;
         }
 
@@ -390,6 +394,7 @@ export default function OrderTest() {
             });
 
             if (!response.ok) {
+                showAlert("항목 삭제에 실패했습니다.", "error"); 
                 throw new Error("orderbasket delete item response was not ok");
             }
 
@@ -398,6 +403,7 @@ export default function OrderTest() {
 
             // 데이터 다시 가져오기
             fetchorderlist(selectedDate.format("YYYY-MM-DD"));
+            showAlert("항목이 성공적으로 삭제되었습니다.", "success");
         } catch (error) {
             console.log(error);
         } finally {
@@ -410,7 +416,7 @@ export default function OrderTest() {
         console.log("selectitemid", selectitemsid);
 
         if (selectitemsid.length === 0) {
-            alert("삭제할 항목이 없습니다.");
+            showAlert("삭제할 항목이 없습니다.", "warning");
             return;
         }
 
@@ -426,11 +432,15 @@ export default function OrderTest() {
             });
 
             if (!response.ok) {
+                showAlert("항목 삭제에 실패했습니다.", "error"); 
                 throw new Error("orderbasket delete item response was not ok");
             }
 
             // 데이터 다시 가져오기
             fetchorderlist(selectedDate.format("YYYY-MM-DD"));
+
+            showAlert("항목이 성공적으로 삭제되었습니다.", "success");
+
         } catch (error) {
             console.log(error);
         } finally {
@@ -445,7 +455,7 @@ export default function OrderTest() {
         const selectedItemsWithQuantity = getCheckedItemsWithQuantity2();
 
         if (selectedItemsWithQuantity.length === 0) {
-            alert("구매할 물건을 선택해 주세요.");
+            showAlert("구매할 물건을 선택해 주세요.", "warning");
             return; // 장바구니가 비어있으면 여기서 함수 종료
         }
 
@@ -483,6 +493,7 @@ export default function OrderTest() {
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error("주문 저장 실패:", errorText);
+                showAlert("주문 저장에 실패했습니다: " + errorText, "error");
                 throw new Error(
                     "주문 장바구니 구매 아이템 응답이 올바르지 않음"
                 );
@@ -490,9 +501,11 @@ export default function OrderTest() {
 
             setPerchaseOpen(false);
             console.log("주문이 성공적으로 저장되었습니다!");
+            showAlert("주문이 성공적으로 저장되었습니다!", "success");
             navigate("/MyOrderList");
         } catch (error) {
             console.log("구매 중 오류 발생:", error);
+            showAlert("구매 중 오류가 발생했습니다.", "error");
         } finally {
             setLoading(false);
         }

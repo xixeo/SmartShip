@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Box, TextField, FormControl, InputLabel, MenuItem, Select, Button } from '@mui/material';
 import PredictionSelect from '../Compo/PredictionSelect';
+import { useAlert } from "../Compo/AlertContext";
+import { useLoading } from "../Compo/LoadingContext";;
 
 const PredictionModal = ({ open, setOpen, title }) => {
     const [formData, setFormData] = useState({
@@ -23,6 +25,9 @@ const PredictionModal = ({ open, setOpen, title }) => {
     const [machineryVisible, setMachineryVisible] = useState(false);
     const [assemblyVisible, setAssemblyVisible] = useState(false);
     const token = localStorage.getItem('token');
+
+    const { setLoading } = useLoading();
+    const { showAlert } = useAlert();
 
     useEffect(() => {
         if (open) {
@@ -47,6 +52,7 @@ const PredictionModal = ({ open, setOpen, title }) => {
     ///////////////////////////
 
     useEffect(() => {
+        setLoading(true);
         fetch('/category1')
             .then((response) => response.json())
             .then((data) => {
@@ -54,7 +60,9 @@ const PredictionModal = ({ open, setOpen, title }) => {
             })
             .catch((error) => {
                 console.error('Error fetching major options:', error);
-            });
+                showAlert('카테고리1 데이터를 불러오는데 실패했습니다.', 'error');
+            })
+            .finally(() => setLoading(false));
     }, []);
 
     if (!open) return null;
@@ -85,6 +93,7 @@ const PredictionModal = ({ open, setOpen, title }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setLoading(true);
         fetch('http://10.125.121.178:5000/predict_machinery', {
             method: 'POST',
             headers: {
@@ -107,10 +116,13 @@ const PredictionModal = ({ open, setOpen, title }) => {
                 if (result.assembly_top_3.length > 0) {
                     setSelectedAssembly(result.assembly_top_3[0]); // 첫 번째 값을 선택
                 }
+                showAlert('카테고리가 성공적으로 검색되었습니다', 'success');
             })
             .catch((error) => {
                 console.error('Error during prediction:', error);
-            });
+                showAlert('카테고리 예측에 실패했습니다.', 'error');
+            })
+            .finally(() => setLoading(false));
     };
 
     const handleChange = (e) => {
@@ -135,8 +147,8 @@ const PredictionModal = ({ open, setOpen, title }) => {
         console.log('selectedMachinery:', selectedMachinery);
         console.log('selectedAssembly:', selectedAssembly);
         if (!formData.item || !selectedMajor || !selectedMachinery || !selectedAssembly) {
-            console.error('모든 필드를 입력해 주세요.');
-            return;
+            showAlert('모든 필드를 입력해 주세요.', 'warning');
+            return; 
         }
 
         const payload = {
@@ -151,7 +163,9 @@ const PredictionModal = ({ open, setOpen, title }) => {
             leadtime: formData.leadtime,
         };
         console.log('payload:', payload);
+        
         try {
+            setLoading(true);
             const response = await fetch('/supplier/items/add', {
                 method: 'POST',
                 headers: {
@@ -162,27 +176,33 @@ const PredictionModal = ({ open, setOpen, title }) => {
             });
             const result = await response.text();
             console.log(result.message); // 응답 메시지 확인
+            showAlert('상품이 성공적으로 등록되었습니다.', 'success');
+            setOpen(false);
         } catch (error) {
             console.error('등록 중 오류 발생:', error);
+            showAlert('상품 등록에 실패했습니다.', 'error')
+            
             // 상태 초기화 (모달을 닫을 때와 동일하게)
-            setFormData({
-                item: '',
-                supplier: localStorage.getItem('username') || '',
-                part_no: '',
-                price: '',
-                currency: 'USD',
-                leadtime: '',
-            });
-            setSelectedMajor('');
-            setSelectedMachinery('');
-            setSelectedAssembly('');
-            setMachineryVisible(false);
-            setAssemblyVisible(false);
+            // setFormData({
+            //     item: '',
+            //     supplier: localStorage.getItem('username') || '',
+            //     part_no: '',
+            //     price: '',
+            //     currency: 'USD',
+            //     leadtime: '',
+            // });
+            // setSelectedMajor('');
+            // setSelectedMachinery('');
+            // setSelectedAssembly('');
+            // setMachineryVisible(false);
+            // setAssemblyVisible(false);
+
+        }
+        finally {
+            setLoading(false);
         }
     };
-
-
-
+    
     return (
         <div
             className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50"

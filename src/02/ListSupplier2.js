@@ -20,16 +20,18 @@ import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import Pagination from "@mui/material/Pagination";
 import PredictionModal from "./PredictionModal";
-import Loading from "../Compo/Loading";
+import { useLoading } from "../Compo/LoadingContext";
+import { useAlert } from "../Compo/AlertContext";
 
 const ListSupplier2 = () => {
+    const { showAlert } = useAlert();
     const [token, setToken] = useState(null); // 초기 토큰 상태
     const [alias, setAlias] = useState(localStorage.getItem("alias") || "Guest");
     // 각 행의 카테고리 선택
     const [category1Map, setCategory1Map] = useState([]);
     const [category2Map, setCategory2Map] = useState(new Map());
     const [category3Map, setCategory3Map] = useState(new Map());
-    const [loading, setLoading] = useState(true);
+    const { setLoading } = useLoading();
 
     ////////////////////////////////
     // 공급업체의 아이템만 가져오기 //
@@ -79,7 +81,7 @@ const ListSupplier2 = () => {
                     },
                 });
                 if (!response.ok)
-                    throw new Error("Network response was not ok");
+                    showAlert("데이터를 가져오는 데 실패했습니다.", "error");
                 const data = await response.json();
 
                 const processedData = data.map((item) => ({
@@ -122,10 +124,11 @@ const ListSupplier2 = () => {
                         return acc;
                     },
                 );
-
                 setSelectedCategories(initialSelectedCategories);
+                showAlert("조회에 성공했습니다.", "success");
             } catch (error) {
                 console.error("데이터 로딩 중 오류 발생:", error);
+                showAlert("데이터 로딩 중 오류가 발생했습니다.", "error");
             } finally {
                 setLoading(false);
             }
@@ -239,6 +242,7 @@ const ListSupplier2 = () => {
             return response.json();
         } catch (error) {
             console.error("Fetch error:", error);
+            showAlert("카테고리를 로드하는 중 오류가 발생했습니다.", "error");
             return [];
         }
     };
@@ -437,7 +441,7 @@ const ListSupplier2 = () => {
             const itemIdsToDelete = Array.from(selectedItems);
 
             if (itemIdsToDelete.length === 0) {
-                alert("삭제할 항목을 선택하세요.");
+                showAlert("삭제할 항목을 선택하세요.", "error");
                 return;
             }
 
@@ -455,17 +459,17 @@ const ListSupplier2 = () => {
 
             if (response.ok) {
                 // 응답이 200번대인지 확인
-                alert("Deleted successfully!");
+                showAlert("항목이 성공적으로 삭제되었습니다.", "success");
                 // 삭제 후 테이블 갱신
                 setRows(rows.filter((row) => !selectedItems.has(row.itemId)));
                 setSelectedItems(new Set()); // 선택 초기화
             } else {
                 const errorMessage = await response.text();
-                alert(`삭제 실패: ${errorMessage}`);
+                showAlert(`삭제에 실패했습니다: ${errorMessage}`, "error");
             }
         } catch (error) {
             console.error("Error deleting items:", error);
-            alert(`삭제 중 오류가 발생했습니다: ${error.message}`);
+            showAlert(`삭제 중 오류가 발생했습니다: ${error.message}`, "error");
         }
     };
 
@@ -493,7 +497,7 @@ const ListSupplier2 = () => {
             });
 
             if (itemsToSave.length === 0) {
-                alert("저장할 항목을 선택하세요.");
+                showAlert("저장할 항목을 선택하세요.", "error");
                 return;
             }
 
@@ -507,7 +511,7 @@ const ListSupplier2 = () => {
             });
 
             if (response.ok) {
-                alert("Items saved successfully!");
+                showAlert("항목이 성공적으로 저장되었습니다.", "success");
 
                 // 성공적으로 저장된 후 로컬 상태에서 rows 업데이트
                 const updatedRows = rows.map((row) => {
@@ -520,11 +524,11 @@ const ListSupplier2 = () => {
                 setRows(updatedRows); // 상태 업데이트 후 화면 재랜더링
             } else {
                 const errorMessage = await response.text();
-                alert(`Failed to save items: ${errorMessage}`);
+                showAlert(`저장에 실패했습니다: ${errorMessage}`, "error");
             }
         } catch (error) {
             console.error("Error saving items:", error);
-            alert(`Error while saving: ${error.message}`);
+            showAlert(`저장 중 오류가 발생했습니다: ${error.message}`, "error");
         }
     };
 
@@ -578,10 +582,6 @@ const ListSupplier2 = () => {
 
     return (
         <div>
-            {/* Loading이 true면 컴포넌트를 띄우고, false면 null(빈 값)처리 하여 컴포넌트 숨김 */}
-            {loading ? (
-                <Loading />
-            ) : (
                 <div className="list-table-root flex flex-col p-6">
                     {/* 공급업체의 아이템 중 <Select> */}
                     <div className="text-xl font-semibold text-white mb-4">{`[ ${alias} ] 물품 관리`}</div>
@@ -995,8 +995,6 @@ const ListSupplier2 = () => {
                         </div>
                     </div>
                 </div>
-            )
-            }
         </div>
     );
 }
