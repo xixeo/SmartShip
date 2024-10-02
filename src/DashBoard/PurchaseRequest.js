@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import Loading from "../Compo/Loading";
 import { useNavigate } from "react-router-dom";
 import ReactPaginate from "react-paginate"; // 페이지네이션 라이브러리
-import { Select, MenuItem } from "@mui/material"; // 페이지당 게시글 수
+import { Select, Pagination, MenuItem } from "@mui/material"; // 페이지당 게시글 수
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -26,11 +26,12 @@ export default function PurchaseRequest() {
     const [listdata, setListdata] = useState([]);
     const [currentItems, setCurrentItems] = useState([]); // 현재 페이지에 표시할 아이템
     const [itemOffset, setItemOffset] = useState(0); // 현재 페이지의 시작 인덱스
-    const [itemsPerPage, setItemsPerPage] = useState(3);
+    const [itemsPerPage, setItemsPerPage] = useState(5);
     const [searchEvent, setSearchEvent] = useState("");
     const [filteredData, setFilteredData] = useState([]); // 검색된 데이터 저장
     const token = localStorage.getItem("token");
     const navigate = useNavigate();
+    const [currentPage, setCurrentPage] = useState(1);
 
     const fetchpurcheslist = async () => {
         setLoading(true);
@@ -55,7 +56,7 @@ export default function PurchaseRequest() {
             // 모든 카드 확장 상태를 true로 설정
             const initialExpanded = {};
             sortdata.forEach((order) => {
-                initialExpanded[order.orderId] = true;
+                initialExpanded[order.orderId] = false;
             });
             setExpanded(initialExpanded);
             setListdata(sortdata);
@@ -74,9 +75,9 @@ export default function PurchaseRequest() {
     }, []);
 
     useEffect(() => {
-        const endOffset = itemOffset + itemsPerPage;
-        setCurrentItems(filteredData.slice(itemOffset, endOffset)); // 필터된 데이터에 따라 현재 아이템 설정
-    }, [itemOffset, filteredData]);
+      const endOffset = itemOffset + itemsPerPage;
+      setCurrentItems(filteredData.slice(itemOffset, endOffset)); // 화면에 보여질 아이템들을 재설정
+  }, [itemOffset, itemsPerPage, filteredData]); // itemsPerPage가 변경될 때도 이 useEffect가 동작하도록 의존성 배열에 추가
 
     const handleExpandClick = (orderId) => () => {
         setExpanded({
@@ -85,9 +86,19 @@ export default function PurchaseRequest() {
         });
     };
 
-    const handlePageClick = (event) => {
-        const newOffset = (event.selected * itemsPerPage) % filteredData.length;
+    const handleRowsPerPageChange = (event) => {
+      setItemsPerPage(event.target.value); // itemsPerPage 상태 업데이트
+      setItemOffset(0); // 첫 페이지의 아이템 offset으로 재설정
+      setCurrentPage(1); // 현재 페이지를 첫 페이지로 재설정
+  };
+
+    const handlePageClick = (event, value) => {
+        const newOffset = (value - 1) * itemsPerPage;
+        setCurrentPage(value);
         setItemOffset(newOffset);
+        setCurrentItems(
+            filteredData.slice(newOffset, newOffset + itemsPerPage)
+        );
     };
 
     const handleSearch = () => {
@@ -113,7 +124,7 @@ export default function PurchaseRequest() {
     };
 
     return (
-        <div>
+        <div className="list-table-root">
             {loading ? (
                 <Loading />
             ) : (
@@ -146,106 +157,128 @@ export default function PurchaseRequest() {
                     {currentItems.length === 0 ? (
                         <div className="text-white">검색 결과가 없습니다.</div>
                     ) : (
-                        currentItems.map((order) => (
-                            <div
-                                key={order.orderId}
-                                className="text-white rounded-lg mt-6 card-bg"
-                                onClick={(e) =>
-                                    navigate(`/getOrderDetail/${order.orderId}`)
-                                }
-                            >
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        alignItems: "end",
-                                        padding: "18px 24px",
-                                    }}
-                                >
-                                    <div className="w-full cursor-pointer">
-                                        <div className="w-full flex items-center mb-3">
-                                            <div className="flex text-sm mr-6 text-[#ffffff59]">
-                                                <h1 className="mr-2">
-                                                    주문일자 :{" "}
-                                                </h1>
-                                                <h1>{order.requestDate}</h1>
-                                            </div>
-                                        </div>
-                                        <div className="w-full flex justify-between items-center">
-                                            <h1 className="text-xl font-bold text-[#A276FF]">
-                                                {order.username}
-                                            </h1>
-                                            <div className="flex items-center">
-                                                <h1 className="mr-3 text-sm">
-                                                    희망입고일 :
-                                                </h1>
-                                                <h1 className="ml-2 text-xl font-bold text-[#A276FF]">
-                                                    {order.releaseDate}
-                                                </h1>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <IconButton
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleExpandClick(order.orderId)();
-                                        }}
-                                        aria-expanded={
-                                            expanded[order.orderId] || false
+                        <div className="card-wrap">
+                            {currentItems.map(
+                                (
+                                    order // 여기에 중괄호 추가
+                                ) => (
+                                    <div
+                                        key={order.orderId}
+                                        className="text-white rounded-lg mb-6 card-bg"
+                                        onClick={(e) =>
+                                            navigate(
+                                                `/getOrderDetail/${order.orderId}`
+                                            )
                                         }
-                                        aria-label="show more"
-                                        className={`transition-transform ${
-                                            expanded[order.orderId]
-                                                ? "rotate-180"
-                                                : ""
-                                        }`}
-                                        sx={{
-                                            color: "white",
-                                            marginLeft: "10px",
-                                            padding: "2px"
-                                        }}
                                     >
-                                        <ArrowDown height={"24px"} />
-                                    </IconButton>
-                                </Box>
-                                    <Collapse
-                                        in={expanded[order.orderId]}
-                                        timeout="auto"
-                                        unmountOnExit
-                                        className="p-6 pt-2"
+                                        <Box
+                                            sx={{
+                                                display: "flex",
+                                                alignItems: "end",
+                                                padding: "18px 24px",
+                                            }}
                                         >
-                                        <div>
-                                            <h1 className="mb-2 text-[#c4c4c4]">
-                                                비고
-                                            </h1>
-                                            <div className="mr-5 p-5 rounded-lg textfieldRead min-h-9">
-                                                {order.memo ? (order.memo) : "-"}
+                                            <div className="w-full cursor-pointer">
+                                                <div className="w-full flex items-center mb-3">
+                                                    <div className="flex text-sm mr-6 text-[#ffffff59]">
+                                                        <h1 className="mr-2">
+                                                            주문일자 :
+                                                        </h1>
+                                                        <h1>
+                                                            {order.requestDate}
+                                                        </h1>
+                                                    </div>
+                                                </div>
+                                                <div className="w-full flex justify-between items-center">
+                                                    <h1 className="text-xl font-bold text-[#A276FF]">
+                                                        {order.username}
+                                                    </h1>
+                                                    <div className="flex items-center">
+                                                        <h1 className="mr-3 text-sm">
+                                                            희망입고일 :
+                                                        </h1>
+                                                        <h1 className="ml-2 text-xl font-bold text-[#A276FF]">
+                                                            {order.releaseDate}
+                                                        </h1>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </Collapse>
-                            </div>
-                        ))
+                                            <IconButton
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleExpandClick(
+                                                        order.orderId
+                                                    )();
+                                                }}
+                                                aria-expanded={
+                                                    expanded[order.orderId] ||
+                                                    false
+                                                }
+                                                aria-label="show more"
+                                                className={`transition-transform ${
+                                                    expanded[order.orderId]
+                                                        ? "rotate-180"
+                                                        : ""
+                                                }`}
+                                                sx={{
+                                                    color: "white",
+                                                    marginLeft: "10px",
+                                                    padding: "2px",
+                                                }}
+                                            >
+                                                <ArrowDown height={"24px"} />
+                                            </IconButton>
+                                        </Box>
+                                        <Collapse
+                                            in={expanded[order.orderId]}
+                                            timeout="auto"
+                                            unmountOnExit
+                                            className="p-6 pt-2"
+                                        >
+                                            <div>
+                                                <h1 className="mb-2 text-[#c4c4c4]">
+                                                    비고
+                                                </h1>
+                                                <div className="mr-5 p-5 rounded-lg textfieldRead min-h-9">
+                                                    {order.memo
+                                                        ? order.memo
+                                                        : "-"}
+                                                </div>
+                                            </div>
+                                        </Collapse>
+                                    </div>
+                                )
+                            )}
+                        </div>
                     )}
-                    <div className="flex justify-center">
-                        <ReactPaginate
-                            breakLabel="..."
-                            nextLabel="다음 >"
-                            onPageChange={handlePageClick}
-                            pageRangeDisplayed={3}
-                            pageCount={Math.ceil(
-                                filteredData.length / itemsPerPage
-                            )} // 필터된 데이터에 따라 페이지 수 결정
-                            previousLabel="< 이전"
-                            renderOnZeroPageCount={null}
-                            containerClassName="pagination"
-                            pageClassName="page-item"
-                            pageLinkClassName="page-link"
-                            previousClassName="page-item"
-                            previousLinkClassName="page-link"
-                            nextClassName="page-item"
-                            nextLinkClassName="page-link"
-                            activeClassName="active"
-                            className="text-white w-80 flex justify-around fixed bottom-24 left-1/2 transform -translate-x-1/2"
-                        />
+
+                    <div className="mt-6 flex justify-between items-center bottomWrap">
+                        <div className="flex items-center">
+                            <div className="flex gap-4">
+                                <Select
+                                    value={itemsPerPage}
+                                    onChange={handleRowsPerPageChange}
+                                    className="select-custom"
+                                >
+                                    {[5, 10, 15].map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                            {option}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </div>
+                        </div>
+                        <div className="pagination-container">
+                            <Pagination
+                                count={Math.ceil(
+                                    filteredData.length / itemsPerPage
+                                )}
+                                page={currentPage}
+                                onChange={handlePageClick}
+                                variant="outlined"
+                                shape="rounded"
+                            />
+                        </div>
                     </div>
                 </div>
             )}
