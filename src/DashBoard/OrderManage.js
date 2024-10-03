@@ -611,7 +611,7 @@ export default function OrderTest() {
    console.log('버튼행 값',e)  // 현재 선택된 공급자것만 보여줄거면 이걸로
    console.log('버튼행 값의 itemid',e.selecteditemid)  // 현재 선택된 공급자것만 보여줄거면 이걸로
   //  console.log('버튼행 값',e.map(i=>i.itemid)) 만약 한번에 업체별 다 보여줄거면 이걸로
-  const selid = 100;
+  const selid = 26041;
   // const selid = e.selecteditemid;
      //  ==============
      // | 과거리드 api |
@@ -888,22 +888,20 @@ export default function OrderTest() {
   console.log('차트데이터 전처리 완',barData);
   console.log('차트데이터 전처리 키', Object.keys(barData).sort((a, b) => new Date(b) - new Date(a)));
   
-// 있는 색상을 제거한 랜덤색상 생성
-const getRandomColor = (existingColors) => {
-  let randomColor;
-  do {
-      randomColor = Math.floor(Math.random() * 16777215).toString(16);
-      randomColor = `#${randomColor}`;
-  } while (existingColors.includes(randomColor)); // 중복 체크
-
-  return randomColor;
+// 파란색과 보라색 계열의 랜덤 색상 생성
+const getRandomBluePurpleColor = () => {
+  const hue = Math.floor(Math.random() * 40) + 240; // Hue 범위: 240 ~ 280 (파란색~보라색)
+  const saturation = Math.floor(Math.random() * 50) + 50; // 채도: 50% ~ 100%
+  const lightness = Math.floor(Math.random() * 30) + 40; // 명도: 40% ~ 70%
+  
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
 //고유색상 배열 생성
 const getUniqueRandomColors = (count) => {
   const colors = [];
   while (colors.length < count) {
-      const color = getRandomColor(colors);
+      const color = getRandomBluePurpleColor(colors);
       colors.push(color);
   }
   return colors;
@@ -917,6 +915,7 @@ if (chartDom) {
 
     // 아이템별 랜덤 색상 생성
     const itemColors = getUniqueRandomColors(items.length);
+    console.log('색확인',itemColors)
 
     const sortedDates = Object.keys(barData).sort((a, b) => new Date(a) - new Date(b));
     const newOption = {
