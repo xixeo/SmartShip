@@ -107,7 +107,7 @@ function App() {
                                                 <Route path="/Membership" element={<PrivateRoute element={<Membership />} />} />
                                                 <Route path="/PurchaseRequest" element={<PrivateRoute element={<PurchaseRequest />} />} />
                                                 <Route path="/getOrderDetail/:orderId" element={<PrivateRoute element={<OrderManage />} />} />
-                                                <Route path="/itemSupplier" element={<PrivateRoute element={<itemSupplier />} />} />
+                                                <Route path="/itemSupplier" element={<PrivateRoute element={<ItemSupplier />} />} />
                                                 <Route path="/Supplierboard" element={<PrivateRoute element={<Supplierboard2 />} />} />
                                             </Routes>
                                         </LoadingProvider>

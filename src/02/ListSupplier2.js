@@ -83,19 +83,25 @@ const ListSupplier2 = () => {
                 if (!response.ok)
                     showAlert("데이터를 가져오는 데 실패했습니다.", "error");
                 const data = await response.json();
+                console.log("데이터",data);
 
-                const processedData = data.map((item) => ({
-                    ...item,
-                    forSale: item.forSale ?? false,
-                }));
-                console.log("패치받아온 데이터:", processedData);
-                console.log("0번째 항목:", processedData[0]);
-                console.log("1번째 항목:", processedData[1]);
-                console.log("2번째 항목:", processedData[2]);
-                setRows(processedData);
+                // const processedData = data.map((item) => ({
+                //     ...item,
+                //     forSale: item.forSale ?? false,
+                // }));
+                // console.log("패치받아온 데이터:", processedData);
+                // console.log("0번째 항목:", processedData[0]);
+                // console.log("1번째 항목:", processedData[1]);
+                // console.log("2번째 항목:", processedData[2]);
+                // setRows(processedData);
+                
+                console.log("0번째 항목:", data[0]);
+                console.log("1번째 항목:", data[1]);
+                console.log("2번째 항목:", data[2]);
+                setRows(data);
 
                 // 각 행의 카테고리 값을 초기화
-                const initialSelectedCategories = processedData.reduce(
+                const initialSelectedCategories = data.reduce(
                     (acc, item) => {
                         const category1Name =
                             category1Map.find(
