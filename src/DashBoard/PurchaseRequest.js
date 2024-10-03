@@ -6,7 +6,6 @@ import { ReactComponent as ArrowDown } from "../assets/icons/svg/arrowDown.svg";
 import Box from "@mui/material/Box";
 import Loading from "../Compo/Loading";
 import { useNavigate } from "react-router-dom";
-import ReactPaginate from "react-paginate"; // 페이지네이션 라이브러리
 import { Select, Pagination, MenuItem } from "@mui/material"; // 페이지당 게시글 수
 
 const ExpandMore = styled((props) => {
