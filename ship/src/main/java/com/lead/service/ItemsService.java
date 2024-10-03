@@ -144,6 +144,7 @@ public class ItemsService {
 	            .part2(item.getPart2())
 	            .price(item.getPrice())
 	            .unit(item.getUnit())
+	            .purchaseCount(item.getPurchaseCount())
 	            .supplierName(item.getMember().getUsername())
 	            .alias(item.getMember().getAlias())
 	            .forSale(item.isForSale())

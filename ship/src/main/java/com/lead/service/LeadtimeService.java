@@ -70,7 +70,7 @@ public class LeadtimeService {
                 requestData.put("currency", currency);
 
                 // Flask API 호출
-                String flaskApiUrl = "http://10.125.121.178:5000/predict_leadtime";  // Flask API 엔드포인트 수정
+                String flaskApiUrl = "http://10.125.121.178:5001/predict_leadtime";  // Flask API 엔드포인트 수정
                 sendRequestToFlask(flaskApiUrl, requestData);
             }
         }
