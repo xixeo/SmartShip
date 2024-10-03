@@ -46,6 +46,25 @@
   }
 }
 
+.white-btn {
+  border: 1px solid #7D828D;
+  color: #7D828D;
+  border-radius: 4px;
+  outline: 0 !important;
+  padding: 6px 16px;
+
+  &:hover {
+    background: #7D828D;
+    color: #fff;
+    transition: all 0.3s;
+  }
+
+  &.active {
+    background: #7D828D;
+    color: #fff;
+}
+}
+
 .blue-btn2 {
     background: $blue-btn;
     color: #fff;

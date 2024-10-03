@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, TextField, FormControl, InputLabel, MenuItem, Select, Button } from '@mui/material';
 import PredictionSelect from '../Compo/PredictionSelect';
 import { useAlert } from "../Compo/AlertContext";
-import { useLoading } from "../Compo/LoadingContext";;
+import { useLoading } from "../Compo/LoadingContext";
 
 const PredictionModal = ({ open, setOpen, title }) => {
     const [formData, setFormData] = useState({
