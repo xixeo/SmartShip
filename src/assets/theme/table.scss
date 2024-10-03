@@ -1,7 +1,7 @@
 @import "../../App.scss";
 
 /** ✏️ TABLE CSS  */
-.MuiTable-root {
+.MuiTable-root, .MuiDataGrid-root {
     th,
     td {
         color: #fff;
@@ -9,13 +9,12 @@
         padding: 4px;
     }
 
-    th {
+    th, .custom-header, .MuiDataGrid-columnHeader{
         background: $table-header !important;
         font-weight: 600;
-        height: 50px;
     }
 
-    td {
+    td, .custom-cell {
         background: $table-body !important;
         font-weight: 400;
         height: 41.5px;
@@ -30,6 +29,23 @@
     .MuiCheckbox-root {
         color: #fff;
     }
+
+    .MuiDataGrid-footerContainer{
+        border: 0!important;
+        margin-top: 40px;
+    }
+}
+
+.MuiDataGrid-columnHeader{
+    height: 50px !important;
+    border-bottom: 0 !important;
+}
+
+.MuiDataGrid-topContainer{
+    overflow: hidden;
+}
+.MuiDataGrid-main{
+    width: 100%;
 }
 
 .MuiTableContainer-root {
