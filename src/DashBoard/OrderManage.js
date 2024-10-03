@@ -5,12 +5,11 @@ import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal'
-import { LoadingProvider, useLoading } from '../Compo/LoadingContext';
-import { json, useParams } from 'react-router-dom';
+import { useLoading } from '../Compo/LoadingContext';
+import { useParams } from 'react-router-dom';
 import * as echarts from 'echarts';
+import { Typography } from '@mui/material';
 import './OrderManage.scss';
-import { styled } from '@mui/material';
-import { Height, LineStyle } from '@mui/icons-material';
 
 export default function OrderTest() {
   const { orderId } = useParams(); // URL에서 orderId 가져오기
@@ -18,19 +17,19 @@ export default function OrderTest() {
   const [purDetails1, setPurDetails1] = useState([]);
   const [purDetails2, setPurDetails2] = useState([]);
   const [chartdata, setChartdata] = useState([]);
+  const [past, setPast] = useState([]);
   const [quantityState, setQuantityState] = useState({});
   const [pastleadopen, setPastleadOpen] = useState(false);
   const [preleadopen, setPreleadOpen] = useState(false);
   const [perchasopen, setPerchasopen] = useState(false);
-  const [option, setOption] = useState({});
   const [recoal, setrecoal] = useState(false);
   const [recoal2, setrecoal2] = useState(false);
   const [selrow, setSelrow] = useState([]);
-  const [totalAmounts, setTotalAmounts] = useState({});
+  // const [totalAmounts, setTotalAmounts] = useState({});
   const [total, setTotal] = useState({});
   const [clickrow, setClickrow] = useState(null);
-  const [supplierOptions, setSupplierOptions] = useState([]);
-  const [selectedSupplier, setSelectedSupplier] = useState({});
+  // const [supplierOptions, setSupplierOptions] = useState([]);
+  // const [selectedSupplier, setSelectedSupplier] = useState({});
   const [selectrowOrderid, setSelectrowOrderid] = useState([]);
   const [selectrowitemid, setSelectrowitemid] = useState({});
   const [Currentrow, setCurrentrow] = useState({});
@@ -150,18 +149,6 @@ export default function OrderTest() {
       console.log('formattedData', formattedData)
       setPurDetails2(formattedData);
 
-      // console.log('차트줄거야',formattedData.map(i=>({
-      //   date : i.bestOrderDate,
-      //   leadtime : i.leadtime,
-      //   item : i.itemName,
-      // })))
-      const Cdata = formattedData.map(i => ({
-        date: i.bestOrderDate,
-        leadtime: i.leadtime,
-        item: i.itemName,
-      }))
-      setChartdata(Cdata)
-
       const formatted = Array.isArray(details) ? details : [details];
 
       const groupedData = formatted.reduce((acc, order) => {
@@ -189,6 +176,7 @@ export default function OrderTest() {
             amount: formatPrice(detail.price, detail.quantity, detail.unit),
             supplier: detail.username,
             BestOrderDate: detail.recommendedOrderDate + `(${detail.leadtime}일)`,
+            bestOrderDate: detail.recommendedOrderDate,
             unit: detail.unit,
             leadtime: detail.leadtime,
           });
@@ -225,61 +213,6 @@ export default function OrderTest() {
   // console.log('purdetails[0].detail', purDetails.length > 0 ? purDetails[0].detail : '데이터 패치전')
   // console.log('purdetails[0].detail.', purDetails.length > 0 ? purDetails[0].detail[0].releaseDate : '데이터 패치전')
 
-  //////////////////////
-  //  차트 데이터 처리  //
-  //////////////////////
-
-  console.log('차트넣을거야',chartdata)
-  console.log('차트넣을아이템',chartdata.map(i=>i.item))
-
-  const items = chartdata.map(i=>i.item);
-
-  // 날짜별로 데이터를 처리하는 함수
-  const processData = (chartdata, items) => {
-    const result = {};
-  
-    // 날짜별로 데이터를 그룹화
-    chartdata.forEach(entry => {
-      const { date, leadtime, item } = entry;
-  
-      // 해당 날짜가 처음 나오는 경우 빈 배열 생성
-      if (!result[date]) {
-        result[date] = Array(items.length).fill(0);
-      }
-  
-      // item에 맞는 인덱스 찾기
-      const itemIndex = items.indexOf(item);
-  
-      // item에 맞는 위치에 leadtime 값을 넣음
-      if (itemIndex !== -1) {
-        result[date][itemIndex] = leadtime;
-      }
-    });
-  
-    // 날짜를 역순으로 정렬
-    const sortedDates = Object.keys(result).sort((a, b) => new Date(b) - new Date(a));
-  
-    // 날짜별로 값을 이전 값으로 채움
-    for (let i = 1; i < sortedDates.length; i++) {
-      const currentDate = sortedDates[i];
-      const previousDate = sortedDates[i - 1];
-  
-      // 현재 날짜 배열에서 0인 부분을 이전 날짜 값으로 채움
-      result[currentDate] = result[currentDate].map((value, index) =>
-        value === 0 && result[previousDate][index] !== 0 
-          ? result[previousDate][index] 
-          : value
-      );
-    }
-  
-    return result;
-  };
-  
-  // 결과
-  const barData = processData(chartdata, items);
-  console.log('차트데이터 전처리 완',barData);
-  console.log('차트데이터 전처리 키', Object.keys(barData).sort((a, b) => new Date(b) - new Date(a)));
-  
   //////////////////////
   //  통화 단위 함수   //
   //////////////////////
@@ -448,7 +381,7 @@ export default function OrderTest() {
     {
       field: 'Pastlead', headerName: 'Past Lead Time', width: 130, renderCell: (params) => (
         <div onClick={(e) => { e.stopPropagation() }}>
-          <Button className='greenbutton' onClick={() => setPastleadOpen(true)}>과거리드타임</Button>
+          <Button className='greenbutton' onClick={() => { handlepast(params.row)}}>과거리드타임</Button>
         </div>
       )
     },
@@ -470,6 +403,9 @@ export default function OrderTest() {
         key: entry.key, // 카테고리 key
         details: entry.detail, // 공급자별 상세 정보를 포함
         selectedSupplier: firstDetail.supplier, // 기본적으로 첫 번째 공급자 선택
+        selecteditemid: firstDetail.itemid,
+        selectedleadtime: firstDetail.leadtime,
+        selectedbestodate: firstDetail.bestOrderDate,
         // 나머지 정보
         ...firstDetail,
       };
@@ -491,6 +427,9 @@ export default function OrderTest() {
             return {
               ...r,
               selectedSupplier: selectedSupplier,
+              selecteditemid: selectedDetail.itemid,
+              selectedleadtime: selectedDetail.leadtime,
+              selectedbestodate: selectedDetail.bestOrderDate,
               // 공급자에 맞는 데이터 업데이트
               price: selectedDetail.price,
               quantity: selectedDetail.quantity,
@@ -642,7 +581,8 @@ export default function OrderTest() {
       setClickrow(selectedDetail);
       getOrderDetaildata(selectedDetail, event);
       const id = selectedDetail.itemid;
-      // console.log('클릭한 id', id)
+      console.log('클릭한 id', id)
+      console.log('클릭한 event', event)
       fetchRecommenditems(id, event);
     }
   };
@@ -662,6 +602,44 @@ export default function OrderTest() {
       setSelectrowOrderid(orderdetailid)
       setSelectrowitemid(itemid)
     }
+  };
+
+   ///////////////////////
+  //   chart button    //
+ ///////////////////////
+ const handlepast = async (e)=>{
+   console.log('버튼행 값',e)  // 현재 선택된 공급자것만 보여줄거면 이걸로
+   console.log('버튼행 값의 itemid',e.selecteditemid)  // 현재 선택된 공급자것만 보여줄거면 이걸로
+  //  console.log('버튼행 값',e.map(i=>i.itemid)) 만약 한번에 업체별 다 보여줄거면 이걸로
+  const selid = 100;
+  // const selid = e.selecteditemid;
+     //  ==============
+     // | 과거리드 api |
+     //  ==============
+   setLoading(true)
+    try{
+      const response = await fetch(`/pasttime/${selid}`,{
+        headers:{
+          Authorization: `Bearer ${token}`
+        }
+      })
+      if(!response.ok){
+        throw new Error("pastleadtime was not ok");
+      }
+      const data = await response.json();
+      console.log('과거리드타임 정보', data);
+      const pastdata = data.map(i => ({
+        ptime: i.pastleadtime,
+        odate: i.orderdate,
+        item: e.itemName,
+      }))
+      setPast(pastdata);
+    }catch(error){
+      console.error('Faild to fetch pastleadtime :',error);
+    }finally{
+      setLoading(false)
+    }
+    setPastleadOpen(true);
   };
 
   //  ===============
@@ -697,7 +675,6 @@ export default function OrderTest() {
   // | 물품 바꾸기 api |
   //  ================
   const handleRecommend = (reco) => {
-
     // 선택한 물품이 공급업체를 바꾸기만 하면되면 모달
     if (Currentrow.details.map(detail => detail.itemid).includes(reco)) {
       return setrecoal(true)
@@ -836,115 +813,281 @@ export default function OrderTest() {
 
   // console.log('추천data', recommendItem)
 
-  // 있는 색상을 제거한 랜덤색상 생성
-  const getRandomColor = (existingColors) => {
-    let randomColor;
-    do {
-        randomColor = Math.floor(Math.random() * 16777215).toString(16);
-        randomColor = `#${randomColor}`;
-    } while (existingColors.includes(randomColor)); // 중복 체크
+   //////////////////////
+  //  차트 데이터 처리  //
+  //////////////////////
 
-    return randomColor;
+  // console.log('차트줄거야', rows.map(i=>({ date: i.selectedbestodate, leadtime: i.selectedleadtime, item: i.itemName})))
+  useEffect(() => {
+    // rows로부터 Cdata 생성
+    const currentDate = new Date();
+    
+    const Cdata = rows
+        .filter(i => new Date(i.selectedbestodate) > currentDate) // 현재 날짜보다 미래인 경우만 필터링
+        .map(i => ({
+            date: i.selectedbestodate,
+            leadtime: i.selectedleadtime,
+            item: i.itemName,
+        }));
+
+    setChartdata(Cdata); // Cdata를 설정
+  }, [rows]);
+
+  console.log('차트넣을거야',chartdata)
+  console.log('차트넣을아이템',chartdata.map(i=>i.item))
+
+  const items = chartdata.map(i=>i.item);
+
+  // 날짜별로 데이터를 처리하는 함수
+  const processData = (chartdata, items) => {
+    const result = {};
+    const currentDate = new Date();
+  
+    // 날짜별로 데이터를 그룹화
+    chartdata.forEach(entry => {
+      const { date, leadtime, item } = entry;
+  
+      const bestOrderDate = new Date(date);
+      
+    // 해당 날짜가 현재 날짜보다 미래인 경우에만 빈 배열 생성
+      // 해당 날짜에 대한 배열이 없으면 초기화
+      if (!result[date]) {
+        result[date] = Array(items.length).fill(0);
+      }
+
+      // item에 맞는 인덱스 찾기
+      const itemIndex = items.indexOf(item);
+  
+      // item에 맞는 위치에 leadtime 값을 넣음
+      if (itemIndex !== -1) {
+        result[date][itemIndex] = leadtime;
+      }
+    });
+  
+    // 날짜를 역순으로 정렬
+    const sortedDates = Object.keys(result).sort((a, b) => new Date(b) - new Date(a));
+  
+    // 날짜별로 값을 이전 값으로 채움
+    for (let i = 1; i < sortedDates.length; i++) {
+      const currentDate = sortedDates[i];
+      const previousDate = sortedDates[i - 1];
+  
+      // 현재 날짜 배열에서 0인 부분을 이전 날짜 값으로 채움
+      result[currentDate] = result[currentDate].map((value, index) =>
+        value === 0 && result[previousDate][index] !== 0 
+          ? result[previousDate][index] 
+          : value
+      );
+    }
+  
+    return result;
+  };
+  
+  // 결과
+  const barData = processData(chartdata, items);
+  console.log('차트데이터 전처리 완',barData);
+  console.log('차트데이터 전처리 키', Object.keys(barData).sort((a, b) => new Date(b) - new Date(a)));
+  
+// 있는 색상을 제거한 랜덤색상 생성
+const getRandomColor = (existingColors) => {
+  let randomColor;
+  do {
+      randomColor = Math.floor(Math.random() * 16777215).toString(16);
+      randomColor = `#${randomColor}`;
+  } while (existingColors.includes(randomColor)); // 중복 체크
+
+  return randomColor;
 };
+
 //고유색상 배열 생성
 const getUniqueRandomColors = (count) => {
-    const colors = [];
-    while (colors.length < count) {
-        const color = getRandomColor(colors);
-        colors.push(color);
-    }
-    return colors;
+  const colors = [];
+  while (colors.length < count) {
+      const color = getRandomColor(colors);
+      colors.push(color);
+  }
+  return colors;
 };
 
+// 전체품목 리드타임 차트
 const initchart = () => {
-  const chartDom = document.getElementById('main-chart');
-  if (chartDom) {
-      const myChart = echarts.init(chartDom);
+const chartDom = document.getElementById('main-chart');
+if (chartDom) {
+    const myChart = echarts.init(chartDom);
 
-      // 아이템별 랜덤 색상 생성
-      const itemColors = getUniqueRandomColors(items.length);
+    // 아이템별 랜덤 색상 생성
+    const itemColors = getUniqueRandomColors(items.length);
 
-      const sortedDates = Object.keys(barData).sort((a, b) => new Date(a) - new Date(b));
-      const newOption = {
-        baseOption: {
-            timeline: {
-                axisType: 'category',
-                autoPlay: true,
-                playInterval: 1000,
-                data: sortedDates,
-                label: {
-                  normal:{
-                    margin: 15
-                  }
+    const sortedDates = Object.keys(barData).sort((a, b) => new Date(a) - new Date(b));
+    const newOption = {
+      baseOption: {
+          timeline: {
+              axisType: 'category',
+              autoPlay: true,
+              playInterval: 1000,
+              data: sortedDates,
+              label: {
+                normal:{
+                  margin: 15
                 }
-            },
-            title: {}, // 제목 설정 (필요 시 추가)
-            tooltip: { trigger: 'item',  formatter: (params) => {
-              return `${params.name}: ${params.value}`; // X축 항목과 값을 툴팁으로 보여줌
-          } },
-            legend: {
-                left: 'right',
-                data: items,
-                textStyle: { color: '#FFFFFF' }, // 범례 텍스트 색상
-                itemStyle: { color: '#FFFFFF' }, // 범례 아이템 색상
-            },
-            grid: {
-              top: '50px', // 타임라인과 차트 사이의 거리 설정
-              bottom: '100px', // 필요에 따라 하단 간격 조정
-              left: '10%', // 왼쪽 여백
-              right: '10%' // 오른쪽 여백
-          },
-            xAxis: [{
-                type: 'category',
-                data: items,
-                splitLine: { show: false },
-                axisLabel: {
-                  interval: 0, // 모든 항목을 표시
-                  rotate: 30,
-                  textStyle: { color: '#FFFFFF' } // 글자 색상
               }
-            }],
-            yAxis: [{
-                type: 'value',
-                name: 'Lead Time (days)',
-                axisLabel: {
-                    textStyle: { color: '#FFFFFF' } // Y축 레이블 색상
-                },
-                splitLine: {
-                    lineStyle: { color: '#CCCCCC' } // Y축 분할선 색상
-                }
-            }],
-            series: [{ 
-                name: 'Lead Time', 
-                type: 'bar', 
-                data: [] // 데이터는 나중에 설정
-            }]
+          },
+          title: {}, // 제목 설정 (필요 시 추가)
+          tooltip: { trigger: 'item',  formatter: (params) => {
+            return `${params.name}: ${params.value}`; // X축 항목과 값을 툴팁으로 보여줌
+        } },
+          legend: {
+              left: 'right',
+              data: items,
+              textStyle: { color: '#FFFFFF' }, // 범례 텍스트 색상
+              itemStyle: { color: '#FFFFFF' }, // 범례 아이템 색상
+          },
+          grid: {
+            top: '50px', // 타임라인과 차트 사이의 거리 설정
+            bottom: '100px', // 필요에 따라 하단 간격 조정
+            left: '10%', // 왼쪽 여백
+            right: '10%' // 오른쪽 여백
         },
-        options: sortedDates.map(date => {
-            const dataForDate = barData[date].map((value, index) => ({
-                value,
-                itemStyle: { color: itemColors[index] }, // 아이템별 색상 설정
-            }));
-            return {
-                title: { 
-                    text: `Lead time for items that can be ordered on ${date}`, 
-                    left: 'center',
-                    textStyle: { color: '#FFFFFF' } // 각 날짜 제목 색상
-                },
-                series: [{ data: dataForDate }]
-            };
-        })
+          xAxis: [{
+              type: 'category',
+              data: items,
+              splitLine: { show: false },
+              axisLabel: {
+                interval: 0, // 모든 항목을 표시
+                rotate: 30,
+                textStyle: { color: '#FFFFFF' } // 글자 색상
+            }
+          }],
+          yAxis: [{
+              type: 'value',
+              name: 'Lead Time (days)',
+              axisLabel: {
+                  textStyle: { color: '#FFFFFF' } // Y축 레이블 색상
+              },
+              splitLine: {
+                  lineStyle: { color: '#CCCCCC' } // Y축 분할선 색상
+              }
+          }],
+          series: [{ 
+              name: 'Lead Time', 
+              type: 'bar', 
+              data: [] // 데이터는 나중에 설정
+          }]
+      },
+      options: sortedDates.map(date => {
+          const dataForDate = barData[date].map((value, index) => ({
+              value,
+              itemStyle: { color: itemColors[index] }, // 아이템별 색상 설정
+          }));
+          return {
+              title: { 
+                  text: `Lead time for items that can be ordered on ${date}`, 
+                  left: 'center',
+                  textStyle: { color: '#FFFFFF' } // 각 날짜 제목 색상
+              },
+              series: [{ data: dataForDate }]
+          };
+      })
+  };
+
+    myChart.setOption(newOption);
+
+    const resizeHandler = () => myChart.resize();
+    window.addEventListener('resize', resizeHandler);
+
+    return () => {
+        myChart.dispose();
+        window.removeEventListener('resize', resizeHandler);
+    };
+}
+};
+
+// const past = [
+//   {
+//     ptime: 20,
+//     odate: '2023-01-19',
+//     item: '원피스',
+//   },
+//   {
+//     ptime: 21,
+//     odate: '2023-05-19',
+//     item: '원피스',
+//   },
+//   {
+//     ptime: 15,
+//     odate: '2024-01-19',
+//     item: '원피스',
+//   },
+// ]
+console.log('과거차트 넣을거임', past)
+const days = past.map(i=>i.odate); 
+
+// 날짜별로 데이터를 처리하는 함수
+const processdata = (past, days) => {
+  const result = {};
+  
+  // 날짜별로 데이터를 그룹화
+  past.forEach(entry => {
+    const { odate, ptime, item } = entry;
+    
+    // 해당 아이템에 대한 배열이 없으면 초기화
+    if (!result[item]) {
+      result[item] = new Array(days.length).fill(null); // days 길이만큼 null로 채움
+    }
+    
+    // date에 맞는 인덱스 찾기
+    const odateIndex = days.indexOf(odate);
+    
+    // date에 맞는 위치에 leadtime 값을 넣음
+    if (odateIndex !== -1) {
+      result[item][odateIndex] = ptime;
+    }
+    
+  });
+  return result;
+};
+
+const linedata = processdata(past, days)
+
+console.log('라인차트 넣을거임', linedata)
+
+const shuffle = linedata; // 품목명 : [리드타임] > 아이템 하나 오는걸 상정해서 만들어놓음
+
+// 과거리드타임 차트
+const initPastChart = () => {
+  const chartDom2 = document.getElementById('past-chart');
+  if (chartDom2) {
+    const myChart = echarts.init(chartDom2);
+
+    const seriesList = Object.keys(shuffle).map((name) => ({
+      name,
+      symbolSize: 20,
+      type: 'line',
+      smooth: true,
+      emphasis: { focus: 'series' },
+      endLabel: { show: true, formatter: '{a}', distance: 20 },
+      lineStyle: { width: 4 },
+      data: shuffle[name] // 연도별 값, null 포함
+    }));
+
+    const newoption = {
+      title: { text: `${Object.keys(shuffle)}'s PAST LEAD TIME`, left: 'center', textStyle: { color: '#FFFFFF' } },
+      tooltip: { trigger: 'item' },
+      grid: { left: 30, right: 110, bottom: 30, containLabel: true },
+      xAxis: { type: 'category', data: days, name: 'Order date', splitLine: { show: true }, axisLabel: { fontSize: 16 } },
+      yAxis: { type: 'value', name: 'Past lead time', axisLabel: { formatter: '{value}', fontSize: 16} },
+      series: seriesList
     };
 
-      myChart.setOption(newOption);
+    myChart.setOption(newoption);
 
-      const resizeHandler = () => myChart.resize();
-      window.addEventListener('resize', resizeHandler);
+    const resizeHandler = () => myChart.resize();
+    window.addEventListener('resize', resizeHandler);
 
-      return () => {
-          myChart.dispose();
-          window.removeEventListener('resize', resizeHandler);
-      };
+    return () => {
+      myChart.dispose();
+      window.removeEventListener('resize', resizeHandler);
+    };
   }
 };
 
@@ -956,6 +1099,13 @@ const initchart = () => {
       }
 }, [ barData, items, preleadopen]);
 
+useEffect(() => {
+  if (pastleadopen) {
+    setTimeout(() => {
+      initPastChart(); // 과거 리드타임 차트 초기화
+    }, 0);
+  }
+}, [pastleadopen]);
 
   return (
     <div>
@@ -1230,15 +1380,21 @@ const initchart = () => {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)', // 중앙 정렬
-            width: '400px',  // 원하는 너비로 설정
-            height: '200px', // 원하는 높이로 설정
+            width: '1000px',  // 원하는 너비로 설정
+            height: '500px', // 원하는 높이로 설정
             bgcolor: '#17161D', // 배경색 설정 (선택 사항)
             p: 3, // 패딩 설정 (선택 사항)
             borderRadius: 2, // 모서리 둥글기 (선택 사항)
             boxShadow: 24, // 그림자 (선택 사항)
           }}
         >
-          <h1 className='text-white'>과거리드타임차트,, 어케들고오냐</h1>
+           {Object.keys(linedata).length > 0 ? (
+          <div id="past-chart" style={{ width: '100%', height: '400px' }}></div>
+        ) : (
+          <Typography variant="h6" sx={{ color: 'white' }}>
+            과거 리드타임이 없습니다.
+          </Typography>
+        )}
         </Box>
       </Modal>
     </div>
