@@ -26,7 +26,9 @@ import { useAlert } from "../Compo/AlertContext";
 const ListSupplier2 = () => {
     const { showAlert } = useAlert();
     const [token, setToken] = useState(null); // 초기 토큰 상태
-    const [alias, setAlias] = useState(localStorage.getItem("alias") || "Guest");
+    const [alias, setAlias] = useState(
+        localStorage.getItem("alias") || "Guest"
+    );
     // 각 행의 카테고리 선택
     const [category1Map, setCategory1Map] = useState([]);
     const [category2Map, setCategory2Map] = useState(new Map());
@@ -84,7 +86,7 @@ const ListSupplier2 = () => {
                     showAlert("데이터를 가져오는 데 실패했습니다.", "error");
                 }
                 const data = await response.json();
-    
+
                 // 데이터 구조 통일해주기`
                 const processedData = data.map((item) => ({
                     itemId: item.itemId || null,
@@ -98,36 +100,51 @@ const ListSupplier2 = () => {
                     unit: item.unit || null,
                     forSale: item.forSale || null,
                 }));
-    
+
                 console.log("0번째 항목:", processedData[0]);
                 console.log("1번째 항목:", processedData[1]);
                 console.log("2번째 항목:", processedData[2]);
-    
+
                 setRows(processedData);
-    
+
                 // 각 행의 카테고리 값을 초기화
-                const initialSelectedCategories = processedData.reduce((acc, item) => {
-                    const category1Name =
-                        category1Map.find((cat) => cat.category1Name === item.category1Name)?.category1Name || "";
-    
-                    const category2Name =
-                        category2Map.get(category1Name)?.find((cat) => cat.category2Name === item.category2Name)?.category2Name || "";
-    
-                    const category3Name =
-                        category3Map.get(category2Name)?.find((cat) => cat.category3Name === item.category3Name)?.category3Name || "";
-    
-                    acc[item.itemId] = {
-                        category1: category1Name,
-                        category2: category2Name,
-                        category3: category3Name,
-                    };
-    
-                    return acc;
-                }, {});
-    
+                const initialSelectedCategories = processedData.reduce(
+                    (acc, item) => {
+                        const category1Name =
+                            category1Map.find(
+                                (cat) =>
+                                    cat.category1Name === item.category1Name
+                            )?.category1Name || "";
+
+                        const category2Name =
+                            category2Map
+                                .get(category1Name)
+                                ?.find(
+                                    (cat) =>
+                                        cat.category2Name === item.category2Name
+                                )?.category2Name || "";
+
+                        const category3Name =
+                            category3Map
+                                .get(category2Name)
+                                ?.find(
+                                    (cat) =>
+                                        cat.category3Name === item.category3Name
+                                )?.category3Name || "";
+
+                        acc[item.itemId] = {
+                            category1: category1Name,
+                            category2: category2Name,
+                            category3: category3Name,
+                        };
+
+                        return acc;
+                    },
+                    {}
+                );
+
                 setSelectedCategories(initialSelectedCategories);
                 showAlert("조회에 성공했습니다.", "success");
-    
             } catch (error) {
                 console.error("데이터 로딩 중 오류 발생:", error);
                 showAlert("데이터 로딩 중 오류가 발생했습니다.", "error");
@@ -135,10 +152,9 @@ const ListSupplier2 = () => {
                 setLoading(false);
             }
         };
-    
+
         fetchData();
     }, [token, category1Map, category2Map, category3Map]);
-    
 
     ////////////////////////////
     // 카테고리선택, 물품명검색 //
@@ -585,196 +601,194 @@ const ListSupplier2 = () => {
 
     return (
         <div>
-                <div className="list-table-root flex flex-col p-6">
-                    {/* 공급업체의 아이템 중 <Select> */}
-                    <div className="text-xl font-semibold text-white mb-4">{`[ ${alias} ] 물품 관리`}</div>
-                    <div className="flex items-center justify-between gap-4 mb-4">
-                        <div className="flex items-center gap-4">
-                            <Select
-                                value={selectCategory1}
-                                onChange={(e) => setSelectCategory1(e.target.value)}
-                                displayEmpty
-                                className="select-custom"
-                            >
-                                <MenuItem value="">
-                                    <div>Categories 1</div>
+            <div className="list-table-root flex flex-col p-6">
+                {/* 공급업체의 아이템 중 <Select> */}
+                <div className="text-xl font-semibold text-white mb-4">{`[ ${alias} ] 물품 관리`}</div>
+                <div className="flex items-center justify-between gap-4 mb-4">
+                    <div className="flex items-center gap-4">
+                        <Select
+                            value={selectCategory1}
+                            onChange={(e) => setSelectCategory1(e.target.value)}
+                            displayEmpty
+                            className="select-custom"
+                        >
+                            <MenuItem value="">
+                                <div>Categories 1</div>
+                            </MenuItem>
+                            {category1Options.map((option) => (
+                                <MenuItem key={option} value={option}>
+                                    {option}
                                 </MenuItem>
-                                {category1Options.map((option) => (
-                                    <MenuItem key={option} value={option}>
-                                        {option}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                            <Select
-                                value={selectCategory2}
-                                onChange={(e) => setSelectCategory2(e.target.value)}
-                                displayEmpty
-                                className="select-custom"
-                            >
-                                <MenuItem value="">
-                                    <div>Categories 2</div>
+                            ))}
+                        </Select>
+                        <Select
+                            value={selectCategory2}
+                            onChange={(e) => setSelectCategory2(e.target.value)}
+                            displayEmpty
+                            className="select-custom"
+                        >
+                            <MenuItem value="">
+                                <div>Categories 2</div>
+                            </MenuItem>
+                            {category2Options.map((option) => (
+                                <MenuItem key={option} value={option}>
+                                    {option}
                                 </MenuItem>
-                                {category2Options.map((option) => (
-                                    <MenuItem key={option} value={option}>
-                                        {option}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                            <Select
-                                value={selectCategory3}
-                                onChange={(e) => setSelectCategory3(e.target.value)}
-                                displayEmpty
-                                className="select-custom"
-                            >
-                                <MenuItem value="">
-                                    <div>Categories 3</div>
+                            ))}
+                        </Select>
+                        <Select
+                            value={selectCategory3}
+                            onChange={(e) => setSelectCategory3(e.target.value)}
+                            displayEmpty
+                            className="select-custom"
+                        >
+                            <MenuItem value="">
+                                <div>Categories 3</div>
+                            </MenuItem>
+                            {category3Options.map((option) => (
+                                <MenuItem key={option} value={option}>
+                                    {option}
                                 </MenuItem>
-                                {category3Options.map((option) => (
-                                    <MenuItem key={option} value={option}>
-                                        {option}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                            <TextField
-                                value={searchQuery}
-                                onChange={handleSearchChange}
-                                placeholder="물품명 검색"
-                                size="small"
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <SearchIcon
-                                                sx={{ color: "white", fontSize: 20 }}
-                                            />
-                                        </InputAdornment>
-                                    ),
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            {searchQuery && (
-                                                <IconButton
-                                                    onClick={handleSearchReset}
-                                                    edge="end"
-                                                    sx={{ color: "white" }}
-                                                >
-                                                    <CloseIcon
-                                                        sx={{
-                                                            color: "white",
-                                                            fontSize: 20,
-                                                        }}
-                                                    />
-                                                </IconButton>
-                                            )}
-                                        </InputAdornment>
-                                    ),
-                                }}
-                                className="custom-textfield"
-                            />
-                        </div>
-                        <div className="flex space-x-3">
-                            <button
-                                onClick={handleSearchButtonClick}
-                                variant="contained"
-                                className="blue-btn"
-                            >
-                                검색
-                            </button>
-                            <button
-                                onClick={handleRegisterButtonClick}
-                                variant="contained"
-                                className="blue-btn"
-                            >
-                                등록
-                            </button>
-                            <PredictionModal
-                                open={isModalOpen}
-                                setOpen={setIsModalOpen}
-                                title="신규 상품 등록"
-                            />
-                            <button
-                                onClick={handleDelete}
-                                variant="contained"
-                                className="blue-btn"
-                            >
-                                삭제
-                            </button>
-                            <button
-                                onClick={handleSave}
-                                variant="contained"
-                                className="blue-btn"
-                            >
-                                저장
-                            </button>
-                        </div>
-                    </div>
-
-                    <TableContainer>
-                        <Table>
-                            <TableHead isAllSelected={isAllSelected}>
-                                <TableRow>
-                                    <TableCell
-                                        padding="checkbox"
-                                        style={{ width: "5%" }}
-                                    >
-                                        <Checkbox
-                                            color="default"
-                                            checked={isAllSelected}
-                                            onChange={handleSelectAll}
+                            ))}
+                        </Select>
+                        <TextField
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            placeholder="물품명 검색"
+                            size="small"
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon
+                                            sx={{
+                                                color: "white",
+                                                fontSize: 20,
+                                            }}
                                         />
-                                    </TableCell>
-                                    <TableCell
-                                        sx={{ width: "2%", textAlign: "center" }}
-                                    >
-                                        No.
-                                    </TableCell>
-                                    <TableCell
-                                        sx={{ width: "13%", textAlign: "center" }}
-                                    >
-                                        Category 1
-                                    </TableCell>
-                                    <TableCell
-                                        sx={{ width: "13%", textAlign: "center" }}
-                                    >
-                                        Category 2
-                                    </TableCell>
-                                    <TableCell
-                                        sx={{ width: "13%", textAlign: "center" }}
-                                    >
-                                        Category 3
-                                    </TableCell>
-                                    <TableCell
-                                        sx={{ width: "13%", textAlign: "center" }}
-                                    >
-                                        물품명
-                                    </TableCell>
-                                    <TableCell
-                                        sx={{ width: "13%", textAlign: "center" }}
-                                    >
-                                        part 1
-                                    </TableCell>
-                                    <TableCell
-                                        sx={{ width: "12%", textAlign: "center" }}
-                                    >
-                                        가격
-                                    </TableCell>
-                                    <TableCell
-                                        sx={{ width: "6%", textAlign: "center" }}
-                                    >
-                                        화폐단위
-                                    </TableCell>
-                                    <TableCell
-                                        sx={{ width: "10%", textAlign: "center" }}
-                                    >
-                                        판매여부
-                                    </TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody className="items-center">
-                            {currentItems.map((row, index) => {
-        if (index === 0) {
-            console.log("First Row:", row);
-            console.log("Selected Categories for First Row:", selectedCategories[row.itemId]);
-        }
-        return (
+                                    </InputAdornment>
+                                ),
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        {searchQuery && (
+                                            <IconButton
+                                                onClick={handleSearchReset}
+                                                edge="end"
+                                                sx={{ color: "white" }}
+                                            >
+                                                <CloseIcon
+                                                    sx={{
+                                                        color: "white",
+                                                        fontSize: 20,
+                                                    }}
+                                                />
+                                            </IconButton>
+                                        )}
+                                    </InputAdornment>
+                                ),
+                            }}
+                            className="custom-textfield"
+                        />
+                    </div>
+                    <div className="flex space-x-3">
+                        <button
+                            onClick={handleSearchButtonClick}
+                            variant="contained"
+                            className="blue-btn"
+                        >
+                            검색
+                        </button>
+                        <button
+                            onClick={handleRegisterButtonClick}
+                            variant="contained"
+                            className="blue-btn"
+                        >
+                            등록
+                        </button>
+                        <PredictionModal
+                            open={isModalOpen}
+                            setOpen={setIsModalOpen}
+                            title="신규 상품 등록"
+                        />
+                        <button
+                            onClick={handleDelete}
+                            variant="contained"
+                            className="blue-btn"
+                        >
+                            삭제
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            variant="contained"
+                            className="blue-btn"
+                        >
+                            저장
+                        </button>
+                    </div>
+                </div>
+
+                <TableContainer>
+                    <Table>
+                        <TableHead isAllSelected={isAllSelected}>
+                            <TableRow>
+                                <TableCell
+                                    padding="checkbox"
+                                    style={{ width: "5%" }}
+                                >
+                                    <Checkbox
+                                        color="default"
+                                        checked={isAllSelected}
+                                        onChange={handleSelectAll}
+                                    />
+                                </TableCell>
+                                <TableCell
+                                    sx={{ width: "2%", textAlign: "center" }}
+                                >
+                                    No.
+                                </TableCell>
+                                <TableCell
+                                    sx={{ width: "13%", textAlign: "center" }}
+                                >
+                                    Category 1
+                                </TableCell>
+                                <TableCell
+                                    sx={{ width: "13%", textAlign: "center" }}
+                                >
+                                    Category 2
+                                </TableCell>
+                                <TableCell
+                                    sx={{ width: "13%", textAlign: "center" }}
+                                >
+                                    Category 3
+                                </TableCell>
+                                <TableCell
+                                    sx={{ width: "13%", textAlign: "center" }}
+                                >
+                                    물품명
+                                </TableCell>
+                                <TableCell
+                                    sx={{ width: "13%", textAlign: "center" }}
+                                >
+                                    part 1
+                                </TableCell>
+                                <TableCell
+                                    sx={{ width: "12%", textAlign: "center" }}
+                                >
+                                    가격
+                                </TableCell>
+                                <TableCell
+                                    sx={{ width: "6%", textAlign: "center" }}
+                                >
+                                    화폐단위
+                                </TableCell>
+                                <TableCell
+                                    sx={{ width: "10%", textAlign: "center" }}
+                                >
+                                    판매여부
+                                </TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody className="items-center">
+                            {currentItems.map((row, index) => (
                                     <TableRow key={row.id}>
                                         <TableCell
                                             padding="checkbox"
@@ -782,7 +796,9 @@ const ListSupplier2 = () => {
                                         >
                                             <Checkbox
                                                 color="default"
-                                                checked={selectedItems.has(row.itemId)}
+                                                checked={selectedItems.has(
+                                                    row.itemId
+                                                )}
                                                 onChange={() =>
                                                     handleRowSelect(row.itemId)
                                                 }
@@ -792,15 +808,18 @@ const ListSupplier2 = () => {
                                             className="item-cell"
                                             sx={{ width: "2%" }}
                                         >
-                                            {(currentPage-1)*itemsPerPage+index + 1}
+                                            {(currentPage - 1) * itemsPerPage +
+                                                index +
+                                                1}
                                         </TableCell>
                                         {/* 전체 카테고리 목록 중 <Select> */}
                                         <TableCell sx={{ width: "13%" }}>
                                             <Select
                                                 className="select-supplier items-center"
                                                 value={
-                                                    selectedCategories[row.itemId]
-                                                        ?.category1 || ""
+                                                    selectedCategories[
+                                                        row.itemId
+                                                    ]?.category1 || ""
                                                 }
                                                 onChange={(e) =>
                                                     handleCategoryChange(
@@ -816,7 +835,9 @@ const ListSupplier2 = () => {
                                                 {category1Map.map((cat) => (
                                                     <MenuItem
                                                         key={cat.category1Name}
-                                                        value={cat.category1Name}
+                                                        value={
+                                                            cat.category1Name
+                                                        }
                                                     >
                                                         {cat.category1Name}
                                                     </MenuItem>
@@ -827,8 +848,9 @@ const ListSupplier2 = () => {
                                             <Select
                                                 className="select-supplier items-center"
                                                 value={
-                                                    selectedCategories[row.itemId]
-                                                        ?.category2 || ""
+                                                    selectedCategories[
+                                                        row.itemId
+                                                    ]?.category2 || ""
                                                 }
                                                 onChange={(e) =>
                                                     handleCategoryChange(
@@ -838,8 +860,9 @@ const ListSupplier2 = () => {
                                                     )
                                                 }
                                                 disabled={
-                                                    !selectedCategories[row.itemId]
-                                                        ?.category1
+                                                    !selectedCategories[
+                                                        row.itemId
+                                                    ]?.category1
                                                 }
                                             >
                                                 <MenuItem value="">
@@ -847,13 +870,16 @@ const ListSupplier2 = () => {
                                                 </MenuItem>
                                                 {(
                                                     category2Map.get(
-                                                        selectedCategories[row.itemId]
-                                                            ?.category1
+                                                        selectedCategories[
+                                                            row.itemId
+                                                        ]?.category1
                                                     ) || []
                                                 ).map((cat) => (
                                                     <MenuItem
                                                         key={cat.category2Name}
-                                                        value={cat.category2Name}
+                                                        value={
+                                                            cat.category2Name
+                                                        }
                                                     >
                                                         {cat.category2Name}
                                                     </MenuItem>
@@ -864,8 +890,9 @@ const ListSupplier2 = () => {
                                             <Select
                                                 className="select-supplier items-center"
                                                 value={
-                                                    selectedCategories[row.itemId]
-                                                        ?.category3 || ""
+                                                    selectedCategories[
+                                                        row.itemId
+                                                    ]?.category3 || ""
                                                 }
                                                 onChange={(e) =>
                                                     handleCategoryChange(
@@ -875,8 +902,9 @@ const ListSupplier2 = () => {
                                                     )
                                                 }
                                                 disabled={
-                                                    !selectedCategories[row.itemId]
-                                                        ?.category2
+                                                    !selectedCategories[
+                                                        row.itemId
+                                                    ]?.category2
                                                 }
                                             >
                                                 <MenuItem value="">
@@ -884,13 +912,16 @@ const ListSupplier2 = () => {
                                                 </MenuItem>
                                                 {(
                                                     category3Map.get(
-                                                        selectedCategories[row.itemId]
-                                                            ?.category2
+                                                        selectedCategories[
+                                                            row.itemId
+                                                        ]?.category2
                                                     ) || []
                                                 ).map((cat) => (
                                                     <MenuItem
                                                         key={cat.category3Name}
-                                                        value={cat.category3Name}
+                                                        value={
+                                                            cat.category3Name
+                                                        }
                                                     >
                                                         {cat.category3Name}
                                                     </MenuItem>
@@ -921,7 +952,10 @@ const ListSupplier2 = () => {
                                                 className="custom-quantity"
                                                 value={row.part1 || ""}
                                                 onChange={(event) =>
-                                                    handlePart1Change(row.itemId, event)
+                                                    handlePart1Change(
+                                                        row.itemId,
+                                                        event
+                                                    )
                                                 }
                                                 fullWidth
                                             />
@@ -933,7 +967,10 @@ const ListSupplier2 = () => {
                                                 type="number"
                                                 value={row.price}
                                                 onChange={(event) =>
-                                                    handlePriceChange(row.itemId, event)
+                                                    handlePriceChange(
+                                                        row.itemId,
+                                                        event
+                                                    )
                                                 }
                                                 fullWidth
                                             />
@@ -954,13 +991,19 @@ const ListSupplier2 = () => {
                                                 {Object.entries(
                                                     currencyDisplayNames
                                                 ).map(([code, displayName]) => (
-                                                    <MenuItem key={code} value={code}>
+                                                    <MenuItem
+                                                        key={code}
+                                                        value={code}
+                                                    >
                                                         {displayName}
                                                     </MenuItem>
                                                 ))}
                                             </Select>
                                         </TableCell>
-                                        <TableCell sx={{ width: "6%" }} align="center">
+                                        <TableCell
+                                            sx={{ width: "6%" }}
+                                            align="center"
+                                        >
                                             <Switch
                                                 checked={row.forSale ?? false}
                                                 onChange={(event) =>
@@ -972,39 +1015,39 @@ const ListSupplier2 = () => {
                                             />
                                         </TableCell>
                                     </TableRow>
-                              );
-                            })}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                    <div className="flex items-center mt-6">
-                        <div>
-                            <Select
-                                value={itemsPerPage}
-                                onChange={(e) => {
-                                    setItemsPerPage(e.target.value);
-                                    setCurrentPage(1);
-                                }}
-                                className="select-custom"
-                            >
-                                {[5, 10, 15].map((option) => (
-                                    <MenuItem key={option} value={option}>
-                                        {option}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </div>
-                        <div className="pagination-container">
-                            <Pagination
-                                count={totalPages}
-                                page={currentPage}
-                                onChange={handlePageChange}
-                                shape="rounded"
-                            />
-                        </div>
+                                // );
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <div className="flex items-center mt-6">
+                    <div>
+                        <Select
+                            value={itemsPerPage}
+                            onChange={(e) => {
+                                setItemsPerPage(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                            className="select-custom"
+                        >
+                            {[5, 10, 15].map((option) => (
+                                <MenuItem key={option} value={option}>
+                                    {option}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </div>
+                    <div className="pagination-container">
+                        <Pagination
+                            count={totalPages}
+                            page={currentPage}
+                            onChange={handlePageChange}
+                            shape="rounded"
+                        />
                     </div>
                 </div>
+            </div>
         </div>
     );
-}
+};
 export default ListSupplier2;
