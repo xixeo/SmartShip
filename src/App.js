@@ -24,10 +24,11 @@ import AnnounceEdit from "./Admin/AnnounceEdit";
 import Announcement from "./Admin/Announcement";
 import Membership from "./Admin/Membership";
 import Charttest from "./DashBoard/charttest";
-import SupplierBoard from "./DashBoard/SupplierBoard";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { AlertProvider } from "./Compo/AlertContext";
 import { LoadingProvider } from "./Compo/LoadingContext";
+import ItemSupplier from "./DashBoard/itemSupplier";
+import Supplierboard2 from "./DashBoard/Supplierboard2";
 
 function App() {
     const theme = createTheme({
@@ -104,9 +105,10 @@ function App() {
                                                 <Route path="/AnnounceEdit/:noticeid" element={<PrivateRoute element={<AnnounceEdit />} />} />
                                                 <Route path="/Announcement" element={<PrivateRoute element={<Announcement />} />} />
                                                 <Route path="/Membership" element={<PrivateRoute element={<Membership />} />} />
-                                                <Route path="/SupplierBoard" element={<PrivateRoute element={<SupplierBoard />} />} />
                                                 <Route path="/PurchaseRequest" element={<PrivateRoute element={<PurchaseRequest />} />} />
                                                 <Route path="/getOrderDetail/:orderId" element={<PrivateRoute element={<OrderManage />} />} />
+                                                <Route path="/itemSupplier" element={<PrivateRoute element={<itemSupplier />} />} />
+                                                <Route path="/Supplierboard" element={<PrivateRoute element={<Supplierboard2 />} />} />
                                             </Routes>
                                         </LoadingProvider>
                                     </AlertProvider>

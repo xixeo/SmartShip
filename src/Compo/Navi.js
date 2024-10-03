@@ -141,7 +141,7 @@ const Navi = () => {
               {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
             </div>
           </li>
-          <li className="menu-item" onClick={() => navigate("/SupplierBoard")}>
+          <li className="menu-item" onClick={() => navigate("/Supplierboard")}>
             <Side07 className="icon" />
             <div className="menu-text flex justify-between items-center">
               {!isCollapsed && <span>판매자 대시보드</span>}
