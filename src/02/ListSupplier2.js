@@ -71,74 +71,63 @@ const ListSupplier2 = () => {
         const fetchData = async () => {
             // token이 없으면 fetch하지 않음
             if (!token) {
-                setLoading(true); // token이 없을 경우 로딩 해제
                 return; // token이 없으면 함수를 종료
             }
+            setLoading(true); // token이 없을 경우 로딩 해제
             try {
                 const response = await fetch("/finditem", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                if (!response.ok)
+                if (!response.ok) {
                     showAlert("데이터를 가져오는 데 실패했습니다.", "error");
+                }
                 const data = await response.json();
-                console.log("데이터",data);
-
-                // const processedData = data.map((item) => ({
-                //     ...item,
-                //     forSale: item.forSale ?? false,
-                // }));
-                // console.log("패치받아온 데이터:", processedData);
-                // console.log("0번째 항목:", processedData[0]);
-                // console.log("1번째 항목:", processedData[1]);
-                // console.log("2번째 항목:", processedData[2]);
-                // setRows(processedData);
-                
-                console.log("0번째 항목:", data[0]);
-                console.log("1번째 항목:", data[1]);
-                console.log("2번째 항목:", data[2]);
-                setRows(data);
-
+    
+                // 데이터 구조 통일해주기`
+                const processedData = data.map((item) => ({
+                    itemId: item.itemId || null,
+                    category1Name: item.category1Name || item.category1 || "",
+                    category2Name: item.category2Name || item.category2 || "",
+                    category3Name: item.category3Name || item.category3 || "",
+                    itemName: item.itemName || null,
+                    part1: item.part1 || null,
+                    part2: item.part2 || null,
+                    price: item.price || null,
+                    unit: item.unit || null,
+                    forSale: item.forSale || null,
+                }));
+    
+                console.log("0번째 항목:", processedData[0]);
+                console.log("1번째 항목:", processedData[1]);
+                console.log("2번째 항목:", processedData[2]);
+    
+                setRows(processedData);
+    
                 // 각 행의 카테고리 값을 초기화
-                const initialSelectedCategories = data.reduce(
-                    (acc, item) => {
-                        const category1Name =
-                            category1Map.find(
-                                (cat) =>
-                                    cat.category1Name === item.category1Name
-                            )?.category1Name || "";
-
-                        const category2Name =
-                            category2Map
-                                .get(category1Name)
-                                ?.find(
-                                    (cat) =>
-                                        cat.category2Name === item.category2Name
-                                )?.category2Name || "";
-
-                        const category3Name =
-                            category3Map
-                                .get(category2Name)
-                                ?.find(
-                                    (cat) =>
-                                        cat.category3Name === item.category3Name
-                                )?.category3Name || "";
-
-                        acc[item.itemId] = {
-                            category1: category1Name,
-                            category2: category2Name,
-                            category3: category3Name,
-                        };
-
-                        return acc;
-                    },
-                );
+                const initialSelectedCategories = processedData.reduce((acc, item) => {
+                    const category1Name =
+                        category1Map.find((cat) => cat.category1Name === item.category1Name)?.category1Name || "";
+    
+                    const category2Name =
+                        category2Map.get(category1Name)?.find((cat) => cat.category2Name === item.category2Name)?.category2Name || "";
+    
+                    const category3Name =
+                        category3Map.get(category2Name)?.find((cat) => cat.category3Name === item.category3Name)?.category3Name || "";
+    
+                    acc[item.itemId] = {
+                        category1: category1Name,
+                        category2: category2Name,
+                        category3: category3Name,
+                    };
+    
+                    return acc;
+                }, {});
+    
                 setSelectedCategories(initialSelectedCategories);
                 showAlert("조회에 성공했습니다.", "success");
-                console.log("Category 1 Map:", category1Map);
-console.log("Category 2 Map:", Array.from(category2Map.entries()));
-console.log("Category 3 Map:", Array.from(category3Map.entries()));
+    
             } catch (error) {
                 console.error("데이터 로딩 중 오류 발생:", error);
                 showAlert("데이터 로딩 중 오류가 발생했습니다.", "error");
@@ -146,9 +135,10 @@ console.log("Category 3 Map:", Array.from(category3Map.entries()));
                 setLoading(false);
             }
         };
-
+    
         fetchData();
     }, [token, category1Map, category2Map, category3Map]);
+    
 
     ////////////////////////////
     // 카테고리선택, 물품명검색 //
@@ -185,12 +175,12 @@ console.log("Category 3 Map:", Array.from(category3Map.entries()));
 
     // 카테고리 선택 변경 시 필터링 함수
     const applyCategoryFilter = () => {
-        console.log("All Rows:", rows);
-        console.log("Selected Categories:", {
-            selectCategory1,
-            selectCategory2,
-            selectCategory3,
-        });
+        //console.log("All Rows:", rows);
+        //console.log("Selected Categories:", {
+        //     selectCategory1,
+        //     selectCategory2,
+        //     selectCategory3,
+        // });
 
         // 카테고리 선택 해제 로직 추가
         if (!selectCategory1) {
@@ -779,7 +769,12 @@ console.log("Category 3 Map:", Array.from(category3Map.entries()));
                                 </TableRow>
                             </TableHead>
                             <TableBody className="items-center">
-                                {currentItems.map((row, index) => (
+                            {currentItems.map((row, index) => {
+        if (index === 0) {
+            console.log("First Row:", row);
+            console.log("Selected Categories for First Row:", selectedCategories[row.itemId]);
+        }
+        return (
                                     <TableRow key={row.id}>
                                         <TableCell
                                             padding="checkbox"
@@ -977,7 +972,8 @@ console.log("Category 3 Map:", Array.from(category3Map.entries()));
                                             />
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                              );
+                            })}
                             </TableBody>
                         </Table>
                     </TableContainer>
