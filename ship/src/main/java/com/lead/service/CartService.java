@@ -207,11 +207,6 @@ public class CartService {
 				orderDetail.setQuantity(itemDetail.getQuantity());
 				orderDetailRepo.save(orderDetail);
 
-				// 구매 횟수 증가
-				Items item = cartItem.getItem();
-				item.setPurchaseCount(item.getPurchaseCount() + 1);
-				itemsRepo.save(item);
-
 				// 장바구니에서 삭제
 				cartItemRepo.delete(cartItem);
 			}

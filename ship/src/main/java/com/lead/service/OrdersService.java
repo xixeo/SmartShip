@@ -259,7 +259,6 @@ public class OrdersService {
 	}
 
 	// OrderDetail을 DTO로 변환하는 로직 (리드타임을 조건에 맞춰 설정)
-	// OrderDetail을 DTO로 변환하는 로직 (리드타임을 조건에 맞춰 설정)
 	private List<OrderDetailDTO> convertOrderDetailToDTO(List<OrderDetail> orderDetails, LocalDate releaseDate,
 			SelectedDay selectedDay) {
 		return orderDetails.stream().map(orderDetail -> {

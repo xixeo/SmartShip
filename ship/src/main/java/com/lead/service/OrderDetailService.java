@@ -91,6 +91,12 @@ public class OrderDetailService {
     		//ordering true
     		orderDetail.setOrdering(true);
     		
+    		// 구매 횟수 증가
+			Items item = orderDetail.getItem();
+			item.setPurchaseCount(item.getPurchaseCount() + 1);
+			itemsRepo.save(item);
+
+    		
     		//orderDate
     		orderDetail.setOrderDate(LocalDate.now());
     		

@@ -6,13 +6,20 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lead.entity.Items;
+import com.lead.entity.Leadtime;
 import com.lead.entity.Member;
+import com.lead.entity.Season;
+import com.lead.entity.SelectedDay;
 import com.lead.repository.ItemsRepo;
 import com.lead.repository.LeadtimeRepo;
 
@@ -21,19 +28,18 @@ public class LeadtimeService {
 
     @Autowired
     private ItemsRepo itemsRepo;
-    
+
     @Autowired
     private LeadtimeRepo leadtimeRepo;
 
     @Autowired
     private RestTemplate restTemplate;
 
-    // DB에서 데이터를 조회하고 Flask API로 보낼 로직
-    public void sendLeadtimeDataToFlask() {
-        // 오늘 날짜 (requestDate)
-        LocalDate requestDate = LocalDate.now();
+    private int i = 1; // 전송 카운트를 위한 변수
 
-        // 이번 년도의 4개 releaseDate
+    // DB에서 데이터를 조회하고 Flask API로 보낼 로직 (1000개씩 나눠서)
+    public void sendLeadtimeDataToFlask() {
+        LocalDate requestDate = LocalDate.now();
         LocalDate[] releaseDates = {
             LocalDate.of(requestDate.getYear(), 3, 1),
             LocalDate.of(requestDate.getYear(), 6, 1),
@@ -41,50 +47,115 @@ public class LeadtimeService {
             LocalDate.of(requestDate.getYear(), 12, 1)
         };
 
-        // Items 테이블에서 데이터를 조회하여 관련된 supplier, machinery, assembly, currency 값을 구성
-        List<Items> itemsList = itemsRepo.findAll();  // 모든 Items 조회
+        String[] seasons = {"SPRING", "SUMMER", "FALL", "WINTER"};  // 4개의 시즌
+        String[] selectedDays = {"월", "화", "수", "목", "금", "토", "일"};  // 7개의 요일
 
-        for (Items item : itemsList) {
-            // supplier: Items의 user_id와 연결된 Member의 username
-            Member member = item.getMember(); // item을 통해 바로 member를 가져옴
-            String supplier = member.getUsername();
+//        int pageNumber = 0;
+//        int pageSize = 1000; // 한 페이지에 1000개의 아이템씩 조회
+//
+//        boolean hasNextPage;
+//        do {
+//            Pageable pageable = PageRequest.of(pageNumber, pageSize);
+//            List<Items> itemsList = itemsRepo.findLimitedItems(pageable);
+//
+//            hasNextPage = !itemsList.isEmpty(); // 다음 페이지가 있는지 확인
+        int pageNumber = 0;
+        int pageSize = 1000; // 한 번에 1000개의 데이터 조회
+//        int startItemsId = 25909; // 25909번부터 시작
+        int startItemsId = 26112; // 25909번부터 시작
 
-            // machinery: Item을 통해 Category2의 category2Name 값
-            String machinery = item.getCategory3().getCategory2().getCategory2Name();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        
+        boolean hasNextPage;
+        do {
+            // items_id가 25909 이상인 데이터만 조회
+            List<Items> itemsList = itemsRepo.findItemsByItemsIdGreaterThanEqual(startItemsId, pageable);
 
-            // assembly: Item을 통해 Category3의 category3_name 값
-            String assembly = item.getCategory3().getCategory3Name();
+            hasNextPage = !itemsList.isEmpty();
 
-            // currency: Items 테이블의 unit 값
-            String currency = item.getUnit();
+            for (Items item : itemsList) {
+                Member member = item.getMember();
+                String supplier = member.getUsername();
+                String machinery = item.getCategory3().getCategory2().getCategory2Name();
+                String assembly = item.getCategory3().getCategory3Name();
+                String currency = item.getUnit();
 
-            // releaseDate 4개 각각에 대해 Flask API 호출
-            for (LocalDate releaseDate : releaseDates) {
-                // Flask API로 보낼 요청 데이터 구성
-                Map<String, Object> requestData = new HashMap<>();
-                requestData.put("requestDate", requestDate.toString());
-                requestData.put("releaseDate", releaseDate.toString());
-                requestData.put("supplier", supplier);
-                requestData.put("machinery", machinery);
-                requestData.put("assembly", assembly);
-                requestData.put("currency", currency);
-
-                // Flask API 호출
-                String flaskApiUrl = "http://10.125.121.178:5001/predict_leadtime";  // Flask API 엔드포인트 수정
-                sendRequestToFlask(flaskApiUrl, requestData);
+                for (LocalDate releaseDate : releaseDates) {
+                    for (String season : seasons) {
+                        for (String selectedDay : selectedDays) {
+                            Map<String, Object> requestData = new HashMap<>();
+                            requestData.put("requestDate", requestDate.toString());
+                            requestData.put("releaseDate", releaseDate.toString());
+                            requestData.put("supplier", supplier);
+                            requestData.put("machinery", machinery);
+                            requestData.put("assembly", assembly);
+                            requestData.put("currency", currency);
+                            
+                            // Flask API 호출 및 리드타임 데이터 응답 받음
+                            String flaskApiUrl = "http://10.125.121.178:5001/predict_leadtime";  
+                            String leadtime = sendRequestToFlask(flaskApiUrl, requestData);
+                            
+                            // 응답받은 데이터를 DB에 저장
+                            saveLeadtimeToDb(item, leadtime, season, selectedDay);
+                        }
+                    }
+                }
             }
-        }
+
+            pageNumber++; // 다음 페이지로 이동
+
+        } while (hasNextPage); // 다음 페이지가 있을 때까지 반복
     }
 
-    // Flask API로 데이터를 전송하는 메서드
-    private void sendRequestToFlask(String flaskApiUrl, Map<String, Object> requestData) {
-        // Flask API로 POST 요청 보내기
+    // Flask API로 데이터를 전송하고 리드타임을 반환하는 메서드
+    private String sendRequestToFlask(String flaskApiUrl, Map<String, Object> requestData) {
         ResponseEntity<String> response = restTemplate.postForEntity(flaskApiUrl, requestData, String.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
-            System.out.println("Flask API 호출 성공: " + response.getBody());
+            i++;  // i 값 증가
+            System.out.println("Flask API 호출 성공: " + i + ", 응답: " + response.getBody());
+            return response.getBody(); // 리드타임 값 반환
         } else {
             throw new RuntimeException("Flask API 호출 실패");
         }
     }
+
+    // 응답받은 데이터를 Leadtime 테이블에 저장하는 메서드
+
+    private void saveLeadtimeToDb(Items item, String leadtimeJson, String season, String selectedDay) {
+        try {
+            // JSON 응답을 파싱하여 predicted_lead_time 값 추출
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(leadtimeJson);
+            int leadtime = jsonNode.get("predicted_lead_time").asInt(); // JSON에서 리드타임 값 추출
+
+            // season과 selectedDay를 Enum으로 변환
+            Season seasonEnum = Season.valueOf(season);
+            SelectedDay selectedDayEnum = SelectedDay.valueOf(selectedDay);
+
+            // items_id, season, selectedDay 조합으로 기존 데이터를 조회
+            List<Leadtime> existingLeadtime = leadtimeRepo.findByItemsAndSeasonAndSelectedDay(item, seasonEnum, selectedDayEnum);
+
+            Leadtime leadtimeEntity;
+
+            if (existingLeadtime.isEmpty()) {
+                // 해당 season, selectedDay가 존재하지 않으면 새 데이터를 추가
+                leadtimeEntity = new Leadtime();
+                leadtimeEntity.setItems(item);
+                leadtimeEntity.setSeason(seasonEnum);
+                leadtimeEntity.setSelectedDay(selectedDayEnum);
+                leadtimeEntity.setLeadtime(leadtime); // 새로운 리드타임 설정
+            } else {
+                // 해당 season, selectedDay가 존재하면 leadtime만 업데이트
+                leadtimeEntity = existingLeadtime.get(0); // 해당 조합이 존재하는 경우 첫 번째 데이터만 업데이트
+                leadtimeEntity.setLeadtime(leadtime); // 리드타임 업데이트
+            }
+
+            // 리드타임 엔티티 저장 (업데이트 또는 신규 추가)
+            leadtimeRepo.save(leadtimeEntity);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse JSON response or update leadtime", e);
+        }
+    }
 }
+

@@ -62,7 +62,7 @@ public class ItemsService {
 
 		// JWT 토큰에서 사용자 정보 추출 (SecurityContextHolder)
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String username = authentication.getName(); // 토큰에서 username 추출
+		String userId = authentication.getName(); // 토큰에서 username 추출
 		String role = authentication.getAuthorities().stream().findFirst()
 				.orElseThrow(() -> new RuntimeException("권한 정보를 찾을 수 없습니다.")).getAuthority(); // role 추출
 
@@ -78,8 +78,8 @@ public class ItemsService {
 
 			// ROLE 따른 필터링
 			if (role.equals("ROLE_SUPPLIER")) {
-				// ROLE_SUPPLIER: username으로 필터링하여 자신의 물품만 조회
-				return builder.and(builder.equal(root.join("member").get("username"), username),
+				// ROLE_SUPPLIER: userid로 필터링하여 자신의 물품만 조회
+				return builder.and(builder.equal(root.join("member").get("id"), userId),
 						builder.equal(root.get("enabled"), true), // 삭제 된 상품 필터링
 						createCommonFilters(root, builder, category1Name, category2Name, category3Name, itemName));
 			} else {

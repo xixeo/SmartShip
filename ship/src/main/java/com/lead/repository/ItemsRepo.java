@@ -3,6 +3,7 @@ package com.lead.repository;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -57,4 +58,12 @@ public interface ItemsRepo extends JpaRepository<Items, Integer>, JpaSpecificati
     @Modifying
     @Query("UPDATE Items i SET i.purchaseCount = i.purchaseCount + 1 WHERE i.itemsId = :itemsId")
     void incrementPurchaseCount(@Param("itemsId") Integer itemsId);
+    
+    //1000개 제한
+    @Query("SELECT i FROM Items i")
+    List<Items> findLimitedItems(Pageable pageable);
+    
+    // itemsId 지정한 값의 이상만 보내고싶음
+    @Query("SELECT i FROM Items i WHERE i.itemsId >= :startItemsId")
+    List<Items> findItemsByItemsIdGreaterThanEqual(Integer startItemsId, Pageable pageable);
 }

@@ -9,7 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.lead.entity.Items;
 import com.lead.entity.Leadtime;
+import com.lead.entity.Season;
 import com.lead.entity.SelectedDay;
 
 @Repository
@@ -28,6 +30,9 @@ public interface LeadtimeRepo extends JpaRepository<Leadtime, Integer> {
         @Param("selectedDay") SelectedDay selectedDay,
         @Param("releaseDate") LocalDate releaseDate);
     
+    List<Leadtime> findByItemsAndSeasonAndSelectedDay(Items item, Season season, SelectedDay selectedDay);
+    
+
     
 //    Optional<Leadtime> findByItemId(Long itemId);
 }
