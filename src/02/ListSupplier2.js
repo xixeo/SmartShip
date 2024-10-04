@@ -768,7 +768,7 @@ const ListSupplier2 = () => {
                                 <TableCell
                                     sx={{ width: "13%", textAlign: "center" }}
                                 >
-                                    part 1
+                                    상세
                                 </TableCell>
                                 <TableCell
                                     sx={{ width: "12%", textAlign: "center" }}

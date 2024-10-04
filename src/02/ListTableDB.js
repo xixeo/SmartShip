@@ -30,7 +30,7 @@ const headCells = [
   { id: "category2Name", label: "Category 2", width: "16%" },
   { id: "category3Name", label: "Category 3", width: "16%" },
   { id: "itemName", label: "물품명", width: "17%" },
-  { id: "part1", label: "part 1", width: "16%" },
+  { id: "part1", label: "상세", width: "16%" },
   { id: "quantity", label: "수량", width: "12%" },
 ];
 
