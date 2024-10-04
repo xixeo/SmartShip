@@ -783,7 +783,7 @@ export default function OrderTest() {
                                     </TableBody>
                                 </Table>
                             </TableContainer>
-                            <div className="flex bottomWrap mt-6">
+                            <div className="flex bottomWrap mt-4">
                                 <div className="pagination-container">
                                     <Pagination
                                         count={totalPages}
@@ -819,8 +819,8 @@ export default function OrderTest() {
                             <TextField
                                 className="memo-textfield"
                                 multiline
-                                rows={3} // 기본 3줄
-                                maxRows={3} // 최대 3줄까지 보여주고 스크롤
+                                rows={4} // 기본 3줄
+                                maxRows={4} // 최대 3줄까지 보여주고 스크롤
                                 value={memo}
                                 onChange={(e) => setMemo(e.target.value)}
                             />
