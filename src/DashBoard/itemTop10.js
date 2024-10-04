@@ -102,35 +102,52 @@ const ItemTop10 = () => {
         const fetchData = async () => {
             setLoading(true);
 
+            const token = localStorage.getItem('token'); // localStorage에서 토큰 가져오기
+
             try {
-                const response = await fetch('/finditem');
+                const response = await fetch('/finditem', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`, // Authorization 헤더에 토큰 추가
+                        'Content-Type': 'application/json', // 필요한 경우 추가
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('네트워크 응답이 실패했습니다.');
+                }
+
                 const data = await response.json();
 
-                const itemData = await Promise.all(data.map(async item => {
-                    // 각 아이템의 itemsId를 사용하여 리드 타임 데이터를 가져옴
-                    //const leadtimeResponse = await fetch(`/pasttime/${item.itemId}`);
-                    //const leadtimeData = await leadtimeResponse.json();
-
-                    //console.log(`Item ID: ${item.itemId}, Leadtime Data:`, leadtimeData);
-
-                    // 리드 타임이 여러 개일 수 있으므로 필요한 경우 처리
-                    //const leadtime = leadtimeData.length > 0 ? leadtimeData[0].pastleadtime : null;
-                    //const orderdate = leadtimeData.length > 0 ? leadtimeData[0].orderdate : null;
-
-                    //console.log(`Item Name: ${item.itemName}, Lead Time: ${leadtime}, Order Date: ${orderdate}`);
-
-                    return {
-                        itemName: item.itemName,
-                        purchaseCount: item.purchaseCount,
-                        // leadtime: leadtime,
-                        // oderdate: orderdate,
-                    };
-                }));
-
                 // 구매 수량이 가장 큰 10개 아이템을 정렬
-                const sortedData = itemData
+                const sortedData = await Promise.all(data
                     .sort((a, b) => b.purchaseCount - a.purchaseCount)
-                    .slice(0, 10);
+                    .slice(0, 10)
+                    .map(async item => {
+                        // 각 아이템의 아이디를 사용하여 리드타임 데이터를 가져옴
+                        const leadtimeResponse = await fetch(`/pasttime/${item.itemId}`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${token}`, // Authorization 헤더에 토큰 추가
+                                'Content-Type': 'application/json', // 필요한 경우 추가
+                            },
+                        });
+
+                        const leadtimeData = await leadtimeResponse.json();
+
+                        // leadtime과 orderdate 정보를 각각 가져오기
+                        const leadtime = leadtimeData.map(lead => lead.pastleadtime);
+                        const orderdate = leadtimeData.map(lead => lead.orderdate);
+
+                        // 리드타임과 주문일을 처리하여 표시할 형식으로 변환
+                        return {
+                            itemName: item.itemName,
+                            purchaseCount: item.purchaseCount,
+                            leadtime: leadtime.join(', '), // 여러 개의 리드타임을 콤마로 구분
+                            orderdate: orderdate.join(', '), // 여러 개의 주문일을 콤마로 구분
+                        };
+                    })
+                );
 
                 setChartData(sortedData);
                 showAlert("데이터 조회에 성공했습니다.", "success");

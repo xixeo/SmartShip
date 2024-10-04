@@ -148,7 +148,7 @@ const PredictionModal = ({ open, setOpen, title }) => {
         console.log('selectedAssembly:', selectedAssembly);
         if (!formData.item || !selectedMajor || !selectedMachinery || !selectedAssembly) {
             showAlert('모든 필드를 입력해 주세요.', 'warning');
-            return; 
+            return;
         }
 
         const payload = {
@@ -163,7 +163,7 @@ const PredictionModal = ({ open, setOpen, title }) => {
             leadtime: formData.leadtime,
         };
         console.log('payload:', payload);
-        
+
         try {
             setLoading(true);
             const response = await fetch('/supplier/items/add', {
@@ -174,14 +174,22 @@ const PredictionModal = ({ open, setOpen, title }) => {
                 },
                 body: JSON.stringify(payload),
             });
-            const result = await response.text();
-            console.log(result.message); // 응답 메시지 확인
-            showAlert('상품이 성공적으로 등록되었습니다.', 'success');
-            setOpen(false);
+
+            if (response.ok) {
+                const result = await response.text();
+                console.log(result.message); // 응답 메시지 확인
+                showAlert('상품이 성공적으로 등록되었습니다.', 'success');
+                setOpen(false);
+            } else {
+                const errorText = await response.text();
+                console.error('등록 실패:', errorText);
+                showAlert('상품 등록에 실패했습니다.', 'error');
+            }
+            
         } catch (error) {
             console.error('등록 중 오류 발생:', error);
             showAlert('상품 등록에 실패했습니다.', 'error')
-            
+
             // 상태 초기화 (모달을 닫을 때와 동일하게)
             // setFormData({
             //     item: '',
@@ -202,7 +210,7 @@ const PredictionModal = ({ open, setOpen, title }) => {
             setLoading(false);
         }
     };
-    
+
     return (
         <div
             className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50"
