@@ -743,8 +743,8 @@ export default function OrderTest() {
         console.log("버튼행 값", e); // 현재 선택된 공급자것만 보여줄거면 이걸로
         console.log("버튼행 값의 itemid", e.selecteditemid); // 현재 선택된 공급자것만 보여줄거면 이걸로
         //  console.log('버튼행 값',e.map(i=>i.itemid)) 만약 한번에 업체별 다 보여줄거면 이걸로
-        const selid = 26041;
-        // const selid = e.selecteditemid;
+        // const selid = 26041;
+        const selid = e.selecteditemid;
         //  ==============
         // | 과거리드 api |
         //  ==============

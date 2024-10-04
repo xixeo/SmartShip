@@ -287,16 +287,31 @@ export default function MyOrderList() {
                     throw new Error("myorderlist response was not ok");
                 }
                 const myorderlist = await response.json();
-                const sortdata = myorderlist.sort((a, b) => {
-                    const dateA = new Date(a.requestDate);
-                    const dateB = new Date(b.requestDate);
+                const formattedData = myorderlist.map(order => {
+                    const groupedDetails = {};
 
-                    // 날짜가 같으면 시간으로 비교
-                    if (dateA.toDateString() === dateB.toDateString()) {
-                        return dateB - dateA; // 시간 기준으로 내림차순 정렬
-                    }
-                    return dateB - dateA; // 날짜 기준으로 내림차순 정렬
+                    // orderDetails 배열을 key값으로 그룹화
+                    order.orderDetails.forEach(detail => {
+                        const key = `${detail.itemName}-${detail.part1}`;
+
+                        // key에 맞는 배열이 없으면 새로 생성
+                        if (!groupedDetails[key]) {
+                            groupedDetails[key] = [];
+                        }
+
+                        // key에 맞춰 detail을 추가
+                        groupedDetails[key].push(detail);
+                    });
+
+                    // 기존 order에 그룹화된 orderDetails를 추가
+                    return {
+                        ...order,
+                        orderDetails: Object.values(groupedDetails),  // 그룹화된 값들만 배열로 저장
+                    };
                 });
+                console.log('묶은 데이터!!!', formattedData)
+                // orderId를 기준으로 내림차순 정렬
+                const sortdata = formattedData.sort((a, b) => b.orderId - a.orderId);
                 setListdata(sortdata);
             } catch (e) {
                 console.log("Failed to fetch getMyOrderList", e);
@@ -350,6 +365,8 @@ export default function MyOrderList() {
         });
     };
 
+    console.log('확장', expanded)
+
     //////////////////////
     //  발주 현황 함수   //
     //////////////////////
@@ -392,6 +409,12 @@ export default function MyOrderList() {
     //         order.orderDetails.map((detail) => detail.cancel)
     //     )
     // );
+    // console.log('화긴', currentItems)
+    console.log('화긴', currentItems.map(order => order.orderDetails.map(detailsArray => (
+        detailsArray.map(detail => (
+            detail.itemName
+        ))
+    ))))
     return (
         <div className="list-table-root">
             <h2 className="text-2xl font-semibold text-white mb-10 ml-5">
@@ -430,9 +453,8 @@ export default function MyOrderList() {
                                 onClick={handleExpandClick(order.orderId)}
                                 aria-expanded={expanded[order.orderId] || false}
                                 aria-label="show more"
-                                className={`transition-transform ${
-                                    expanded[order.orderId] ? "rotate-180" : ""
-                                }`}
+                                className={`transition-transform ${expanded[order.orderId] ? "rotate-180" : ""
+                                    }`}
                                 sx={{ color: "white", marginLeft: "auto" }}
                             >
                                 <ArrowDown />
@@ -463,55 +485,32 @@ export default function MyOrderList() {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {order.orderDetails.map((detail) => (
-                                            <TableRow
-                                                key={detail.orderDetailId}
-                                            >
-                                                {order.state !== "발주 완료" ? (
-                                                    <>
-                                                        <TableCell align="center">
-                                                            {detail.itemName}
-                                                        </TableCell>
-                                                        <TableCell align="center">
-                                                            {detail.quantity}
-                                                        </TableCell>
-                                                        <TableCell align="center">
-                                                            -
-                                                        </TableCell>
-                                                        <TableCell align="center">
-                                                            -
-                                                        </TableCell>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <TableCell align="center">
-                                                            {detail.itemName}
-                                                        </TableCell>
-                                                        <TableCell align="center">
-                                                            {detail.quantity}
-                                                        </TableCell>
-                                                        <TableCell align="center">
-                                                            {formatPrice(
-                                                                detail.price,
-                                                                detail.quantity,
-                                                                detail.unit
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell align="center">
-                                                            {detail.username}
-                                                        </TableCell>
-                                                    </>
-                                                )}
-                                            </TableRow>
+                                        {order.orderDetails.map((detailsArray) => (
+                                            detailsArray.map((detail) => (
+                                                <TableRow key={detail.orderDetailId}>
+                                                    <TableCell align="center">
+                                                        {detail.itemName}
+                                                    </TableCell>
+                                                    <TableCell align="center">
+                                                        {detail.quantity}
+                                                    </TableCell>
+                                                    <TableCell align="center">
+                                                        {order.state == "complete" ? formatPrice(detail.price, detail.quantity, detail.unit) : '-'}
+                                                    </TableCell>
+                                                    <TableCell align="center">
+                                                        {order.state == "complete" ? detail.username : '-'}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
                                         ))}
                                     </TableBody>
                                 </Table>
                                 <div className="mt-8">
                                     <h1>비고</h1>
                                     <div className="mt-2 p-5 rounded-lg textfieldRead min-h-9">
-                                    {order.memo
-                                                        ? order.memo
-                                                        : "-"}
+                                        {order.memo
+                                            ? order.memo
+                                            : "-"}
                                     </div>
                                 </div>
                             </div>
