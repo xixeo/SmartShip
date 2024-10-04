@@ -25,19 +25,14 @@ export default function OrderTest() {
     const [recoal, setrecoal] = useState(false);
     const [recoal2, setrecoal2] = useState(false);
     const [selrow, setSelrow] = useState([]);
-    // const [totalAmounts, setTotalAmounts] = useState({});
     const [total, setTotal] = useState({});
     const [clickrow, setClickrow] = useState(null);
-    // const [supplierOptions, setSupplierOptions] = useState([]);
-    // const [selectedSupplier, setSelectedSupplier] = useState({});
     const [selectrowOrderid, setSelectrowOrderid] = useState([]);
-    const [selectrowitemid, setSelectrowitemid] = useState({});
     const [Currentrow, setCurrentrow] = useState({});
     const [rows, setRows] = useState([]);
     const token = localStorage.getItem("token");
-    // console.log('id', orderId);
-    const [keey, setKeey] = useState([]);
     const { setLoading } = useLoading();
+
     //  ==================
     // | 발주관리 get api |
     //  ==================
@@ -164,7 +159,6 @@ export default function OrderTest() {
             const groupedData = formatted.reduce((acc, order) => {
                 order.orderDetails.forEach((detail) => {
                     const key = `${detail.category1Name}-${detail.category2Name}-${detail.category3Name}-${detail.itemName}-${detail.part1}`;
-                    setKeey(key);
                     if (!acc[key]) {
                         acc[key] = [];
                     }
@@ -376,12 +370,12 @@ export default function OrderTest() {
         { field: "Category1", headerName: "Category 1", flex: 1 },
         { field: "Category2", headerName: "Category 2", flex: 1 },
         { field: "Category3", headerName: "Category 3", flex: 1 },
-        { field: "itemName", headerName: "Item Name", flex: 1 },
-        { field: "part1", headerName: "Part 1", flex: 1 },
-        { field: "unitprice", headerName: "Unit Price", flex: 1 },
+        { field: "itemName", headerName: "품목명", flex: 1 },
+        { field: "part1", headerName: "상세", flex: 1 },
+        { field: "unitprice", headerName: "화폐 단위", flex: 1 },
         {
             field: "quantity",
-            headerName: "Quantity",
+            headerName: "수량",
             flex: 1,
             renderCell: (params) => {
                 return params.row.details
@@ -421,7 +415,7 @@ export default function OrderTest() {
         },
         {
             field: "amount",
-            headerName: "Amount",
+            headerName: "가격",
             flex: 1,
             renderCell: (params) => {
                 // 현재 선택된 공급자에 맞는 detail만 찾아서 amount 표시
@@ -437,10 +431,10 @@ export default function OrderTest() {
                     : 0;
             },
         },
-        { field: "BestOrderDate", headerName: "Best Order Date", flex: 1 },
+        { field: "BestOrderDate", headerName: "최적주문일", flex: 1 },
         {
             field: "suppliers",
-            headerName: "Supplier",
+            headerName: "공급업체",
             flex: 1,
             renderCell: (params) => {
                 const rowKey = params.row.id; // 행의 ID
@@ -470,7 +464,7 @@ export default function OrderTest() {
         },
         {
             field: "Pastlead",
-            headerName: "Past Lead Time",
+            headerName: "과거리드타임",
             flex: 1,
             renderCell: (params) => (
                 <div
@@ -727,12 +721,11 @@ export default function OrderTest() {
         if (event.target.closest('input[type="checkbox"]') === null) {
             const itemname = clickrow.itemName;
             const orderdetailid = clickrow.orderdetailid;
-            const itemid = clickrow.itemid;
+            // const itemid = clickrow.itemid;
             // console.log('행선택itemname', itemname)
             // console.log('행선택orderdetailid', orderdetailid)
             setSelectrowitemname(itemname);
             setSelectrowOrderid(orderdetailid);
-            setSelectrowitemid(itemid);
         }
     };
 
@@ -1126,6 +1119,7 @@ export default function OrderTest() {
                         {
                             name: "Lead Time",
                             type: "bar",
+                            barWidth: 30,
                             data: [], // 데이터는 나중에 설정
                         },
                     ],
@@ -1137,7 +1131,7 @@ export default function OrderTest() {
                     }));
                     return {
                         title: {
-                            text: `Lead time for items that can be ordered on ${date}`,
+                            text: `${date} 발주 가능한 선용품`,
                             left: "center",
                             textStyle: { color: "#FFFFFF" }, // 각 날짜 제목 색상
                         },
