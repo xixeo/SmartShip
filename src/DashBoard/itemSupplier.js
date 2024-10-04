@@ -8,7 +8,7 @@ import { useAlert } from "../Compo/AlertContext";
 const MyResponsivePie = ({ data }) => (
     <ResponsivePie
         data={data}
-        margin={{ top: 10, right: 20, bottom: 20, left: 20 }}
+        margin={{ top: 25, right: 20, bottom: 20, left: 20 }}
         innerRadius={0.5}
         padAngle={0.7}
         cornerRadius={3}
@@ -35,24 +35,46 @@ function ItemSupplier({ selectedCategory, onCategoryChange }) {
     const [filteredData, setFilteredData] = useState([]); // 필터링된 데이터 상태
     const { setLoading } = useLoading();
     const { showAlert } = useAlert();
+    const [token, setToken] = useState(null); // 초기 토큰 상태
+    const [alias, setAlias] = useState(
+        localStorage.getItem("alias") || "Guest"
+    );
+
+    // 토큰을 로컬 스토리지에서 가져오는 useEffect
+    useEffect(() => {
+        const storedToken = localStorage.getItem("token"); // 예시: 로컬 스토리지에서 토큰 가져오기
+        setLoading(false); // 초기 로딩 상태 설정
+        if (storedToken) {
+            setToken(storedToken);
+        } else {
+            setLoading(false); // 토큰이 없을 경우 로딩 상태 해제
+        }
+    }, []);
 
     // API 데이터 패치 
     useEffect(() => {
+        const token = localStorage.getItem('token');
         setLoading(true); 
-        axios.get('/finditem')
-            .then((response) => {
-                setItems(response.data);
-                showAlert("조회에 성공했습니다.", "success");
-                // handleCategoryChange('category3Name'); // 기본 카테고리로 category3 설정
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error);
-                showAlert("데이터 조회에 실패했습니다.", "error"); // 데이터 조회 실패 시 알림
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    }, []);
+
+         axios.get('/finditem', {
+        headers: {
+            'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
+            'Content-Type': 'application/json', // 필요한 경우 추가
+        },
+    })
+    .then((response) => {
+        setItems(response.data);
+        showAlert("조회에 성공했습니다.", "success");
+        // handleCategoryChange('category3Name'); // 기본 카테고리로 category3 설정
+    })
+    .catch((error) => {
+        console.error('Error fetching data:', error);
+        showAlert("데이터 조회에 실패했습니다.", "error"); // 데이터 조회 실패 시 알림
+    })
+    .finally(() => {
+        setLoading(false);
+    });
+}, []);
 
     // items가 로드된 후 기본 차트 표시
     useEffect(() => {
@@ -109,7 +131,7 @@ function ItemSupplier({ selectedCategory, onCategoryChange }) {
                     </button>
                 </div>
             </div>
-            <div style={{ height: '400px' }}>
+            <div style={{ height: '360px' }}>
                 <MyResponsivePie data={filteredData} /> {/* 필터링된 데이터를 MyResponsivePie에 전달 */}
             </div>
         </div>

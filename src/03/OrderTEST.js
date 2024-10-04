@@ -635,7 +635,7 @@ export default function OrderTest() {
                                                 물품명
                                             </TableCell>
                                             <TableCell align="center">
-                                                part 1
+                                                상세
                                             </TableCell>
                                             <TableCell align="center">
                                                 수량
