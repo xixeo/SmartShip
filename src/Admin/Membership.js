@@ -259,7 +259,6 @@ export default function Membership() {
                         onChange={handleSwitchChange}
                         color="secondary"
                     />
-                    {showEnabledOnly ? "Enabled 회원만 보기" : "모든 회원 보기"}
                 </div>
                 <div>
                     <input className="textfield" placeholder="검색" />

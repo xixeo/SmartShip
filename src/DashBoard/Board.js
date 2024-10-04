@@ -2,6 +2,7 @@ import React from 'react';
 import './Board.css';
 import PurchaseRequest from './PurchaseRequestForDash';
 import Announce from './AnnouncementForDash';
+import Leadtimechart from './charttest'
 
 function Board() {
   return (
@@ -56,7 +57,9 @@ function Board() {
             </div>
       </div>
             {/* 물품 구매 추이 */}
-      <div className="bottom-section text-lg font-bold">물품 구매 추이</div>
+      <div className="bottom-section text-lg font-bold">
+        <Leadtimechart/>
+        </div>
     </div>
   );
 }

@@ -1,17 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import * as echarts from 'echarts';
 import { useLoading } from '../Compo/LoadingContext';
+import { Select, MenuItem } from '@mui/material'
 
 export default function ChartTest() {
     const [chartdata, setChartdata] = useState([]);
-    const { setLoading } = useLoading;
-    const orderId = 134;
+    const [listdata, setListdata] = useState([]);
+    const [selectedOrderId, setSelectedOrderId] = useState('');
+    const { setLoading } = useLoading();
     const token = localStorage.getItem('token');
 
-    const fetchOrderDetails = async () => {
-        // setLoading(true);
+    const fetchpurcheslist = async () => {
+        setLoading(true);
         try {
-            const response = await fetch(`/getOrderDetail/${orderId}`, {
+            const response = await fetch("schedule", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!response.ok) {
+                throw new Error("purchaserequestlist response was not ok");
+            }
+            const purreq = await response.json();
+            const sortdata = purreq.sort((a, b) => b.orderId - a.orderId);
+            setListdata(sortdata.slice(0, 5));
+        } catch (e) {
+            console.log("Failed to fetch PurchaseRequestlist", e);
+        }
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchpurcheslist();
+    }, []);
+
+    const handleChange = (event) => {
+        setSelectedOrderId(event.target.value);
+    };
+
+    useEffect(() => {
+        // listdata가 변경될 때 첫 번째 값을 자동으로 선택
+        if (listdata.length > 0) {
+            setSelectedOrderId(listdata[0].orderId);
+        }
+    }, [listdata]); // listdata가 변경될 때만 실행
+
+    const fetchOrderDetails = async () => {
+        try {
+            const response = await fetch(`/getOrderDetail/${selectedOrderId}`, {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
             if (!response.ok) {
@@ -22,29 +56,38 @@ export default function ChartTest() {
                 order.orderDetails.map((detail) => ({
                     date: detail.recommendedOrderDate,
                     leadtime: detail.leadtime,
-                    item: detail.itemName,
+                    item: `${detail.itemName} (${detail.itemsId})`
                 }))
             );
             setChartdata(formattedData);
         } catch (e) {
             console.error('Error fetching order details:', e);
-        } finally {
-            // setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchOrderDetails();
-    }, [orderId]);
+        if (selectedOrderId) {
+            fetchOrderDetails();
+        }
+    }, [selectedOrderId]);
 
-    // 날짜별로 데이터를 처리하는 함수
+    useEffect(() => {
+        if (chartdata.length > 0) {
+            initchart();
+        }
+    }, [chartdata]);
+
     const processData = (chartdata, items) => {
         const result = {};
-        chartdata.forEach(entry => {
+        const currentDate = new Date();
+
+        chartdata.forEach((entry) => {
             const { date, leadtime, item } = entry;
+
             if (!result[date]) {
                 result[date] = Array(items.length).fill(0);
             }
+
             const itemIndex = items.indexOf(item);
             if (itemIndex !== -1) {
                 result[date][itemIndex] = leadtime;
@@ -56,6 +99,7 @@ export default function ChartTest() {
         for (let i = 1; i < sortedDates.length; i++) {
             const currentDate = sortedDates[i];
             const previousDate = sortedDates[i - 1];
+
             result[currentDate] = result[currentDate].map((value, index) =>
                 value === 0 && result[previousDate][index] !== 0
                     ? result[previousDate][index]
@@ -66,59 +110,99 @@ export default function ChartTest() {
         return result;
     };
 
-    const items = chartdata.map(i => i.item);
-    const barData = processData(chartdata, items);
-    console.log('데이터',barData)
-    console.log('타임라인',Object.keys(barData).sort((a, b) => new Date(a) - new Date(b)))
-    
-    useEffect(() => {
-        if (chartdata.length > 0 && items.length > 0) {
+    const barData = processData(chartdata, chartdata.map((i) => i.item));
+
+    const getUniqueRandomColors = (count) => {
+        const colors = [];
+        while (colors.length < count) {
+            const color = `hsl(${Math.random() * 40 + 240}, ${Math.random() * 50 + 50}%, ${Math.random() * 30 + 40}%)`;
+            colors.push(color);
+        }
+        return colors;
+    };
+
+    const initchart = () => {
+        const chartDom = document.getElementById("main-chart");
+        if (chartDom) {
+            const myChart = echarts.init(chartDom);
+            // items 배열을 itemName만 포함하도록 처리
+            const items = chartdata.map((i) => i.item.split(" (")[0]); // itemId를 제거하고 itemName만 남김
+            const itemColors = getUniqueRandomColors(items.length);
+
             const sortedDates = Object.keys(barData).sort((a, b) => new Date(a) - new Date(b));
             const newOption = {
                 baseOption: {
                     timeline: {
-                        axisType: 'category',
+                        axisType: "category",
                         autoPlay: true,
                         playInterval: 1000,
                         data: sortedDates,
                     },
-                    title: { subtext: '' },
-                    tooltip: { trigger: 'item' },
-                    legend: { left: 'right', data: ['Lead Time'] },
-                    xAxis: [{ type: 'category', data: items, splitLine: { show: false } }],
-                    yAxis: [{ type: 'value', name: 'Lead Time (days)' }],
-                    series: [{ name: 'Lead Time', type: 'bar' }]
+                    tooltip: {
+                        trigger: "item",
+                        formatter: (params) => `${params.name}: ${params.value}`,
+                    },
+                    legend: {
+                        left: "right",
+                        data: items,
+                    },
+                    xAxis: [{
+                        type: "category",
+                        data: items,
+                    }],
+                    yAxis: [{
+                        type: "value",
+                        name: "Lead Time (days)",
+                    }],
+                    series: [{ type: "bar", barWidth: 30, data: [] }],
                 },
-                options: sortedDates.map(date => ({
-                    title: { text: `Lead time for items that can be ordered on ${date}` },
-                    series: [{ data: barData[date] }]
-                }))
+                options: sortedDates.map((date) => {
+                    const dataForDate = barData[date].map((value, index) => ({
+                        value,
+                        itemStyle: { color: itemColors[index] },
+                    }));
+                    return {
+                        series: [{ data: dataForDate }],
+                    };
+                }),
             };
 
-            const chartDom = document.getElementById('main-chart');
-            if (chartDom) {
-                const myChart = echarts.init(chartDom);
-                myChart.setOption(newOption);
+            myChart.setOption(newOption);
+            window.addEventListener("resize", () => myChart.resize());
 
-                const resizeHandler = () => myChart.resize();
-                window.addEventListener('resize', resizeHandler);
-
-                return () => {
-                    myChart.dispose();
-                    window.removeEventListener('resize', resizeHandler);
-                };
-            }
+            return () => {
+                myChart.dispose();
+                window.removeEventListener("resize", () => myChart.resize());
+            };
         }
-    }, [barData, items]);
-
-    // 데이터 로딩 중일 때 표시
-    if (chartdata.length === 0 || items.length === 0) {
-        return <div>Loading...</div>;
-    }
+    };
 
     return (
-        <div>
-            <div id="main-chart" style={{ width: '100%', height: '400px' }}></div>
-        </div>
+        <div className="list-table-root" style={{ position: 'relative', width: '100%', height: '400px' }}>
+        {/* 차트 */}
+        <div id="main-chart" style={{ width: '100%', height: '100%' }}></div>
+    
+        {/* 셀렉트박스 */}
+        <Select
+            className="select-custom"
+            value={selectedOrderId}
+            onChange={handleChange}
+            style={{
+                position: 'absolute',
+                top: '10px',
+                right: '160px',
+                bottom: '10px',
+                zIndex: 1,
+                minWidth: '200px'
+            }}
+        >
+            {listdata.map((i, index) => (
+                <MenuItem key={index} value={i.orderId}>
+                    {i.username} {i.requestDate}
+                </MenuItem>
+            ))}
+        </Select>
+    </div>
+    
     );
 }
