@@ -442,7 +442,7 @@ function ListTableDB() {
   };
 
   return (
-    <div>
+    <div className="h-full">
         <div className="list-table-root flex flex-col p-6">
           <div className="text-xl font-semibold text-white mb-4">물품 리스트</div>
           <div className="flex items-center justify-between gap-4 mb-4">

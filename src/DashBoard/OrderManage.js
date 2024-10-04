@@ -1304,7 +1304,7 @@ export default function OrderTest() {
                                 </div>
                                 <div className="flex justify-between">
                                     <button
-                                        className="blue-btn"
+                                        className="blue-btn text-sm"
                                         onClick={() => setPreleadOpen(true)}
                                     >
                                         차트보기
@@ -1443,7 +1443,7 @@ export default function OrderTest() {
                                     </div>
                                     <div>
                                         <button
-                                            className="blue-btn2"
+                                            className="blue-btn2 text-sm"
                                             onClick={() => setPerchasopen(true)}
                                         >
                                             발주

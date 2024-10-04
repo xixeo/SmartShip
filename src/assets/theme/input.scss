@@ -137,13 +137,14 @@
     }
   }
 
-  // .MuiSelect-select {
-  //   height: 36px;
-  //   min-width: 120px;
-  //   background-color: transparent;
-  //   border:  solid $input-color !important;
-  //   border-radius: 4px !important;
-  //   padding: 8px 40px 8px 12px!important;
+  .MuiSelect-select {
+    height: 36px;
+    min-width: 120px;
+    background-color: transparent;
+    border:  1px solid $input-color !important;
+    border-radius: 4px !important;
+    padding: 8px 40px 8px 12px!important;
+  }
 
   //   svg{
   //     color: white !important;
