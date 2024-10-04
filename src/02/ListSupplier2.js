@@ -600,7 +600,7 @@ const ListSupplier2 = () => {
     };
 
     return (
-        <div>
+        <div className="h-full">
             <div className="list-table-root flex flex-col p-6">
                 {/* 공급업체의 아이템 중 <Select> */}
                 <div className="text-xl font-semibold text-white mb-4">{`[ ${alias} ] 물품 관리`}</div>
