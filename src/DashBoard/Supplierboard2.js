@@ -63,7 +63,7 @@ function Supplierboard2() {
             </div>
             {/* 물품 구매 추이 */}
             <div className="bottom-section text-lg font-bold">
-            <h1>물품 구매 추이</h1>
+            <h1>판매량 Top10</h1>
             <MyResponsiveBar/>
             </div>
         </div>
