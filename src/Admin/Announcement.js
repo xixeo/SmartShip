@@ -378,7 +378,7 @@ export default function Announcement() {
                     <TableBody>
                         {(isSearching ? filteredRows : paginatedRows).map((row) => (
                             <React.Fragment key={row.noticeId}>
-                                <TableRow onClick={() => navigate(`/AnnounceEdit/${row.noticeId}`)}>
+                                <TableRow className="cursor-pointer" onClick={() => navigate(`/AnnounceEdit/${row.noticeId}`)}>
                                     {role === "ROLE_ADMIN" ? (
                                         <TableCell style={{ width: "50px" }}>
                                             <Checkbox
