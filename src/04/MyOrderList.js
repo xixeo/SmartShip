@@ -14,7 +14,7 @@ import {
     MenuItem,
 } from "@mui/material";
 import Box from "@mui/material/Box";
-import Loading from "../Compo/Loading";
+import { useLoading } from "../Compo/LoadingContext";
 import ReactPaginate from "react-paginate";
 import "./MyOrderList.scss";
 
@@ -40,7 +40,7 @@ export default function MyOrderList() {
     const [itemOffset, setItemOffset] = useState(0); // 현재 페이지의 시작 인덱스
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
-    const [loading, setLoading] = useState(true);
+    const { setLoading } = useLoading();
 
     useEffect(() => {
         const fetchMyorderdata = async () => {

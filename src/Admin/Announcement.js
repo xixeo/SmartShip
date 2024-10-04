@@ -28,6 +28,9 @@ export default function Announcement() {
     const [selectedRows, setSelectedRows] = useState(new Set());
     const [page, setPage] = useState(1); // 현재 페이지
     const [currentPage, setCurrentPage] = useState(1);
+    const [search, setSearch] = useState("");
+    const [filteredRows, setFilteredRows] = useState([]); // 검색 결과를 저장하는 상태
+    const [isSearching, setIsSearching] = useState(false); // 검색 중인지 여부를 저장하는 상태
     const { showAlert } = useAlert(); // useAlert 훅 사용
     const { setLoading } = useLoading();
     const navigate = useNavigate();
@@ -234,6 +237,37 @@ export default function Announcement() {
         });
     };
 
+    //////////////////////////////////////////////////////////
+    //                    Search                           //
+    ////////////////////////////////////////////////////////
+
+    const handleSearch =()=>{
+        // console.log('작성자 검색', rows.filter(event => event.author.toLowerCase().includes(search.toLowerCase())))
+        // console.log('제목검색', rows.filter(event => event.title.toLowerCase().includes(search.toLowerCase())))
+        
+        if (!search.trim()) {
+            // 검색어가 없으면 검색을 취소하고 전체 데이터를 표시
+            setFilteredRows([]);
+            setIsSearching(false);
+            return;
+        };
+
+        const searchResults = rows.filter(event => 
+            event.author.toLowerCase().includes(search.toLowerCase()) || 
+            event.title.toLowerCase().includes(search.toLowerCase())
+        );
+        
+        console.log('검색결과', searchResults);
+        setFilteredRows(searchResults); // 검색 결과 저장
+        setIsSearching(true); // 검색 중 상태로 설정
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            handleSearch();
+        }
+      };
+
     return (
         <div className="flex flex-col p-6 h-full list-table-root">
            {/* 모달 */}
@@ -289,8 +323,8 @@ export default function Announcement() {
                 공지사항
             </div>
             <div className="flex justify-end">
-                <input className="textfield" placeholder="검색" />
-                <button className="blue-btn ml-2">검색</button>
+                <input className="textfield" placeholder="검색" value={search} onChange={(e)=>setSearch(e.target.value)} onKeyDown={handleKeyDown}/>
+                <button className="blue-btn ml-2" onClick={handleSearch}>검색</button>
                 {role === "ROLE_ADMIN" ? (
                     <button
                         onClick={() => setPreleadOpen(true)}
@@ -342,7 +376,7 @@ export default function Announcement() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {paginatedRows.map((row) => (
+                        {(isSearching ? filteredRows : paginatedRows).map((row) => (
                             <React.Fragment key={row.noticeId}>
                                 <TableRow onClick={() => navigate(`/AnnounceEdit/${row.noticeId}`)}>
                                     {role === "ROLE_ADMIN" ? (
