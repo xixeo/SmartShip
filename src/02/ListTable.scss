@@ -82,6 +82,7 @@
     .MuiSelect-select {
       color: white;
       font-size: 0.85rem !important;
+      border:  $input-color !important;
     }
 
     .MuiOutlinedInput-notchedOutline {
@@ -106,6 +107,7 @@
     min-width: 120px;
     background-color: transparent;
     font-size: 14px;
+    border-color: #d0d0d0 !important;
 
     .MuiSelect-select {
       color: white;
@@ -119,9 +121,9 @@
       color: #fff;
     }
 
-    &:hover .MuiOutlinedInput-notchedOutline {
-      border-color: $inner-input-color !important;
-    }
+    // &:hover .MuiOutlinedInput-notchedOutline {
+    //   border-color: $inner-input-color !important;
+    // }
 
     &.Mui-focused .MuiOutlinedInput-notchedOutline {
       border-color: $blue-btn !important;

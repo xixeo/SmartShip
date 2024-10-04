@@ -438,7 +438,7 @@ function ListTableDB() {
   // 모달의 '장바구니로 이동' 버튼 클릭 시 동작
   const handleNavigateToCart = () => {
     setIsModalOpen(false);
-    navigate("/ordertest");
+    navigate("/Cart");
   };
 
   return (
