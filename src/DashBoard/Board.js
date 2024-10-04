@@ -1,6 +1,7 @@
 import React from 'react';
 import './Board.css';
 import PurchaseRequest from './PurchaseRequestForDash';
+import Announce from './AnnouncementForDash';
 
 function Board() {
   return (
@@ -8,7 +9,10 @@ function Board() {
       <div className="top-section">
         <div className="left-side">
             {/* 공지사항 */}
-          <div className="announcement text-lg font-bold">공지사항</div>
+          <div className="announcement text-lg font-bold">
+            <h1>공지사항</h1>
+            <Announce />
+            </div>
           <div className="schedule">
             {/* 일정 */}
             <div className="flex items-center justify-between mb-4">

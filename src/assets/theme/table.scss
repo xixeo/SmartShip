@@ -1,7 +1,8 @@
 @import "../../App.scss";
 
+
 /** ✏️ TABLE CSS  */
-.MuiTable-root, .MuiDataGrid-root {
+.MuiTable-root:not(.dashboard-notice .MuiTable-root), .MuiDataGrid-root {
     th,
     td {
         color: #fff;
