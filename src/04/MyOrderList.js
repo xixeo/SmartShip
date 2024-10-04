@@ -325,7 +325,7 @@ export default function MyOrderList() {
     useEffect(() => {
         const endOffset = itemOffset + itemsPerPage;
         setCurrentItems(updatedListData.slice(itemOffset, endOffset)); // 화면에 보여질 아이템들을 재설정
-    }, [itemOffset, itemsPerPage, updatedListData]); // 의존성 배열 업데이트
+    }, [itemOffset, itemsPerPage, listdata]); // 의존성 배열 업데이트
 
     const handleRowsPerPageChange = (event) => {
         setItemsPerPage(event.target.value); // itemsPerPage 상태 업데이트
