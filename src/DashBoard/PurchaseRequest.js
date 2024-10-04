@@ -42,16 +42,8 @@ export default function PurchaseRequest() {
                 throw new Error("purchaserequestlist response was not ok");
             }
             const purreq = await response.json();
-            const sortdata = purreq.sort((a, b) => {
-                const dateA = new Date(a.requestDate);
-                const dateB = new Date(b.requestDate);
-
-                // 날짜가 같으면 시간으로 비교
-                if (dateA.toDateString() === dateB.toDateString()) {
-                    return dateB - dateA; // 시간 기준으로 내림차순 정렬
-                }
-                return dateB - dateA; // 날짜 기준으로 내림차순 정렬
-            });
+             // orderId를 기준으로 내림차순 정렬
+             const sortdata = purreq.sort((a, b) => b.orderId - a.orderId);
             // 모든 카드 확장 상태를 true로 설정
             const initialExpanded = {};
             sortdata.forEach((order) => {

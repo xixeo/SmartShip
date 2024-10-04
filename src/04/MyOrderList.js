@@ -486,22 +486,22 @@ export default function MyOrderList() {
                                     </TableHead>
                                     <TableBody>
                                         {order.orderDetails.map((detailsArray) => (
-                                            detailsArray.map((detail) => (
-                                                <TableRow key={detail.orderDetailId}>
+                                            detailsArray.length > 0 && (
+                                                <TableRow key={detailsArray[0].orderDetailId}>
                                                     <TableCell align="center">
-                                                        {detail.itemName}
+                                                        {detailsArray[0].itemName}
                                                     </TableCell>
                                                     <TableCell align="center">
-                                                        {detail.quantity}
+                                                        {detailsArray[0].quantity}
                                                     </TableCell>
                                                     <TableCell align="center">
-                                                        {order.state == "complete" ? formatPrice(detail.price, detail.quantity, detail.unit) : '-'}
+                                                        {order.state === "complete" ? formatPrice(detailsArray[0].price, detailsArray[0].quantity, detailsArray[0].unit) : '-'}
                                                     </TableCell>
                                                     <TableCell align="center">
-                                                        {order.state == "complete" ? detail.username : '-'}
+                                                        {order.state === "complete" ? detailsArray[0].username : '-'}
                                                     </TableCell>
                                                 </TableRow>
-                                            ))
+                                            )
                                         ))}
                                     </TableBody>
                                 </Table>
