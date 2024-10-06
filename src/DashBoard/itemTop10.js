@@ -19,14 +19,35 @@ const MyResponsiveBar = ({ data }) => (
                 {/* 주문일: {d.data.orderdate} 주문일 */}
             </div>
         )}
-        tooltip={() => null}
+        tooltip={({ indexValue, value }) => (
+            <div style={{ color: '#fff', padding: '10px', backgroundColor: 'rgba(0, 0, 0, 0.7)', borderRadius: '5px' }}>
+                <strong>{indexValue}</strong>: {value} {/* itemName과 구매 수량 표시 */}
+            </div>
+        )}
         axisBottom={{
             tickSize: 5,
             tickPadding: 5,
             tickRotation: 0,
             legendPosition: 'bottom',
             legendOffset: 32,
-            tickTextColor: '#fff', // x축 글자 색상
+            tickTextColor: '#fff',
+            renderTick: (tick) => (
+                <g transform={`translate(${tick.x},${tick.y + 22})`}>
+                    <text
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        style={{
+                            fill: '#fff',
+                            fontSize: 12,
+                            cursor: 'pointer',
+                        }}
+                        data-tooltip-id={`tooltip-${tick.value}`}
+                        data-tooltip-content={tick.value}
+                    >
+                        {tick.value.length > 10 ? `${tick.value.substring(0, 10)}...` : tick.value}
+                    </text>
+                </g>
+            ),
         }}
         axisLeft={{
             tickSize: 5,
