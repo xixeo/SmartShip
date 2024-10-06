@@ -1,15 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLoading } from "../Compo/LoadingContext";
-import {
-    Table,
-    TableHead,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableRow,
-} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-// import Modal from '@mui/material/Modal'
 import "../assets/theme/table.scss";
 
 export default function AnnouncementForDash() {
@@ -19,10 +10,6 @@ export default function AnnouncementForDash() {
     const { setLoading } = useLoading();
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
-
-    ////////////////////////////////////////////////////////////
-    //               TABLE                                    //
-    ////////////////////////////////////////////////////////////
 
     // DATA PATCH
     useEffect(() => {
