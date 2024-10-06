@@ -30,7 +30,7 @@ function Supplierboard2() {
                             {/* <div className="border border-gray-400 rounded-full px-5 py-1">
                                 <div className="status-icon pending  mr-2" /> 작업전
                                 <div className="status-icon in-progress  mr-2 ml-4" /> 작업중
-                                <div className="status-icon compleㅇted  mr-2 ml-4" /> 작업완료
+                                <div className="status-icon completed  mr-2 ml-4" /> 작업완료
                             </div> */}
              
                         {/* <div className="status-item mt-7">

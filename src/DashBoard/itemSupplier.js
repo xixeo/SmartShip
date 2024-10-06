@@ -4,7 +4,6 @@ import axios from 'axios';
 import { useLoading } from "../Compo/LoadingContext";
 import { useAlert } from "../Compo/AlertContext";
 
-// MyResponsivePie 컴포넌트
 const MyResponsivePie = ({ data }) => (
     <ResponsivePie
         data={data}
@@ -28,38 +27,35 @@ const MyResponsivePie = ({ data }) => (
     />
 );
 
-// ItemSupplier 컴포넌트
 function ItemSupplier({ selectedCategory, onCategoryChange }) {
-    const [items, setItems] = useState([]); // 데이터 리스트
+    const [items, setItems] = useState([]); 
     const [activeCategory, setActiveCategory] = useState('category2Name');
-    const [filteredData, setFilteredData] = useState([]); // 필터링된 데이터 상태
+    const [filteredData, setFilteredData] = useState([]); 
     const { setLoading } = useLoading();
     const { showAlert } = useAlert();
-    const [token, setToken] = useState(null); // 초기 토큰 상태
+    const [token, setToken] = useState(null); 
     const [alias, setAlias] = useState(
         localStorage.getItem("alias") || "Guest"
     );
 
-    // 토큰을 로컬 스토리지에서 가져오는 useEffect
     useEffect(() => {
-        const storedToken = localStorage.getItem("token"); // 예시: 로컬 스토리지에서 토큰 가져오기
-        setLoading(false); // 초기 로딩 상태 설정
+        const storedToken = localStorage.getItem("token"); 
+        setLoading(false); 
         if (storedToken) {
             setToken(storedToken);
         } else {
-            setLoading(false); // 토큰이 없을 경우 로딩 상태 해제
+            setLoading(false); 
         }
     }, []);
 
-    // API 데이터 패치 
     useEffect(() => {
         const token = localStorage.getItem('token');
         setLoading(true); 
 
          axios.get('/finditem', {
         headers: {
-            'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
-            'Content-Type': 'application/json', // 필요한 경우 추가
+            'Authorization': `Bearer ${token}`, 
+            'Content-Type': 'application/json', 
         },
     })
     .then((response) => {
@@ -69,7 +65,7 @@ function ItemSupplier({ selectedCategory, onCategoryChange }) {
     })
     .catch((error) => {
         console.error('Error fetching data:', error);
-        showAlert("데이터 조회에 실패했습니다.", "error"); // 데이터 조회 실패 시 알림
+        showAlert("데이터 조회에 실패했습니다.", "error"); 
     })
     .finally(() => {
         setLoading(false);

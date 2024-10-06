@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from "react";
+import { useLoading } from "../Compo/LoadingContext";
+import { useAlert } from "../Compo/AlertContext";
 
 const ItemOrderList = () => {
     const [orderData, setOrderData] = useState([]);
-    // const token = localStorage.getItem('token'); // 또는 적절한 위치에서 토큰 가져오기
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjgyNTMyNzEsImlkIjoi7KCV7ZW07J24IiwidXNlcm5hbWUiOiJL7ZW07Jq07ISg7IKsIiwiYWxpYXMiOiLsoJXtlbTsnbgiLCJyb2xlIjoiUk9MRV9NQU5BR0VSIn0.Ly0xbi6L85QbXvcLumLR317rfnuCnxTYwZQCeH6C0ME'
+    const token = localStorage.getItem('token'); 
+    const { setLoading } = useLoading();
+    const { showAlert } = useAlert();
+
+    // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjgyNTMyNzEsImlkIjoi7KCV7ZW07J24IiwidXNlcm5hbWUiOiJL7ZW07Jq07ISg7IKsIiwiYWxpYXMiOiLsoJXtlbTsnbgiLCJyb2xlIjoiUk9MRV9NQU5BR0VSIn0.Ly0xbi6L85QbXvcLumLR317rfnuCnxTYwZQCeH6C0ME'
 
     useEffect(() => {
         // API 요청
         const fetchData = async () => {
+            setLoading(true);
             try {
                 const response = await fetch('/supplierOrder', {
                     headers: {
@@ -15,7 +21,7 @@ const ItemOrderList = () => {
                     },
                 });
                 const data = await response.json();
-                console.log(data); // 데이터를 콘솔에 출력하여 확인
+                console.log(data); 
 
                 // 가장 최근 3개의 날짜 추출 및 데이터 세팅
                 const groupedDetails = data.groupedOrderDetails;
@@ -37,8 +43,12 @@ const ItemOrderList = () => {
                 });
 
                 setOrderData(ordersToDisplay);
+                showAlert("데이터 조회에 성공했습니다.", "success");
             } catch (error) {
                 console.error('데이터 가져오기 실패:', error);
+                showAlert("데이터 조회에 실패했습니다.", "error");
+            } finally {
+                setLoading(false);
             }
         };
 
