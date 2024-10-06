@@ -13,12 +13,41 @@ function SignUp({ setIsAuthenticated }) {
   const [role, setRole] = useState("ROLE_USER"); // 기본 역할을 'user'로 설정
   const [signupError, setSignupError] = useState("");
   const [idCheckMessage, setIdCheckMessage] = useState("");
+  const [pwValidationMessage, setPwValidationMessage] = useState("");
   const navigate = useNavigate();
+
+  const validatePassword = (password) => {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChars = /[!@#$%^&*]/.test(password);
+
+    if (password.length < minLength) {
+      return "비밀번호는 최소 8자 이상이어야 합니다.";
+    }
+    if (!hasUpperCase) {
+      return "비밀번호에는 최소 하나의 대문자가 포함되어야 합니다.";
+    }
+    if (!hasNumbers) {
+      return "비밀번호에는 최소 하나의 숫자가 포함되어야 합니다.";
+    }
+    if (!hasSpecialChars) {
+      return "비밀번호에는 최소 하나의 특수 문자가 포함되어야 합니다.";
+    }
+    return "";
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSignupError("");
+    setPwValidationMessage("");
 
+    const validationMessage = validatePassword(pw);
+    if (validationMessage) {
+      setPwValidationMessage(validationMessage);
+      return; // 유효성 검사 실패 시 제출 중단
+    }
+    
     try {
       const url = "/signup";
       const body = { id, username, pw, alias, role, phone };
@@ -210,6 +239,9 @@ function SignUp({ setIsAuthenticated }) {
               required
               className="w-full px-1 py-2 login-input"
             />
+            {pwValidationMessage && (
+              <p className="text-red-500 text-sm">{pwValidationMessage}</p>
+            )}
           </div>
 
            {/* 회사명 또는 선박명 입력란 */}

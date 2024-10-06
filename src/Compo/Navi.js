@@ -20,6 +20,7 @@ const Navi = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
+  const role = localStorage.getItem('role');
 
   // 사이드바의 확장/축소 상태를 변경하는 함수
   const toggleSidebar = () => {
@@ -89,87 +90,87 @@ const Navi = () => {
 
         {/* menu */}
         <ul className={`menu`}>
-          <li className="menu-item" onClick={() => navigate("/Schedule")}>
-            <Side02 className="icon" />
-            <div className="menu-text flex justify-between items-center">
-              {!isCollapsed && <span>일정 관리</span>}
-              {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
-            </div>
-          </li>
-          <li className="menu-item" onClick={() => navigate("/listTable")}>
-            <Side05 className="icon" />
-            <div className="menu-text flex justify-between items-center">
-              {!isCollapsed && <span>선용품 리스트</span>}
-              {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
-            </div>
-          </li>
-          <li className="menu-item" onClick={() => navigate("/listSupplier")}>
-            <Side08 className="icon" />
-            <div className="menu-text flex justify-between items-center">
-              {!isCollapsed && <span>판매물품 리스트</span>}
-              {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
-            </div>
-          </li>
-          <li className="menu-item" onClick={() => navigate("/Cart")}>
-            <Side06 className="icon" />
-            <div className="menu-text flex justify-between items-center">
-              {!isCollapsed && <span>장바구니</span>}
-              {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
-            </div>
-          </li>
-          <li className="menu-item" onClick={() => navigate("/MyOrderList")}>
-            <Side03 className="icon" />
-            <div className="menu-text flex justify-between items-center">
-              {!isCollapsed && <span>주문 내역</span>}
-              {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
-            </div>
-          </li>
-          <li
-            className="menu-item"
-            onClick={() => navigate("/PurchaseRequest")}
-          >
-            <Side04 className="icon" />
-            <div className="menu-text flex justify-between items-center">
-              {!isCollapsed && <span>발주 요청 내역</span>}
-              {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
-            </div>
-          </li>
-          <li className="menu-item" onClick={() => navigate("/Board")}>
-            <Side07 className="icon" />
-            <div className="menu-text flex justify-between items-center">
-              {!isCollapsed && <span>해운선사 대시보드</span>}
-              {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
-            </div>
-          </li>
-          <li className="menu-item" onClick={() => navigate("/Supplierboard")}>
-            <Side07 className="icon" />
-            <div className="menu-text flex justify-between items-center">
-              {!isCollapsed && <span>판매자 대시보드</span>}
-              {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
-            </div>
-          </li>
-          <li className="menu-item" onClick={() => navigate("/Membership")}>
-            <Side09 className="icon" />
-            <div className="menu-text flex justify-between items-center">
-              {!isCollapsed && <span>회원관리</span>}
-              {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
-            </div>
-          </li>
-          <li className="menu-item" onClick={() => navigate("/Announcement")}>
-            <Side01 className="icon" />
-            <div className="menu-text flex justify-between items-center">
-              {!isCollapsed && <span>공지사항</span>}
-              {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
-            </div>
-          </li>
-          <li className="menu-item" onClick={() => navigate("/AnnounceWrite")}>
-            <Side01 className="icon" />
-            <div className="menu-text flex justify-between items-center">
-              {!isCollapsed && <span>공지사항 글쓰기</span>}
-              {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
-            </div>
-          </li>
-
+          {role === 'ROLE_MANAGER' ? <>
+            <li className="menu-item" onClick={() => navigate("/Board")}>
+              <Side07 className="icon" />
+              <div className="menu-text flex justify-between items-center">
+                {!isCollapsed && <span>해운선사 대시보드</span>}
+                {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
+              </div>
+            </li>
+            <li
+              className="menu-item"
+              onClick={() => navigate("/PurchaseRequest")}
+            >
+              <Side04 className="icon" />
+              <div className="menu-text flex justify-between items-center">
+                {!isCollapsed && <span>발주 요청 내역</span>}
+                {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
+              </div>
+            </li>
+            <li className="menu-item" onClick={() => navigate("/Schedule")}>
+              <Side02 className="icon" />
+              <div className="menu-text flex justify-between items-center">
+                {!isCollapsed && <span>일정 관리</span>}
+                {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
+              </div>
+            </li>
+          </> : null}
+          {role === 'ROLE_USER' ? <>
+            <li className="menu-item" onClick={() => navigate("/listTable")}>
+              <Side05 className="icon" />
+              <div className="menu-text flex justify-between items-center">
+                {!isCollapsed && <span>선용품 리스트</span>}
+                {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
+              </div>
+            </li>
+            <li className="menu-item" onClick={() => navigate("/Cart")}>
+              <Side06 className="icon" />
+              <div className="menu-text flex justify-between items-center">
+                {!isCollapsed && <span>장바구니</span>}
+                {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
+              </div>
+            </li>
+            <li className="menu-item" onClick={() => navigate("/MyOrderList")}>
+              <Side03 className="icon" />
+              <div className="menu-text flex justify-between items-center">
+                {!isCollapsed && <span>주문 내역</span>}
+                {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
+              </div>
+            </li>
+          </> : null}
+          {role === 'ROLE_SUPPLIER' ? <>
+            <li className="menu-item" onClick={() => navigate("/Supplierboard")}>
+              <Side07 className="icon" />
+              <div className="menu-text flex justify-between items-center">
+                {!isCollapsed && <span>판매자 대시보드</span>}
+                {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
+              </div>
+            </li>
+            <li className="menu-item" onClick={() => navigate("/listSupplier")}>
+              <Side08 className="icon" />
+              <div className="menu-text flex justify-between items-center">
+                {!isCollapsed && <span>판매물품 리스트</span>}
+                {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
+              </div>
+            </li>
+          </> : null}
+          {role === 'ROLE_ADMIN' ? <>
+            <li className="menu-item" onClick={() => navigate("/Membership")}>
+              <Side09 className="icon" />
+              <div className="menu-text flex justify-between items-center">
+                {!isCollapsed && <span>회원관리</span>}
+                {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
+              </div>
+            </li>
+            <li className="menu-item" onClick={() => navigate("/Announcement")}>
+              <Side01 className="icon" />
+              <div className="menu-text flex justify-between items-center">
+                {!isCollapsed && <span>공지사항</span>}
+                {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
+              </div>
+            </li>
+          </> : null}
         </ul>
       </div>
       <div className="withdrawal-button items-center">
@@ -189,48 +190,48 @@ const Navi = () => {
           title="정말 탈퇴하시겠습니까?"
           onConfirm={handleWithdrawal}
         /> */}
-        {!isCollapsed && 
-        <Box sx={{ textAlign: 'center', margin: '20px' }}>
-          {isConfirmVisible ? (
-            <div>
-              <p className="text-white">정말 탈퇴하시겠습니까?</p>
+        {!isCollapsed &&
+          <Box sx={{ textAlign: 'center', margin: '20px' }}>
+            {isConfirmVisible ? (
+              <div>
+                <p className="text-white">정말 탈퇴하시겠습니까?</p>
+                <button
+                  className="blue-btn"
+                  style={{
+                    margin: '10px'
+                  }}
+                  onClick={handleWithdrawal}
+                >
+                  확인
+                </button>
+                <button
+                  className="blue-btn"
+                  style={{
+                    margin: '10px'
+                  }}
+                  onClick={() => setIsConfirmVisible(false)} // 취소 클릭 시 버튼으로 돌아감
+                >
+                  취소
+                </button>
+              </div>
+            ) : (
               <button
-                className="blue-btn"
-                style={{
-                  margin: '10px'
+                className="blue-btn items-center"
+                variant="contained"
+                onClick={() => setIsConfirmVisible(true)}
+                sx={{
+                  margin: "10px",
+                  backgroundColor: "#9c87ff",
+                  color: "white",
+                  '&:hover': {
+                    backgroundColor: "#8a76e0",
+                  },
                 }}
-                onClick={handleWithdrawal}
               >
-                확인
+                회원 탈퇴
               </button>
-              <button
-                className="blue-btn"
-                style={{
-                  margin: '10px'
-                }}
-                onClick={() => setIsConfirmVisible(false)} // 취소 클릭 시 버튼으로 돌아감
-              >
-                취소
-              </button>
-            </div>
-          ) : (
-            <button
-              className="blue-btn items-center"
-              variant="contained"
-              onClick={() => setIsConfirmVisible(true)} 
-              sx={{
-                margin: "10px",
-                backgroundColor: "#9c87ff", 
-                color: "white", 
-                '&:hover': {
-                  backgroundColor: "#8a76e0", 
-                },
-              }}
-            >
-              회원 탈퇴
-            </button>
-          )}
-        </Box>
+            )}
+          </Box>
         }{" "}
       </div>
       <div className="toggle-btn" onClick={toggleSidebar}>
