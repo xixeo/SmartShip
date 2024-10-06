@@ -14,8 +14,8 @@ import {
     MenuItem,
 } from "@mui/material";
 import Box from "@mui/material/Box";
+import { useAlert } from "../Compo/AlertContext";
 import { useLoading } from "../Compo/LoadingContext";
-import ReactPaginate from "react-paginate";
 import "./MyOrderList.scss";
 
 //////////////////////
@@ -40,6 +40,7 @@ export default function MyOrderList() {
     const [itemOffset, setItemOffset] = useState(0); // 현재 페이지의 시작 인덱스
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
+    const { showAlert } = useAlert();
     const { setLoading } = useLoading();
 
     useEffect(() => {
@@ -313,8 +314,10 @@ export default function MyOrderList() {
                 // orderId를 기준으로 내림차순 정렬
                 const sortdata = formattedData.sort((a, b) => b.orderId - a.orderId);
                 setListdata(sortdata);
+                showAlert('조회에 성공했습니다.','success')
             } catch (e) {
                 console.log("Failed to fetch getMyOrderList", e);
+                showAlert('데이터를 가져오는데 실패했습니다.','error')
             } finally {
                 setLoading(false);
             }

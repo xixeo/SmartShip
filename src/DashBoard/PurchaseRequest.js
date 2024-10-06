@@ -4,6 +4,7 @@ import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import { ReactComponent as ArrowDown } from "../assets/icons/svg/arrowDown.svg";
 import Box from "@mui/material/Box";
+import { useAlert } from "../Compo/AlertContext";
 import { useLoading } from "../Compo/LoadingContext";
 import { useNavigate } from "react-router-dom";
 import { Select, Pagination, MenuItem } from "@mui/material"; // 페이지당 게시글 수
@@ -21,6 +22,7 @@ const ExpandMore = styled((props) => {
 
 export default function PurchaseRequest() {
     const [expanded, setExpanded] = useState({});
+    const { showAlert } = useAlert();
     const { setLoading } = useLoading();
     const [listdata, setListdata] = useState([]);
     const [currentItems, setCurrentItems] = useState([]); // 현재 페이지에 표시할 아이템
@@ -54,8 +56,10 @@ export default function PurchaseRequest() {
             setCurrentItems(sortdata); // 초기 아이템 설정
             setFilteredData(sortdata); // 초기 필터된 데이터 설정
             setLoading(false);
+            showAlert('조회에 성공했습니다.', 'success')
         } catch (e) {
             console.log("Failed to fetch PurchaseRequestlist", e);
+            showAlert('데이터를 가져오는데 실패했습니다.', 'error')
         }
     };
 
@@ -146,10 +150,7 @@ export default function PurchaseRequest() {
                     <div className="text-white">검색 결과가 없습니다.</div>
                 ) : (
                     <div className="card-wrap">
-                        {currentItems.map(
-                            (
-                                order // 여기에 중괄호 추가
-                            ) => (
+                        {currentItems.map((order) => (
                                 <div
                                     key={order.orderId}
                                     className="text-white rounded-lg mb-6 card-bg"
@@ -204,8 +205,8 @@ export default function PurchaseRequest() {
                                             }
                                             aria-label="show more"
                                             className={`transition-transform ${expanded[order.orderId]
-                                                    ? "rotate-180"
-                                                    : ""
+                                                ? "rotate-180"
+                                                : ""
                                                 }`}
                                             sx={{
                                                 color: "white",

@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import Loading from '../Compo/Loading';
+import { useAlert } from "../Compo/AlertContext";
+import { useLoading } from "../Compo/LoadingContext";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import "../assets/theme/Schedule.scss";
 import { styled } from '@mui/material/styles';
 import Modal from "../Compo/Modal";
-import Collapse from '@mui/material/Collapse';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionSummary, AccordionDetails, IconButton, Typography } from '@mui/material';
 
@@ -46,7 +46,8 @@ const ChangeData = (events) => {
   });
 };
 export default function Schedule() {
-  const [loading, setLoading] = useState(true);
+  const { showAlert } = useAlert();
+  const { setLoading } = useLoading();
   const token = localStorage.getItem("token");
   useEffect(() => {
     fetchScheduleData(); //전체 스케줄 api 호출
@@ -111,8 +112,10 @@ export default function Schedule() {
       const changeDatas = ChangeData(events);
       setScheduledatas(changeDatas);
       setFilteredData(changeDatas);
+      showAlert('조회에 성공했습니다.','success')
     } catch (error) {
       console.error("Failed to fetch scheduleData:", error);
+      showAlert('데이터를 가져오는데 실패했습니다.','error')
     } finally {
       setLoading(false)
     }
@@ -169,10 +172,12 @@ export default function Schedule() {
       }));
       console.log('확인111', detailevents)
       // setDetaildatas(detailevents);
+      showAlert('조회에 성공했습니다.','success')
       return detailevents
       console.log('시간 확인', detaildatas)
     } catch (error) {
       console.error("Failed to fetch scheduleData:", error);
+      showAlert('데이터를 가져오는데 실패했습니다.','error')
     } finally {
       setLoading(false)
     }
