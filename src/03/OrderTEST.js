@@ -382,8 +382,8 @@ export default function OrderTest() {
             return;
         }
 
+        setLoading(true); // 초기 로딩 상태 설정
         try {
-            setLoading(false); // 초기 로딩 상태 설정
             const response = await fetch(`delItem`, {
                 method: "DELETE",
                 headers: {
@@ -394,18 +394,18 @@ export default function OrderTest() {
             });
 
             if (!response.ok) {
-                showAlert("항목 삭제에 실패했습니다.", "error"); 
                 throw new Error("orderbasket delete item response was not ok");
             }
-
+            
             setSelectedItems(new Set()); // 선택된 항목 초기화
             setDeleteOpen(false);
-
+            
             // 데이터 다시 가져오기
             fetchorderlist(selectedDate.format("YYYY-MM-DD"));
             showAlert("항목이 성공적으로 삭제되었습니다.", "success");
         } catch (error) {
             console.log(error);
+            showAlert("항목 삭제에 실패했습니다.", "error"); 
         } finally {
             setLoading(false);
         }
@@ -420,8 +420,8 @@ export default function OrderTest() {
             return;
         }
 
+        setLoading(true); // 초기 로딩 상태 설정
         try {
-            setLoading(false); // 초기 로딩 상태 설정
             const response = await fetch(`delItem`, {
                 method: "DELETE",
                 headers: {
@@ -432,17 +432,17 @@ export default function OrderTest() {
             });
 
             if (!response.ok) {
-                showAlert("항목 삭제에 실패했습니다.", "error"); 
                 throw new Error("orderbasket delete item response was not ok");
             }
-
+            
             // 데이터 다시 가져오기
             fetchorderlist(selectedDate.format("YYYY-MM-DD"));
-
+            
             showAlert("항목이 성공적으로 삭제되었습니다.", "success");
-
+            
         } catch (error) {
             console.log(error);
+            showAlert("항목 삭제에 실패했습니다.", "error"); 
         } finally {
             setLoading(false);
         }
