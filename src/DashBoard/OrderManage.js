@@ -933,7 +933,7 @@ export default function OrderTest() {
             //   },
             // ];
             const response = await fetch(
-                `/recommend?selectedItemId=${id}&releaseDate=${orderdate}`,
+                `/recommend?selectedItemId=${id}&releaseDate=${orderdate}&orderId=${orderId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
