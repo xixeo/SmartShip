@@ -441,6 +441,12 @@ function ListTableDB() {
     navigate("/Cart");
   };
 
+  const handleSearchSubmit = ()=>{
+    if (searchQuery.trim() !== "") {
+      handleSearchButtonClick(); // 검색 버튼 클릭 함수 호출
+    } 
+  }
+
   return (
     <div className="h-full">
         <div className="list-table-root flex flex-col p-6">
@@ -495,6 +501,11 @@ function ListTableDB() {
               <TextField
                 value={searchQuery}
                 onChange={handleSearchChange}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    handleSearchSubmit(); // 엔터를 누르면 검색 함수 호출
+                  }
+                }}
                 placeholder="물품명 검색"
                 size="small"
                 InputProps={{
