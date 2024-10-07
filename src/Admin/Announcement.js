@@ -24,7 +24,7 @@ import "../assets/theme/table.scss";
 export default function Announcement() {
     const [allData, setAllData] = useState([]); //패치된 데이터 저장
     const [rows, setRows] = useState([]);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [selectedRows, setSelectedRows] = useState(new Set());
     const [page, setPage] = useState(1); // 현재 페이지
     const [currentPage, setCurrentPage] = useState(1);

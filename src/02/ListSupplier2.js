@@ -586,7 +586,7 @@ const ListSupplier2 = () => {
     /////////////////////////////
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(5);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     // 현재 페이지에 따라 표시할 데이터의 인덱스를 계산하는 함수
     const indexOfLastItem = currentPage * itemsPerPage;
