@@ -145,7 +145,7 @@ export default function AnnounceEdit() {
           <div className='flex flex-col p-2'>
             <div className='flex items-center mb-4'>
               <h1 className='text-white w-[76px]'>제목</h1>
-              <input className={`ml-5 w-full bg-[#ffffff20] rounded-md h-8 text-white ${role !== 'ROLE_ADMIN' ? 'no-hover' : ''}`} value={title} readOnly/>
+              <input className={`ml-5 p-3 w-full bg-[#ffffff20] rounded-md h-8 text-white ${role !== 'ROLE_ADMIN' ? 'no-hover' : ''}`} value={title} readOnly/>
             </div>
             {/* <div className='flex items-center mb-4'>
               <h1 className='text-white w-[76px]'>첨부된 파일 </h1>
@@ -161,7 +161,7 @@ export default function AnnounceEdit() {
   
             <div className='flex items-center mb-4'>
               <h1 className='text-white w-[76px]'>내용</h1>
-              <textarea rows={10} className={`ml-5 pl-1 w-full h-48 bg-[#ffffff20] rounded-md text-white ${role !== 'ROLE_ADMIN' ? 'no-hover' : ''}`} value={content} readOnly></textarea>
+              <textarea rows={10} className={`ml-5 pl-3 w-full h-48 bg-[#ffffff20] rounded-md text-white ${role !== 'ROLE_ADMIN' ? 'no-hover' : ''}`} value={content} readOnly></textarea>
             </div>
           </div>
         </>

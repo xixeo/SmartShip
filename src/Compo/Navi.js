@@ -103,6 +103,13 @@ const redirectToFirstPage = () => {
 
         {/* menu */}
         <ul className={`menu`}>
+            <li className="menu-item" onClick={() => navigate("/Announcement")}>
+              <Side01 className="icon" />
+              <div className="menu-text flex justify-between items-center">
+                {!isCollapsed && <span>공지사항</span>}
+                {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
+              </div>
+            </li>
           {role === 'ROLE_MANAGER' ? <>
             <li className="menu-item" onClick={() => navigate("/Board")}>
               <Side07 className="icon" />
@@ -173,13 +180,6 @@ const redirectToFirstPage = () => {
               <Side09 className="icon" />
               <div className="menu-text flex justify-between items-center">
                 {!isCollapsed && <span>회원관리</span>}
-                {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
-              </div>
-            </li>
-            <li className="menu-item" onClick={() => navigate("/Announcement")}>
-              <Side01 className="icon" />
-              <div className="menu-text flex justify-between items-center">
-                {!isCollapsed && <span>공지사항</span>}
                 {!isCollapsed && <ArrowR width={20} className="right-arrow" />}
               </div>
             </li>
