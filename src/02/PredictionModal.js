@@ -275,7 +275,7 @@ const PredictionModal = ({ open, setOpen, title }) => {
                     </div>
 
                     <div className="field flex mb-4 items-center px-4">
-                        <label className="text-white w-1/4">part 1</label>
+                        <label className="text-white w-1/4">상세</label>
                         <div className='w-3/4 ml-auto flex'>
                             <TextField
                                 name="part_no"
