@@ -20,6 +20,8 @@ import AnnounceWrite from "./Admin/AnnounceWrite";
 import AnnounceEdit from "./Admin/AnnounceEdit";
 import Announcement from "./Admin/Announcement";
 import Membership from "./Admin/Membership";
+import PurchaseRequest from "./DashBoard/PurchaseRequestForDash";
+import OrderManage from "./DashBoard/OrderManage"
 import { createTheme, ThemeProvider } from "@mui/material";
 import { AlertProvider } from "./Compo/AlertContext";
 import { LoadingProvider } from "./Compo/LoadingContext";
@@ -117,6 +119,8 @@ function AuthenticatedRoutes({ isAuthenticated, setIsAuthenticated, role }) {
                                         <Route path="/Announcement" element={<PrivateRoute element={<Announcement />} />} />
                                         <Route path="/Membership" element={<PrivateRoute element={<Membership />} />} />
                                         <Route path="/Supplierboard" element={<PrivateRoute element={<Supplierboard2 />} />} />
+                                        <Route path="/PurchaseRequest" element={<PrivateRoute element={<PurchaseRequest />} />} />
+                                        <Route path="/getOrderDetail/:orderId" element={<PrivateRoute element={<OrderManage />} />} />
                                     </Routes>
                                 </LoadingProvider>
                             </AlertProvider>
