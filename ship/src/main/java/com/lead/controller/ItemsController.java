@@ -74,11 +74,11 @@ public class ItemsController {
 	public ResponseEntity<String> addItem(@RequestBody ItemsDTO itemsDTO) {
 	    // JWT 토큰에서 사용자 정보 추출
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	    String username = authentication.getName(); // 토큰에서 username 추출
+	    String userId = authentication.getName(); // 토큰에서 username 추출
 	    
 	    try {
 	        // 아이템 등록 서비스 호출
-	        itemsService.addItem(itemsDTO, username, authentication);
+	        itemsService.addItem(itemsDTO, userId, authentication);
 	        return ResponseEntity.ok("상품이 성공적으로 등록되었습니다.");
 	    } catch(Exception e) {
 	        // 예외 발생 시 오류 로그 출력
@@ -92,12 +92,12 @@ public class ItemsController {
 	public ResponseEntity<String> updateItems(@RequestBody List<ItemsDTO> itemsDTOList) {
 	    // JWT 토큰에서 사용자 정보 추출
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	    String username = authentication.getName(); // 토큰에서 username 추출
+	    String userId = authentication.getName(); // 토큰에서 userId 추출
 
 	    try {
 	    	 System.out.println("===========================물품정보 수정 한다");
 	        // 여러 아이템 수정 로직 호출
-	        itemsService.updateMultipleItems(itemsDTOList, username);
+	        itemsService.updateMultipleItems(itemsDTOList, userId);
 	        return ResponseEntity.ok("물품들이 성공적으로 수정되었습니다.");
 	    } catch (Exception e) {
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류 발생: " + e.getMessage());
@@ -108,11 +108,11 @@ public class ItemsController {
 	@DeleteMapping("/supplier/delete")
 	public ResponseEntity<String> deleteItems(@RequestBody List<Integer> itemIds) {
         // JWT 토큰에서 사용자 정보 추출 (SecurityContextHolder)
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // 토큰에서 username 추출
+		  Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		    String userId = authentication.getName(); // 토큰에서 userId 추출
 
         try {
-            itemsService.deleteItems(itemIds, username);
+            itemsService.deleteItems(itemIds, userId);
             
             System.out.println("===========================물품 삭제 한다");
             

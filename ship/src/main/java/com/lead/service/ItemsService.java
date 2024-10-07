@@ -153,7 +153,7 @@ public class ItemsService {
 
 	/////////////////////////////////////////////////////////////////////////////////// 상품
 	/////////////////////////////////////////////////////////////////////////////////// 등록
-	public void addItem(ItemsDTO itemsDTO, String username, Authentication authentication) {
+	public void addItem(ItemsDTO itemsDTO, String userId, Authentication authentication) {
 
 		// 현재 사용자(공급자)가 이 물품의 소유자인지 확인
 		if (authentication.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_SUPPLIER"))) {
@@ -168,10 +168,10 @@ public class ItemsService {
 		}
 
 		// supplierName 설정
-		itemsDTO.setSupplierName(username);
+		itemsDTO.setSupplierName(userId);
 
 		// Member 조회 (supplierName을 통해)
-		Member member = memberRepo.findByUsername(itemsDTO.getSupplierName())
+		Member member = memberRepo.findById(itemsDTO.getSupplierName())
 				.orElseThrow(() -> new RuntimeException("해당 공급자를 찾을 수 없습니다."));
 
 		// Category3 조회
@@ -222,12 +222,12 @@ public class ItemsService {
 	}
 
 	@Transactional
-	public ItemsDTO updateItem(Integer itemId, ItemsDTO updatedItemDto, String username) {
+	public ItemsDTO updateItem(Integer itemId, ItemsDTO updatedItemDto, String userId) {
 		// 수정할 아이템 찾기
 		Items item = itemsRepo.findById(itemId).orElseThrow(() -> new RuntimeException("해당 물품을 찾지 못했습니다."));
 
 		// 현재 사용자(공급자)가 이 물품의 소유자인지 확인
-		if (!item.getMember().getUsername().equals(username)) {
+		if (!item.getMember().getId().equals(userId)) {
 			throw new RuntimeException("해당 물품을 수정할 권한이 없습니다.");
 		}
 
@@ -263,7 +263,7 @@ public class ItemsService {
 	/////////////////////////////////////////////////////////////////////////////////// 상품
 	/////////////////////////////////////////////////////////////////////////////////// 삭제
 	@Transactional
-	public void deleteItems(List<Integer> itemIds, String username) {
+	public void deleteItems(List<Integer> itemIds, String userId) {
 
 	    // 여러 개의 itemId를 순차적으로 처리
 	    for (Integer itemId : itemIds) {
@@ -272,7 +272,7 @@ public class ItemsService {
 	                .orElseThrow(() -> new RuntimeException("해당 물품을 찾을 수 없습니다. ID: " + itemId));
 
 	        // 현재 사용자(공급자)가 이 물품의 소유자인지 확인
-	        if (!item.getMember().getUsername().equals(username)) {
+	        if (!item.getMember().getId().equals(userId)) {
 	            throw new RuntimeException("해당 물품을 삭제할 권한이 없습니다. ID: " + itemId);
 	        }
 

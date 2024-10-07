@@ -29,7 +29,7 @@ public interface ItemsRepo extends JpaRepository<Items, Integer>, JpaSpecificati
 		        FROM
 		            Items i
 		        JOIN
-		            Leadtime1 l ON i.items_id = l.items_id
+		            Leadtime l ON i.items_id = l.items_id
 		        JOIN
 		            member m ON i.user_id = m.id
 		        WHERE

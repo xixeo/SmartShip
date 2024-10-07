@@ -6,9 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.lead.dto.ManagerOrderDTO;
@@ -208,7 +206,6 @@ public class OrdersService {
     
     
 	// 발주 신청 내역 조회 - ROLE_USER
- // 발주 신청 내역 조회 - ROLE_USER
     public List<UserOrderDTO> getUserOrders(Authentication authentication) {
         // JWT 토큰에서 사용자 정보 추출
         String role = authentication.getAuthorities().stream().findFirst()
