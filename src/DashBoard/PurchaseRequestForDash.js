@@ -35,7 +35,7 @@ export default function PurchaseRequest() {
 
   return (
     <div>
-        <div className="p-2">
+        <div className="p-2 cursor-pointer">
           {listdata.map((order) => (
               <div
                 key={order.orderId}

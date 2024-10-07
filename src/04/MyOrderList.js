@@ -423,7 +423,7 @@ export default function MyOrderList() {
             <h2 className="text-2xl font-semibold text-white mb-10 ml-5">
                 구매요청 내역
             </h2>
-            <div className="flex-col text-white MyOrderList">
+            <div className="flex-col text-white cursor-pointer MyOrderList">
                 {currentItems.map((order, index) => (
                     <div
                         key={order.orderId}

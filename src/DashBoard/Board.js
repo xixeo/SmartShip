@@ -15,7 +15,7 @@ function Board() {
         <div className="left-side">
           {/* 공지사항 */}
           <div className="announcement text-lg font-bold">
-            <h1 onClick={() => navigate(`Announcement`)}>공지사항</h1>
+            <h1 onClick={() => navigate(`/Announcement`)}>공지사항</h1>
             <Announce />
           </div>
           <div className="schedule">
@@ -32,7 +32,7 @@ function Board() {
         </div>
         {/* 구매 요청 */}
         <div className="right-side text-lg font-bold">
-          <h1 onClick={() => navigate(`PurchaseRequest`)}>구매 요청</h1>
+          <h1 onClick={() => navigate(`/PurchaseRequest`)} className='cursor-pointer'>구매 요청</h1>
           <PurchaseRequest />
         </div>
       </div>
