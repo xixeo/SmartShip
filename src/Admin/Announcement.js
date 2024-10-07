@@ -396,7 +396,7 @@ export default function Announcement() {
                                     <TableCell align="center">
                                         {row.boardId}
                                     </TableCell>
-                                    <TableCell align="center">
+                                    <TableCell align="left">
                                         {row.title}
                                     </TableCell>
                                     <TableCell align="center">
