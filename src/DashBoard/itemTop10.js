@@ -8,8 +8,9 @@ const MyResponsiveBar = ({ data }) => (
         data={data}
         keys={['purchaseCount']}
         indexBy="itemName"
-        margin={{ top: 30, right: 60, bottom: 40, left: 60 }}
+        margin={{ top: 30, right: 20, bottom: 0, left: 20 }}
         padding={0.5} 
+        height={180}
         colors={({ index }) => `hsl(${270 - index * 7}, 60%, ${40 + index * 6}%)`} 
         enableArcLabels={true}
         label={(d) => (
@@ -177,8 +178,8 @@ const ItemTop10 = () => {
     
 
     return (
-        <div>
-            <div style={{ height: '400px' }}>
+        <div className='h-auto'>
+            <div style={{ height: '180px' }}>
                 <MyResponsiveBar data={chartData} />
             </div>
         </div>

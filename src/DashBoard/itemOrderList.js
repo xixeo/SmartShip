@@ -56,14 +56,14 @@ const ItemOrderList = () => {
     }, [token]);
 
     return (
-        <div className=" text-white">
+        <div className="text-white">
             {orderData.length > 0 ? (
                 orderData.map((order, index) => (
-                    <div key={index} className="flex justify-between items-center m-2 mt-5 px-6 py-4 card-bg rounded-lg">
-                        <h3 className="text-lg font-bold">{order.displayText}</h3>
+                    <div key={index} className="flex justify-between items-center mt-2 px-4 py-3 card-bg rounded-md">
+                        <h3 className="text-[0.95rem] font-medium ">{order.displayText}</h3>
                         <div className="flex items-center">
                         <h1 className="text-sm">주문일자 : </h1>
-                        <h3 className="ml-4 text-xl font-bold text-[#A276FF]">{order.orderDate}</h3>
+                        <h3 className="ml-4 text-[0.95rem] text-[#A276FF]">{order.orderDate}</h3>
                         </div>
                     </div>
                 ))

@@ -58,22 +58,22 @@ export default function AnnouncementForDash() {
 
 
     return (
-        <div className="flex flex-col p-6 h-full dashboard-notice">
+        <div className="flex flex-col pt-4 h-full dashboard-notice">
             <div className="table-body">
                 {rows.map((row) => (
                     <div
                         key={row.noticeId}
                         onClick={() => navigate(`/AnnounceEdit/${row.noticeId}`)}
-                        className="flex justify-between items-center py-2 cursor-pointer text-white"
+                        className="flex justify-between items-center pb-2 cursor-pointer text-white"
                     >
-                        <div className="flex-1 w-1/3 text-base">
-                            {row.title}
+                        <div className="flex-1 w-1/3 text-[0.98rem] font-light">
+                            • {row.title}
                         </div>
                         <div className="flex justify-end w-1/3">
-                        <div className="flex-1 text-right text-base">
+                        <div className="flex-1 text-right text-[0.98rem] font-light">
                             {row.author}
                         </div>
-                        <div className="flex-1 text-right text-base text-[#939393]">
+                        <div className="flex-1 text-right text-[0.98rem] font-light text-[#939393]">
                             {row.createdAt}
                         </div>
                         </div>

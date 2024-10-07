@@ -83,7 +83,7 @@ function ListTableDB() {
   const [rows, setRows] = useState([]);
   const [selected, setSelected] = useState(new Set());
   const [page, setPage] = useState(1); // 현재 페이지
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [appliedSearchQuery, setAppliedSearchQuery] = useState("");
   const [category1Name, setCategoryName] = useState("");
