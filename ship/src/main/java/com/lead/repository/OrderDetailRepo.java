@@ -17,6 +17,9 @@ public interface OrderDetailRepo extends JpaRepository<OrderDetail, Integer> {
 	
 	   // OrderId로 OrderDetail 조회 (cancel=false 인 항목만)
     List<OrderDetail> findByOrderOrderIdAndCancelFalse(Integer orderId);
+    
+    List<OrderDetail> findAllByItem_Member_IdAndOrderingTrue(String userId);
+
 	
 	//List<OrderDetail> findByOrder_Member_Username(String username);
 

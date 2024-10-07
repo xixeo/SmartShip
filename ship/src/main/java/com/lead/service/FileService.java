@@ -31,38 +31,42 @@ public class FileService {
 	}
 
 	public Resource loadFileAsResource(String fileName) {
-		try {
-			Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
-			Resource resource = new UrlResource(filePath.toUri());
+	    try {
+	        Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+	        
+	        // 파일 경로 디버깅
+	        System.out.println("파일을 로드하는 경로: " + filePath.toString());
 
-			if (resource.exists() && resource.isReadable()) {
-				return resource;
-			} else {
-				throw new RuntimeException("파일을 찾을 수 없거나 읽을 수 없습니다.");
-			}
-		} catch (MalformedURLException ex) {
-			throw new RuntimeException("파일을 찾을 수 없습니다.", ex);
-		}
+	        Resource resource = new UrlResource(filePath.toUri());
+
+	        if (resource.exists() && resource.isReadable()) {
+	            return resource;
+	        } else {
+	            throw new RuntimeException("파일을 찾을 수 없거나 읽을 수 없습니다.");
+	        }
+	    } catch (MalformedURLException ex) {
+	        throw new RuntimeException("파일을 찾을 수 없습니다.", ex);
+	    }
 	}
-	
+
 	//////////////////////////////////////////////////////////파일 저장
-	   // 파일을 저장하는 메서드
-    public String storeFile(MultipartFile file) throws IOException {
-        // 파일 이름을 정리하여 저장
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+	public String storeFile(MultipartFile file) throws IOException {
+	    String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
-        // 파일 이름에 부적합한 문자가 있는지 확인
-        if (fileName.contains("..")) {
-            throw new IOException("파일 이름에 부적합한 문자가 포함되어 있습니다: " + fileName);
-        }
+	    // 로그로 파일 저장 경로와 파일명 확인
+	    System.out.println("저장되는 파일 이름: " + fileName);
+	    System.out.println("파일이 저장되는 경로: " + this.fileStorageLocation.toString());
 
-        // 파일 저장 경로 설정 및 파일 복사
-        Path targetLocation = this.fileStorageLocation.resolve(fileName);
-        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+	    if (fileName.contains("..")) {
+	        throw new IOException("파일 이름에 부적합한 문자가 포함되어 있습니다: " + fileName);
+	    }
 
-        return fileName;  // 저장된 파일 이름 반환
-    }
-    
+	    Path targetLocation = this.fileStorageLocation.resolve(fileName);
+	    Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+	    return fileName;
+	}
+
     //////////////////////////////////////////////////////////파일 삭제
     public void deleteFile(String fileName) {
         try {

@@ -1,11 +1,14 @@
 package com.lead.controller;
 
+import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,11 +29,10 @@ import com.lead.service.FileService;
 import com.lead.service.MemberService;
 import com.lead.service.NoticeService;
 
-
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class NoticeController {
-	
+
 	@Autowired
 	private MemberService memberService;
 
@@ -80,24 +82,22 @@ public class NoticeController {
 	// 첨부파일 다운로드
 	@GetMapping("/noticeFile/{fileName}")
 	public ResponseEntity<?> downloadFile(@PathVariable String fileName) {
-		try {
-			// 파일을 로드하는 로직
-			System.out.println("===========================첨부파일 다운로드한다");
-			Resource file = fileService.loadFileAsResource(fileName);
+	    try {
+	        Resource file = fileService.loadFileAsResource(fileName);
+	        String contentType = Files.probeContentType(file.getFile().toPath());
+	        if (contentType == null) {
+	            contentType = "application/octet-stream";
+	        }
 
-			// 정상적으로 파일을 로드했을 경우 파일을 반환
-			return ResponseEntity.ok()
-					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-					.body(file);
-
-		} catch (RuntimeException e) {
-			// 파일을 찾을 수 없거나 오류 발생 시, 404 상태 코드와 메시지를 반환
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("파일을 찾을 수 없습니다." + e.getMessage());
-		} catch (Exception e) {
-			// 기타 오류 발생 시, 500 상태 코드와 함께 오류를 반환
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("기타 오류 발생했습니다." + e.getMessage());
-		}
+	        return ResponseEntity.ok()
+	                .contentType(MediaType.parseMediaType(contentType))
+	                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+	                .body(file);
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일을 찾을 수 없습니다.");
+	    }
 	}
+
 
 	// 공지 등록
 	@PostMapping("/notice")
@@ -121,61 +121,60 @@ public class NoticeController {
 	@DeleteMapping("/noticeDelete")
 	public ResponseEntity<String> deleteNotice(@RequestBody List<Integer> noticeIds) {
 
-	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	    String userId = authentication.getName(); // 토큰에서 String 타입의 사용자 id 추출
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String userId = authentication.getName(); // 토큰에서 String 타입의 사용자 id 추출
 
-	    try {
-	        // String 타입의 userId로 사용자를 조회
-	        Member member = memberService.findMemberById(userId);
+		try {
+			// String 타입의 userId로 사용자를 조회
+			Member member = memberService.findMemberById(userId);
 
-	        // 공지사항 삭제 로직 호출
-	        noticeService.deleteNotice(noticeIds, member.getId()); // userId가 String 타입이면 그대로 사용
-	        System.out.println("===========================공지 삭제 한다");
-	        
-	        return ResponseEntity.ok("공지사항이 성공적으로 삭제되었습니다.");
-	    } catch (RuntimeException e) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("공지사항을 찾을 수 없습니다: " + e.getMessage());
-	    } catch (Exception e) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("공지사항 삭제 중 오류가 발생했습니다: " + e.getMessage());
-	    }
-	}
+			// 공지사항 삭제 로직 호출
+			noticeService.deleteNotice(noticeIds, member.getId()); // userId가 String 타입이면 그대로 사용
+			System.out.println("===========================공지 삭제 한다");
 
-	//공지사항 수정
-	@PutMapping("/notice/{noticeId}")
-	public ResponseEntity<String> updateNotice(@PathVariable Integer noticeId,
-	                                           @RequestParam("title") String title,
-	                                           @RequestParam("content") String content,
-	                                           @RequestParam("status") Boolean status,
-	                                           @RequestParam(value = "file", required = false) MultipartFile file,
-	                                           Authentication authentication) {
-	    String username = authentication.getName(); // 토큰에서 사용자 이름 가져오기
-
-	    try {
-	        // 공지사항 수정 로직 호출
-	        noticeService.updateNotice(noticeId, title, content, status, file, username);
-	        return ResponseEntity.ok("공지사항이 성공적으로 수정되었습니다.");
-	    } catch (RuntimeException e) {
-	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-	    } catch (Exception e) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("공지사항 수정 중 오류가 발생했습니다." + e.getMessage());
-	    }
-	}
-	
-	//공지사항 노출여부 수정
-		@PutMapping("/noticeStatus/{noticeId}")
-		public ResponseEntity<String> updateNoticeState(@PathVariable Integer noticeId,
-		                                           @RequestParam("status") Boolean status,
-		                                           Authentication authentication) {
-		    //String username = authentication.getName(); // 토큰에서 사용자 이름 가져오기
-
-		    try {
-		        // 공지사항 수정 로직 호출
-		        noticeService.updateNoticeState(noticeId, status, authentication);
-		        return ResponseEntity.ok("공지사항이 성공적으로 수정되었습니다.");
-		    } catch (RuntimeException e) {
-		        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-		    } catch (Exception e) {
-		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("공지사항 수정 중 오류가 발생했습니다." + e.getMessage());
-		    }
+			return ResponseEntity.ok("공지사항이 성공적으로 삭제되었습니다.");
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("공지사항을 찾을 수 없습니다: " + e.getMessage());
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("공지사항 삭제 중 오류가 발생했습니다: " + e.getMessage());
 		}
+	}
+
+	// 공지사항 수정
+	@PutMapping("/notice/{noticeId}")
+	public ResponseEntity<String> updateNotice(@PathVariable Integer noticeId, @RequestParam("title") String title,
+			@RequestParam("content") String content, @RequestParam("status") Boolean status,
+			@RequestParam(value = "file", required = false) MultipartFile file, Authentication authentication) {
+		String username = authentication.getName(); // 토큰에서 사용자 이름 가져오기
+
+		try {
+			// 공지사항 수정 로직 호출
+			noticeService.updateNotice(noticeId, title, content, status, file, username);
+			return ResponseEntity.ok("공지사항이 성공적으로 수정되었습니다.");
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("공지사항 수정 중 오류가 발생했습니다." + e.getMessage());
+		}
+	}
+
+	// 공지사항 노출여부 수정
+	@PutMapping("/noticeStatus/{noticeId}")
+	public ResponseEntity<String> updateNoticeState(@PathVariable Integer noticeId,
+			@RequestParam("status") Boolean status, Authentication authentication) {
+		// String username = authentication.getName(); // 토큰에서 사용자 이름 가져오기
+
+		try {
+			// 공지사항 수정 로직 호출
+			noticeService.updateNoticeState(noticeId, status, authentication);
+			return ResponseEntity.ok("공지사항이 성공적으로 수정되었습니다.");
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("공지사항 수정 중 오류가 발생했습니다." + e.getMessage());
+		}
+	}
 }

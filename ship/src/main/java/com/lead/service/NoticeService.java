@@ -77,7 +77,7 @@ public class NoticeService {
 				.build();
 	}
 
-/////////////////////////////////////////////////////////// notice 등록
+	/////////////////////////////////////////////////////////// notice 등록
 	public void createNotice(String title, String content, MultipartFile[] files, String userId,
 			Authentication authentication) throws IOException {
 

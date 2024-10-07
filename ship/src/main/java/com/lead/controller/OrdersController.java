@@ -32,6 +32,16 @@ public class OrdersController {
 	@Autowired
 	private OrderDetailService orderDetailService;
 
+    @GetMapping("/orderingZero")
+    public ResponseEntity<List<OrdersDTO>> getOrdersWithOrderingZero() {
+        List<OrdersDTO> orders = ordersService.getOrders();
+        if (orders.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(orders);
+    }
+    
+
 	// 추천 아이템으로 업데이트
 	@PutMapping("/updateItem")
 	public ResponseEntity<?> updateOrderDetailItem(@RequestParam Integer orderDetailId, // 주문 상세 항목 ID

@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.lead.dto.ManagerOrderDTO;
@@ -38,16 +40,25 @@ public class OrdersService {
 	private LeadtimeRepo leadtimeRepo;
 
 	// Orders만 반환
+//	public List<OrdersDTO> getOrders() {
+//		List<Orders> orders = ordersRepo.findAll();
+//		return orders.stream()
+//				.map(order -> new OrdersDTO(order.getOrderId(), order.getMember().getUsername(),
+//						order.getMember().getAlias(), order.getMember().getPhone(), order.getReleaseDate(),
+//						order.getBestOrderDate(), order.getRequestDate(), order.getMemo(), order.getSelectedDay(), null // OrderDetail은
+//																														// 포함되지
+//																														// 않음
+//				)).collect(Collectors.toList());
+//	}
 	public List<OrdersDTO> getOrders() {
-		List<Orders> orders = ordersRepo.findAll();
-		return orders.stream()
-				.map(order -> new OrdersDTO(order.getOrderId(), order.getMember().getUsername(),
-						order.getMember().getAlias(), order.getMember().getPhone(), order.getReleaseDate(),
-						order.getBestOrderDate(), order.getRequestDate(), order.getMemo(), order.getSelectedDay(), null // OrderDetail은
-																														// 포함되지
-																														// 않음
-				)).collect(Collectors.toList());
+	    List<Orders> orders = ordersRepo.findOrdersWithOrderingZero();
+	    return orders.stream()
+	            .map(order -> new OrdersDTO(order.getOrderId(), order.getMember().getUsername(),
+	                    order.getMember().getAlias(), order.getMember().getPhone(), order.getReleaseDate(),
+	                    order.getBestOrderDate(), order.getRequestDate(), order.getMemo(), order.getSelectedDay(), null // OrderDetail은 포함되지 않음
+	            )).collect(Collectors.toList());
 	}
+
 
 	// Orders & OrderDetail 반환
 	public List<OrdersDTO> getOrdersWithDetails() {
@@ -169,37 +180,117 @@ public class OrdersService {
 		);
 	}
 
+	  // Supplier가 자신의 주문 내역을 조회하는 로직
+    public ManagerOrderDTO getSupplierOrdersGroupedByDate(String userId) {
+
+        // userId로 주문 내역을 조회 (ordering = true인 항목들)
+        List<OrderDetail> orderDetails = orderDetailRepo.findAllByItem_Member_IdAndOrderingTrue(userId);
+
+        // OrderDetail을 DTO로 변환하고, orderDate로 그룹화
+        Map<LocalDate, List<ManagerOrderDetailDTO>> groupedOrderDetails = orderDetails.stream()
+                .filter(orderDetail -> orderDetail.getOrderDate() != null) // orderDate가 null이 아닌 것만 처리
+                .map(orderDetail -> new ManagerOrderDetailDTO(
+                        orderDetail.getOrderDetailId(),
+                        orderDetail.getItem().getItemsId(),
+                        orderDetail.getItem().getItemName(),
+                        orderDetail.getItem().getPart1(),
+                        orderDetail.getItem().getPrice(),
+                        orderDetail.getItem().getUnit(),
+                        orderDetail.getQuantity(),
+                        orderDetail.getItem().getMember().getUsername(),
+                        orderDetail.getOrderDate()
+                ))
+                .collect(Collectors.groupingBy(ManagerOrderDetailDTO::getOrderDate)); // orderDate로 그룹화
+
+        // 결과를 ManagerOrderDTO로 반환
+        return new ManagerOrderDTO(null, userId, null, null, null, null, groupedOrderDetails);
+    }
+    
+    
 	// 발주 신청 내역 조회 - ROLE_USER
-	public List<UserOrderDTO> getUserOrders(Authentication authentication) {
-	    // JWT 토큰에서 사용자 ID 추출 (id로 변경)
-	    String userId = authentication.getName(); // 토큰에서 id 추출
+ // 발주 신청 내역 조회 - ROLE_USER
+    public List<UserOrderDTO> getUserOrders(Authentication authentication) {
+        // JWT 토큰에서 사용자 정보 추출
+        String role = authentication.getAuthorities().stream().findFirst()
+                .orElseThrow(() -> new RuntimeException("권한 정보를 찾을 수 없습니다.")).getAuthority();
+        String userId = authentication.getName(); // 토큰에서 id 추출
 
-	    // 해당 사용자의 주문만 조회 (id로 필터링)
-	    List<Orders> orders = ordersRepo.findByMemberId(userId); // id로 필터링
+        // Role에 따라 주문 조회
+        List<Orders> orders;
+        if ("ROLE_MANAGER".equals(role)) {
+            // ROLE_MANAGER라면 모든 주문 조회
+            orders = ordersRepo.findAll();
+        } else if ("ROLE_USER".equals(role)) {
+            // ROLE_USER라면 본인의 주문만 조회
+            orders = ordersRepo.findByMemberId(userId);
+        } else {
+            throw new RuntimeException("올바르지 않은 권한입니다.");
+        }
 
-	    return orders.stream().map(order -> {
-	        // OrderDetail 조회
-	        List<OrderDetail> orderDetails = orderDetailRepo.findByOrderOrderId(order.getOrderId());
+        return orders.stream().map(order -> {
+            // OrderDetail 조회
+            List<OrderDetail> orderDetails = orderDetailRepo.findByOrderOrderId(order.getOrderId());
 
-	        // OrderDetail을 UserOrderDetailDTO로 변환
-	        List<UserOrderDetailDTO> orderDetailDTOs = convertOrderDetailToUserOrderDetailDTO(orderDetails);
+            // OrderDetail을 UserOrderDetailDTO로 변환
+            List<UserOrderDetailDTO> orderDetailDTOs = convertOrderDetailToUserOrderDetailDTO(orderDetails);
 
-	        // 상태 계산
-	        String state = calculateOrderState(orderDetails);
+            // 상태 계산
+            String state = calculateOrderState(orderDetails);
 
-	        // UserOrderDTO 반환
-	        return new UserOrderDTO(
-	                order.getOrderId(),
-	                order.getMember().getId(), // userId를 반환
-	                order.getMember().getAlias(),
-	                order.getRequestDate(),
-	                order.getReleaseDate(),
-	                order.getMemo(),
-	                state, // 상태 필드 추가
-	                orderDetailDTOs // 변환된 주문 상세 정보
-	        );
-	    }).collect(Collectors.toList());
-	}
+            // UserOrderDTO 반환
+            return new UserOrderDTO(
+                    order.getOrderId(),
+                    order.getMember().getId(), // userId를 반환
+                    order.getMember().getAlias(),
+                    order.getRequestDate(),
+                    order.getReleaseDate(),
+                    order.getMemo(),
+                    state, // 상태 필드 추가
+                    orderDetailDTOs // 변환된 주문 상세 정보
+            );
+        }).collect(Collectors.toList());
+    }
+
+//	public List<UserOrderDTO> getUserOrders(Authentication authentication) {
+//		
+//		// JWT 토큰에서 사용자 정보 추출 (SecurityContextHolder)
+//		Authentication authentication1 = SecurityContextHolder.getContext().getAuthentication();
+//		String role = authentication1.getAuthorities().stream().findFirst()
+//				.orElseThrow(() -> new RuntimeException("권한 정보를 찾을 수 없습니다.")).getAuthority(); // role 추출
+//		
+//		// Role추출
+//		// Role이 manager면 전부
+//		// Role이 user라면 본인꺼만 필터링 
+//		
+//	    // JWT 토큰에서 사용자 ID 추출 (id로 변경)
+//	    String userId = authentication1.getName(); // 토큰에서 id 추출
+//
+//	    // 해당 사용자의 주문만 조회 (id로 필터링)
+//	    List<Orders> orders = ordersRepo.findByMemberId(userId); // id로 필터링
+//
+//	    return orders.stream().map(order -> {
+//	        // OrderDetail 조회
+//	        List<OrderDetail> orderDetails = orderDetailRepo.findByOrderOrderId(order.getOrderId());
+//
+//	        // OrderDetail을 UserOrderDetailDTO로 변환
+//	        List<UserOrderDetailDTO> orderDetailDTOs = convertOrderDetailToUserOrderDetailDTO(orderDetails);
+//
+//	        // 상태 계산
+//	        String state = calculateOrderState(orderDetails);
+//
+//	        // UserOrderDTO 반환
+//	        return new UserOrderDTO(
+//	                order.getOrderId(),
+//	                order.getMember().getId(), // userId를 반환
+//	                order.getMember().getAlias(),
+//	                order.getRequestDate(),
+//	                order.getReleaseDate(),
+//	                order.getMemo(),
+//	                state, // 상태 필드 추가
+//	                orderDetailDTOs // 변환된 주문 상세 정보
+//	        );
+//	    }).collect(Collectors.toList());
+//	}
 
 	// OrderDetail을 UserOrderDetailDTO로 변환하는 메서드
 	private List<UserOrderDetailDTO> convertOrderDetailToUserOrderDetailDTO(List<OrderDetail> orderDetails) {

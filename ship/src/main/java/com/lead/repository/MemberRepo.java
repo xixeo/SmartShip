@@ -1,10 +1,12 @@
 package com.lead.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.lead.entity.Member;
+import com.lead.entity.OrderDetail;
 
 
 public interface MemberRepo extends JpaRepository<Member, String>{
@@ -15,6 +17,6 @@ public interface MemberRepo extends JpaRepository<Member, String>{
     Optional<Member> findByAlias(String alias);
     // phone으로 Member 찾기
     Optional<Member> findByPhone(String phone);
-    
+      
 
 }

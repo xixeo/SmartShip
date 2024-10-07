@@ -45,13 +45,7 @@ public class ItemsService {
 
 	@Autowired
 	private MemberRepo memberRepo;
-
-//	@Autowired
-//	private Category1Repo category1Repo;
-//
-//	@Autowired
-//	private Category2Repo category2Repo;
-
+	
 	@Autowired
 	private Category3Repo category3Repo;
 
@@ -127,9 +121,15 @@ public class ItemsService {
 		return ItemsDTO.builder().itemId(item.getItemsId()).itemName(item.getItemName())
 				.category1Name(item.getCategory3().getCategory2().getCategory1().getCategoryName())
 				.category2Name(item.getCategory3().getCategory2().getCategory2Name())
-				.category3Name(item.getCategory3().getCategory3Name()).part1(item.getPart1()).part2(item.getPart2())
-				.price(item.getPrice()).unit(item.getUnit()).supplierName(item.getMember().getUsername())
-				.alias(item.getMember().getAlias()).forSale(item.isForSale()).build();
+				.category3Name(item.getCategory3().getCategory3Name())
+				.part1(item.getPart1())
+				.part2(item.getPart2())
+				.price(item.getPrice())
+				.unit(item.getUnit())
+				.purchaseCount(item.getPurchaseCount())
+				.supplierName(item.getMember().getUsername())
+				.alias(item.getMember().getAlias())
+				.forSale(item.isForSale()).build();
 	}
 
 	// 리드타임 없이 DTO 생성
@@ -209,12 +209,6 @@ public class ItemsService {
 	        }
 	    }
 
-		// Leadtime 저장
-//		Leadtime leadtime = new Leadtime();
-//		leadtime.setItems(savedItem);
-//		leadtime.setLeadtime(itemsDTO.getLeadtime());
-//
-//		leadtimeRepo.save(leadtime);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////// 상품
