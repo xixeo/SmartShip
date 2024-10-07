@@ -99,21 +99,23 @@ export default function AnnounceEdit() {
   };
 
   return (
-    <div className='bg-[#162136] border-[#162136] rounded-lg p-3'>
-      {role === "ROLE_ADMIN" ? (
-        <>
-          <div className="text-xl font-semibold text-white p-4">
+    <div className='p-6'>
+       <div className="text-xl font-semibold text-white p-4 pl-0">
             공지사항 수정
           </div>
-          <div className='flex flex-col p-2'>
-            <div className='flex items-center mb-2'>
-              <h1 className='text-white w-24'>제목</h1>
-              <input className='ml-5 w-full bg-[#2D374A] h-8 text-white' value={title} onChange={(e) => setTitle(e.target.value)} />
+    <div className='card-bg rounded-lg p-3'>
+      {role === "ROLE_ADMIN" ? (
+        <>
+         
+          <div className='flex flex-col p-5'>
+            <div className='flex items-center mb-4'>
+              <h1 className='mr-1 text-white w-24 min-w-24'>제목</h1>
+              <input className='w-full p-3 bg-[#ffffff20] rounded-md h-8 text-white' value={title} onChange={(e) => setTitle(e.target.value)} />
             </div>
   
-            <div className='flex items-center mb-2'>
-              <h1 className='text-white w-24'>파일첨부</h1>
-              <input type="file" onChange={handleFileChange} className='ml-5 w-full bg-[#2D374A] h-9 text-white' />
+            {/* <div className='flex items-center mb-4'>
+              <h1 className='text-white w-24 min-w-[76px]'>파일첨부</h1>
+              <input type="file" onChange={handleFileChange} className='ml-5 pl-1 py-1 w-full bg-[#ffffff20] rounded-md h-9 text-white' />
   
               {ANdata.attachment && (
                 <div className='flex'>
@@ -124,14 +126,14 @@ export default function AnnounceEdit() {
                   </a>
                 </div>
               )}
-            </div>
+            </div> */}
   
-            <div className='flex items-center mb-2'>
-              <h1 className='text-white w-24'>내용</h1>
-              <textarea rows={10} className='ml-5 w-full h-48 bg-[#2D374A] text-white' value={content} onChange={(e) => setContent(e.target.value)}></textarea>
+            <div className='flex items-center mb-4'>
+              <h1 className='text-white w-[76px]'>내용</h1>
+              <textarea rows={10} className='ml-6 w-full h-48 p-3 bg-[#ffffff20] rounded-md text-white' value={content} onChange={(e) => setContent(e.target.value)}></textarea>
             </div>
           </div>
-          <div className='mt-3 flex justify-end'>
+          <div className='mt-3 mr-5 mb-3 flex justify-end'>
             <button className='blue-btn2' onClick={handleEdit}> 수정 </button>
           </div>
         </>
@@ -141,12 +143,12 @@ export default function AnnounceEdit() {
             공지사항
           </div>
           <div className='flex flex-col p-2'>
-            <div className='flex items-center mb-2'>
-              <h1 className='text-white w-24'>제목</h1>
-              <input className={`ml-5 w-full bg-[#2D374A] h-8 text-white ${role !== 'ROLE_ADMIN' ? 'no-hover' : ''}`} value={title} readOnly/>
+            <div className='flex items-center mb-4'>
+              <h1 className='text-white w-[76px]'>제목</h1>
+              <input className={`ml-5 w-full bg-[#ffffff20] rounded-md h-8 text-white ${role !== 'ROLE_ADMIN' ? 'no-hover' : ''}`} value={title} readOnly/>
             </div>
-            <div className='flex items-center mb-2'>
-              <h1 className='text-white w-24'>첨부된 파일 </h1>
+            {/* <div className='flex items-center mb-4'>
+              <h1 className='text-white w-[76px]'>첨부된 파일 </h1>
               {ANdata.attachment && (
                 <div className='flex'>
                   <h1 className='text-white ml-5'>{getFileNameFromPath(ANdata.attachment)}</h1>
@@ -155,15 +157,16 @@ export default function AnnounceEdit() {
                   </a>
                 </div>
               )}
-            </div>
+            </div> */}
   
-            <div className='flex items-center mb-2'>
-              <h1 className='text-white w-24'>내용</h1>
-              <textarea rows={10} className={`ml-5 w-full h-48 bg-[#2D374A] text-white ${role !== 'ROLE_ADMIN' ? 'no-hover' : ''}`} value={content} readOnly></textarea>
+            <div className='flex items-center mb-4'>
+              <h1 className='text-white w-[76px]'>내용</h1>
+              <textarea rows={10} className={`ml-5 pl-1 w-full h-48 bg-[#ffffff20] rounded-md text-white ${role !== 'ROLE_ADMIN' ? 'no-hover' : ''}`} value={content} readOnly></textarea>
             </div>
           </div>
         </>
       )}
+    </div>
     </div>
   );
 }
