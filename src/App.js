@@ -65,7 +65,9 @@ function AuthenticatedRoutes({ isAuthenticated, setIsAuthenticated, role }) {
 
      // 역할에 따른 첫 화면 리디렉션 처리
      useEffect(() => {
-        if (isAuthenticated && role && !hasRedirected) {
+        const currentPath = window.location.pathname;
+        
+        if (isAuthenticated && role && !hasRedirected&& currentPath === "/") {
             if (role === "ROLE_ADMIN") {
                 navigate("/Announcement");
             } else if (role === "ROLE_SUPPLIER") {
@@ -78,6 +80,12 @@ function AuthenticatedRoutes({ isAuthenticated, setIsAuthenticated, role }) {
             setHasRedirected(true); // 리디렉션 후 상태 변경
         }
     }, [isAuthenticated, role, hasRedirected, navigate]);
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate("/signin");
+        }
+    }, [isAuthenticated, navigate]);
 
     const PrivateRoute = ({ element }) => {
         return isAuthenticated ? element : <Navigate to="/signin" />;
@@ -95,7 +103,6 @@ function AuthenticatedRoutes({ isAuthenticated, setIsAuthenticated, role }) {
                         path="/signin"
                         element={<SignIn setIsAuthenticated={setIsAuthenticated} />}
                     />
-                    {/* <Route path="/" element={<PrivateRoute element={<MainApp />} />} /> */}
                 </Routes>
             ) : (
                 <div className="flex content-wrap w-full h-screen">

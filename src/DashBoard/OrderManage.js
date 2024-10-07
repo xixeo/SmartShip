@@ -815,11 +815,11 @@ export default function OrderTest() {
     const handleRecommend = (reco) => {
         // 선택한 물품이 공급업체를 바꾸기만 하면되면 모달
         if (Currentrow.details.map((detail) => detail.itemid).includes(reco)) {
-            return showAlert('공급자를 바꿔주세요.','info')
+            showAlert('공급자를 바꿔주세요.','info')
         }
         // 선택한 물품이 이미 장바구니에 있을 때 모달
         if (rows.map((detail) => detail.itemid).includes(reco)) {
-            return showAlert('이미 장바구니에 있는 물품입니다.','info')
+            showAlert('이미 장바구니에 있는 물품입니다.','info')
         }
         const fetchChangeitem = async () => {
             try {
