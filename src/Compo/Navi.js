@@ -77,10 +77,23 @@ const Navi = () => {
     }
   };
 
+  // 역할에 맞춰서 첫 화면으로 리디렉션하는 함수
+const redirectToFirstPage = () => {
+  if (role === "ROLE_ADMIN") {
+      navigate("/Announcement");
+  } else if (role === "ROLE_SUPPLIER") {
+      navigate("/Supplierboard");
+  } else if (role === "ROLE_MANAGER") {
+      navigate("/Board");
+  } else {
+      navigate("/listTable");
+  }
+};
+
   return (
     <div className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
       <div>
-        <div onClick={() => navigate("/Board")} className="logo cursor-pointer">
+        <div onClick={redirectToFirstPage} className="logo cursor-pointer">
           <img src={logo} alt="Logo" className="logo-image" />
           {!isCollapsed && <span className="logo-text">SMARTSHIP</span>}{" "}
           {/* 축소 시 텍스트 숨기기 */}
