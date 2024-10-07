@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLoading } from "../Compo/LoadingContext";
 import { useNavigate } from "react-router-dom";
-import './Board.css';
+import './Board.scss';
 
 export default function CardForDash() {
   const [listdata, setListdata] = useState([]);

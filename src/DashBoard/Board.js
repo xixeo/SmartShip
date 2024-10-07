@@ -1,5 +1,5 @@
 import React from 'react';
-import './Board.css';
+import './Board.scss';
 import PurchaseRequest from './PurchaseRequestForDash';
 import Announce from './AnnouncementForDash';
 import Leadtimechart from './charttest';

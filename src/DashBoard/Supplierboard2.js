@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Board.css';
+import './Board.scss';
 import Announce from './AnnouncementForDash';
 import ItemSupplier from './itemSupplier';
 import MyResponsiveBar from './itemTop10';
