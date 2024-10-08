@@ -40,11 +40,9 @@ function App() {
     
     useEffect(() => {
         const token = localStorage.getItem("token");
-        const isAuthenticatedNow = !!token; 
-        if (isAuthenticatedNow !== isAuthenticated) {
-            setIsAuthenticated(isAuthenticatedNow); 
-        }
-    }, [isAuthenticated]);
+        const isAuthenticatedNow = !!token;
+        setIsAuthenticated(isAuthenticatedNow);
+    }, []);
     
     return (
         <ThemeProvider theme={theme}>
@@ -81,11 +79,11 @@ function AuthenticatedRoutes({ isAuthenticated, setIsAuthenticated, role }) {
         }
     }, [isAuthenticated, role, hasRedirected, navigate]);
 
-    useEffect(() => {
-        if (!isAuthenticated && currentPath !== "/signup") {
-            navigate("/signin");
-        }
-    }, [isAuthenticated, navigate]);
+    // useEffect(() => {
+    //     if (!isAuthenticated && currentPath !== "/signup") {
+    //         navigate("/signin");
+    //     }
+    // }, [isAuthenticated, navigate]);
 
     const PrivateRoute = ({ element }) => {
         return isAuthenticated ? element : <Navigate to="/signin" />;

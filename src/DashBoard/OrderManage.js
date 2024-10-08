@@ -839,7 +839,7 @@ export default function OrderTest() {
                 }
                 // 선택한 행을 해제
                 setClickrow(null);
-                fetchOrderDetails();
+                window.location.reload();
                 showAlert("물품 대체에 성공했습니다.", "success");
             } catch (e) {
                 console.error("Failed to fetch Changeitem :", e);
