@@ -9,7 +9,7 @@ import { useAlert } from "../Compo/AlertContext";
 import { useLoading } from "../Compo/LoadingContext";
 import { useParams } from "react-router-dom";
 import * as echarts from "echarts";
-import { Typography } from "@mui/material";
+import { Typography, Select } from "@mui/material";
 import "./OrderManage.scss";
 
 export default function OrderTest() {
@@ -450,7 +450,7 @@ export default function OrderTest() {
                         }}
                     >
                         <select
-                            className="w-full bg-[#ffffff00]"
+                            className="w-full select-custom"
                             value={params.row.selectedSupplier}
                             onChange={(e) =>
                                 handleSupplierChange(rowKey, e.target.value)

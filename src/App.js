@@ -62,10 +62,10 @@ function App() {
 function AuthenticatedRoutes({ isAuthenticated, setIsAuthenticated, role }) {
     const [hasRedirected, setHasRedirected] = useState(false); // 리디렉션이 한 번 발생했는지 추적
     const navigate = useNavigate();
+    const currentPath = window.location.pathname;
 
      // 역할에 따른 첫 화면 리디렉션 처리
      useEffect(() => {
-        const currentPath = window.location.pathname;
         
         if (isAuthenticated && role && !hasRedirected&& currentPath === "/") {
             if (role === "ROLE_ADMIN") {
@@ -82,7 +82,7 @@ function AuthenticatedRoutes({ isAuthenticated, setIsAuthenticated, role }) {
     }, [isAuthenticated, role, hasRedirected, navigate]);
 
     useEffect(() => {
-        if (!isAuthenticated) {
+        if (!isAuthenticated && currentPath !== "/signup") {
             navigate("/signin");
         }
     }, [isAuthenticated, navigate]);

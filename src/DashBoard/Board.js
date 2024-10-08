@@ -15,7 +15,7 @@ function Board() {
         <div className="left-side">
           {/* 공지사항 */}
           <div className="announcement text-lg font-bold">
-            <h1 onClick={() => navigate(`/Announcement`)}>공지사항</h1>
+            <h1 onClick={() => navigate(`/Announcement`)} className='cursor-pointer'>공지사항</h1>
             <Announce />
           </div>
           <div className="schedule">
