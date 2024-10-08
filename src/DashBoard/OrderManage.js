@@ -1101,7 +1101,7 @@ export default function OrderTest() {
                         itemStyle: { color: "#FFFFFF" }, // 범례 아이템 색상
                     },
                     grid: {
-                        top: "50px", // 타임라인과 차트 사이의 거리 설정
+                        top: "100px", // 타임라인과 차트 사이의 거리 설정
                         bottom: "100px", // 필요에 따라 하단 간격 조정
                         left: "10%", // 왼쪽 여백
                         right: "10%", // 오른쪽 여백
@@ -1113,7 +1113,7 @@ export default function OrderTest() {
                             splitLine: { show: false },
                             axisLabel: {
                                 interval: 0, // 모든 항목을 표시
-                                rotate: 30,
+                                rotate: 10,
                                 textStyle: { color: "#FFFFFF" }, // 글자 색상
                             },
                         },
@@ -1236,7 +1236,7 @@ export default function OrderTest() {
 
             const newoption = {
                 title: {
-                    text: `${Object.keys(shuffle)}'s PAST LEAD TIME`,
+                    text: `${Object.keys(shuffle)} 과거 리드타임`,
                     left: "center",
                     textStyle: { color: "#FFFFFF" },
                 },

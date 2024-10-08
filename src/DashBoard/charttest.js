@@ -138,6 +138,11 @@ export default function ChartTest() {
                         playInterval: 1000,
                         data: sortedDates,
                     },
+                    title: {
+                        text: `발주 요청 품목 리드타임`,
+                        left: "center",
+                        textStyle: { color: "#FFFFFF" }, 
+                    },
                     tooltip: {
                         trigger: "item",
                         formatter: (params) => `${params.name}: ${params.value}`,
@@ -149,6 +154,7 @@ export default function ChartTest() {
                     xAxis: [{
                         type: "category",
                         data: items,
+                        splitLine: { show: false },
                     }],
                     yAxis: [{
                         type: "value",
