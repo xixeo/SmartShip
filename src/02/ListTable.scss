@@ -1,5 +1,37 @@
 @import "../App.scss";
 
+.select-custom2 {
+  height: 36px;
+  min-width: 120px;
+  background-color: transparent;
+
+  fieldset{
+    border: 0 !important;
+  }
+
+  .MuiSelect-select {
+    color: white;
+    font-size: 0.85rem !important;
+    border:  0 !important;
+  }
+
+  .MuiOutlinedInput-notchedOutline {
+    border-color: $input-color !important;
+  }
+
+  .MuiSvgIcon-root {
+    color: $input-color;
+  }
+
+  &:hover .MuiOutlinedInput-notchedOutline {
+    border-color: $input-color !important;
+  }
+
+  &.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: $blue-btn !important;
+  }
+}
+
 .list-table-root {
   // .MuiTableRow-root:last-child .MuiTableCell-root {
   //   border-bottom: 1px solid #47464F;
@@ -101,6 +133,8 @@
       border-color: $blue-btn !important;
     }
   }
+
+
 
   .select-supplier {
     height: $input-height;
