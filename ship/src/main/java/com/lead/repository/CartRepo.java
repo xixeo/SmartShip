@@ -9,5 +9,5 @@ import com.lead.entity.Cart;
 
 @Repository
 public interface CartRepo extends JpaRepository<Cart, Integer> {
-	Optional<Cart> findByMemberUsername(String username);
+	Optional<Cart> findByMemberId(String userId);
 }

@@ -56,9 +56,9 @@ public class CartService {
 
 		// JWT 토큰에서 사용자 정보 추출 (SecurityContextHolder)
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String username = authentication.getName(); // 토큰에서 username 추출
+		String userId = authentication.getName(); // 토큰에서 username 추출
 
-		Cart cart = cartRepo.findByMemberUsername(username)
+		Cart cart = cartRepo.findByMemberId(userId)
 				.orElseThrow(() -> new RuntimeException("해당 장바구니를 찾을 수 없습니다."));
 
 		List<CartItem> cartItems = cartItemRepo.findByCartCartId(cart.getCartId());
@@ -98,13 +98,13 @@ public class CartService {
 	public CartDTO addToCart(List<CartItemRequestDTO> cartItems) {
 		// JWT 토큰에서 사용자 정보 추출 (SecurityContextHolder)
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String username = authentication.getName(); // 토큰에서 username 추출
+		String userId = authentication.getName(); // 토큰에서 username 추출
 
 		// Alias에 해당하는 Member 찾기
-		Member member = memberRepo.findByUsername(username).orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
+		Member member = memberRepo.findById(userId).orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
 
 		// 사용자의 기존 장바구니가 있는지 확인
-		Cart cart = cartRepo.findByMemberUsername(username).orElse(null);
+		Cart cart = cartRepo.findByMemberId(userId).orElse(null);
 
 	    // 상품 목록이 비어 있는지 확인
 	    if (cartItems == null || cartItems.isEmpty()) {
@@ -152,11 +152,11 @@ public class CartService {
 	public void deleteItemsByItemId(List<Integer> itemIds) {
 		// JWT 토큰에서 사용자 정보 추출 (SecurityContextHolder)
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String username = authentication.getName(); // 토큰에서 username 추출
+		String userId = authentication.getName(); // 토큰에서 username 추출
 
 		for (Integer itemId : itemIds) {
 			// itemId와 username을 기반으로 cartItem을 찾음
-			List<CartItem> cartItems = cartItemRepo.findByItem_ItemsIdAndCart_Member_Username(itemId, username);
+			List<CartItem> cartItems = cartItemRepo.findByItem_ItemsIdAndCart_Member_Id(itemId, userId);
 
 			if (!cartItems.isEmpty()) {
 				for (CartItem cartItem : cartItems) {
@@ -175,10 +175,10 @@ public class CartService {
 	public OrdersDTO saveCartItemsToOrder(List<CartItemDTO> cartItems, LocalDate releaseDate, String memo, SelectedDay selectedDay) {
 		// JWT 토큰에서 사용자 정보 추출
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String username = authentication.getName(); // 토큰에서 username 추출
+		String userId = authentication.getName(); // 토큰에서 username 추출
 
 		// 사용자 정보 확인
-		Member member = memberRepo.findByUsername(username).orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
+		Member member = memberRepo.findById(userId).orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
 
 		// 주문 정보 생성
 		Orders order = new Orders();
@@ -192,7 +192,7 @@ public class CartService {
 		// OrderDetail 저장 및 장바구니에서 삭제
 		for (CartItemDTO itemDetail : cartItems) {
 			List<CartItem> cartItemList = cartItemRepo
-					.findByItem_ItemsIdAndCart_Member_Username(itemDetail.getItemsId(), username);
+					.findByItem_ItemsIdAndCart_Member_Id(itemDetail.getItemsId(), userId);
 
 			if (cartItemList.isEmpty()) {
 				throw new RuntimeException("해당 사용자에게 해당 품목이 장바구니에 없습니다: " + itemDetail.getItemsId());

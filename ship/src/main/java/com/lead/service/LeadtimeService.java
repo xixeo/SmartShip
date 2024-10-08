@@ -62,7 +62,7 @@ public class LeadtimeService {
         int pageNumber = 0;
         int pageSize = 1000; // 한 번에 1000개의 데이터 조회
 //        int startItemsId = 25909; // 25909번부터 시작
-        int startItemsId = 29078; // 25909번부터 시작
+        int startItemsId = 29597; // 25909번부터 시작
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         

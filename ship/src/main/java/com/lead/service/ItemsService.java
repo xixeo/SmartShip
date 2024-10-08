@@ -64,25 +64,42 @@ public class ItemsService {
 		entityManager.flush();
 		entityManager.clear();
 
+//		Specification<Items> spec = (root, query, builder) -> {
+//			
+//			// ROLE 따른 필터링
+//			if (role.equals("ROLE_SUPPLIER")) {
+//				// ROLE_SUPPLIER: userid로 필터링하여 자신의 물품만 조회
+//				return builder.and(builder.equal(root.join("member").get("id"), userId),
+//						builder.equal(root.get("enabled"), true), // 삭제 된 상품 필터링
+//						createCommonFilters(root, builder, category1Name, category2Name, category3Name, itemName));
+//			} else {
+//				// ROLE_USER: 모든 물품 조회
+//				return builder.and(builder.equal(root.get("enabled"), true), // 삭제 된 상품 필터링
+//						builder.equal(root.get("forSale"), true), // 판매 중인 상품만 필터링
+//						createCommonFilters(root, builder, category1Name, category2Name, category3Name, itemName));
+//			}
+//		};
+		
 		Specification<Items> spec = (root, query, builder) -> {
 
-			// enabled 필터링 - 판매자가 삭제한 상품
-			// Predicate enabledPredicate = builder.isTrue(root.get("enabled")); // enabled
-			// = true인 항목만 조회
+		    // 기존 조건문
+		    Predicate rolePredicate;
+		    if (role.equals("ROLE_SUPPLIER")) {
+		        rolePredicate = builder.and(builder.equal(root.join("member").get("id"), userId),
+		                                    builder.equal(root.get("enabled"), true), // 삭제 된 상품 필터링
+		                                    createCommonFilters(root, builder, category1Name, category2Name, category3Name, itemName));
+		    } else {
+		        rolePredicate = builder.and(builder.equal(root.get("enabled"), true), // 삭제 된 상품 필터링
+		                                    builder.equal(root.get("forSale"), true), // 판매 중인 상품만 필터링
+		                                    createCommonFilters(root, builder, category1Name, category2Name, category3Name, itemName));
+		    }
 
-			// ROLE 따른 필터링
-			if (role.equals("ROLE_SUPPLIER")) {
-				// ROLE_SUPPLIER: userid로 필터링하여 자신의 물품만 조회
-				return builder.and(builder.equal(root.join("member").get("id"), userId),
-						builder.equal(root.get("enabled"), true), // 삭제 된 상품 필터링
-						createCommonFilters(root, builder, category1Name, category2Name, category3Name, itemName));
-			} else {
-				// ROLE_USER: 모든 물품 조회
-				return builder.and(builder.equal(root.get("enabled"), true), // 삭제 된 상품 필터링
-						builder.equal(root.get("forSale"), true), // 판매 중인 상품만 필터링
-						createCommonFilters(root, builder, category1Name, category2Name, category3Name, itemName));
-			}
+		    // category1Name 기준으로 오름차순 정렬 추가
+		    query.orderBy(builder.asc(root.join("category3").join("category2").join("category1").get("categoryName")));
+
+		    return rolePredicate;
 		};
+
 
 		// JpaSpecificationExecutor의 findAll을 사용하여 필터링된 결과 조회
 		List<Items> items = itemsRepo.findAll(spec);
