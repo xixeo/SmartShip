@@ -9,8 +9,9 @@ import { useAlert } from "../Compo/AlertContext";
 import { useLoading } from "../Compo/LoadingContext";
 import { useParams } from "react-router-dom";
 import * as echarts from "echarts";
-import { Typography, Select } from "@mui/material";
+import { Typography } from "@mui/material";
 import "./OrderManage.scss";
+import { Select, MenuItem } from "@mui/material";
 
 export default function OrderTest() {
     const { orderId } = useParams(); // URL에서 orderId 가져오기
@@ -208,10 +209,10 @@ export default function OrderTest() {
                 return acc;
             }, {});
             setQuantityState(initialQuantities);
-            showAlert('조회에 성공했습니다.','success')
+            showAlert("조회에 성공했습니다.", "success");
         } catch (e) {
             console.error("Error fetching order details:", e);
-            showAlert('데이터를 가져오는데 실패했습니다.','error')
+            showAlert("데이터를 가져오는데 실패했습니다.", "error");
         } finally {
             setLoading(false);
         }
@@ -449,19 +450,19 @@ export default function OrderTest() {
                             e.stopPropagation();
                         }}
                     >
-                        <select
-                            className="w-full select-custom"
+                        <Select
+                            className="w-full select-custom2"
                             value={params.row.selectedSupplier}
                             onChange={(e) =>
                                 handleSupplierChange(rowKey, e.target.value)
                             }
                         >
                             {params.row.details.map((detail, index) => (
-                                <option key={index} value={detail.supplier}>
+                                <MenuItem key={index} value={detail.supplier}>
                                     {detail.supplier}
-                                </option>
+                                </MenuItem>
                             ))}
-                        </select>
+                        </Select>
                     </div>
                 );
             },
@@ -634,10 +635,10 @@ export default function OrderTest() {
                 throw new Error("ordering cancel item response was not ok");
             }
             window.location.reload();
-            showAlert('삭제에 성공했습니다.','success')
+            showAlert("삭제에 성공했습니다.", "success");
         } catch (error) {
             console.log(error);
-            showAlert('삭제에 실패했습니다.','error')
+            showAlert("삭제에 실패했습니다.", "error");
         }
     };
 
@@ -765,10 +766,10 @@ export default function OrderTest() {
                 item: e.itemName,
             }));
             setPast(pastdata);
-            showAlert('조회에 성공했습니다.','success')
+            showAlert("조회에 성공했습니다.", "success");
         } catch (error) {
             console.error("Faild to fetch pastleadtime :", error);
-            showAlert('데이터를 가져오는데 실패했습니다.','error')
+            showAlert("데이터를 가져오는데 실패했습니다.", "error");
         } finally {
             setLoading(false);
         }
@@ -794,10 +795,10 @@ export default function OrderTest() {
                 if (!response.ok) {
                     throw new Error("Ordering response was not ok");
                 }
-                showAlert('발주에 성공했습니다.','success')
+                showAlert("발주에 성공했습니다.", "success");
             } catch (e) {
                 console.error("Failed to fetch Ordering: ", e);
-                showAlert('발주에 실패했습니다.','error')
+                showAlert("발주에 실패했습니다.", "error");
             }
         };
         fetchOrdering();
@@ -815,11 +816,11 @@ export default function OrderTest() {
     const handleRecommend = (reco) => {
         // 선택한 물품이 공급업체를 바꾸기만 하면되면 모달
         if (Currentrow.details.map((detail) => detail.itemid).includes(reco)) {
-            showAlert('공급자를 바꿔주세요.','info')
+            showAlert("공급자를 바꿔주세요.", "info");
         }
         // 선택한 물품이 이미 장바구니에 있을 때 모달
         if (rows.map((detail) => detail.itemid).includes(reco)) {
-            showAlert('이미 장바구니에 있는 물품입니다.','info')
+            showAlert("이미 장바구니에 있는 물품입니다.", "info");
         }
         const fetchChangeitem = async () => {
             try {
@@ -839,10 +840,10 @@ export default function OrderTest() {
                 // 선택한 행을 해제
                 setClickrow(null);
                 fetchOrderDetails();
-                showAlert('물품 대체에 성공했습니다.','success')
+                showAlert("물품 대체에 성공했습니다.", "success");
             } catch (e) {
                 console.error("Failed to fetch Changeitem :", e);
-                showAlert('물품 대체에 실패했습니다.','error')
+                showAlert("물품 대체에 실패했습니다.", "error");
             }
         };
         fetchChangeitem();
@@ -947,10 +948,10 @@ export default function OrderTest() {
             // console.log('reco', recoitems);
             setRecommendItem(recoitems);
             // console.log('최종',recommenditem)
-            showAlert('대체 물품 조회에 성공했습니다.','success')
+            showAlert("대체 물품 조회에 성공했습니다.", "success");
         } catch (error) {
             console.error("Failed to fetch recommend:", error);
-            showAlert('대체 물품 조회에 실패했습니다.','error')
+            showAlert("대체 물품 조회에 실패했습니다.", "error");
         } finally {
             // setLoading(false);
         }
@@ -1397,7 +1398,9 @@ export default function OrderTest() {
                                             ? "overdate"
                                             : "";
                                     }}
-                                    slotProps={{ pagination: { labelRowsPerPage: '' } }}
+                                    slotProps={{
+                                        pagination: { labelRowsPerPage: "" },
+                                    }}
                                     sx={{
                                         color: "white",
                                         fontWeight: "semi-bold",
@@ -1546,7 +1549,7 @@ export default function OrderTest() {
                                 ({disablerowcount}건)
                             </h2>
                         </div>
-                        
+
                         <div className="bg-[#00000030] m-5 px-5 py-8 rounded-lg">
                             <div className="flex items-center ml-3">
                                 <h4 className="text-[#5BF4FF] text-xl font-bold">
