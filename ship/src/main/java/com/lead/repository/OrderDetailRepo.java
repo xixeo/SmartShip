@@ -20,6 +20,10 @@ public interface OrderDetailRepo extends JpaRepository<OrderDetail, Integer> {
     
     List<OrderDetail> findAllByItem_Member_IdAndOrderingTrue(String userId);
 
+    //같은 itemName을 갖고 supplier가 다른 애들 삭제
+    List<OrderDetail> findByItem_ItemName(String itemName);
+
+
 	
 	//List<OrderDetail> findByOrder_Member_Username(String username);
 

@@ -102,6 +102,15 @@ public class OrderDetailService {
     		
     		//저장
     		orderDetailRepo.save(orderDetail);
+    		
+    		// 같은 itemName을 가진 다른 OrderDetail 삭제
+            List<OrderDetail> sameItemOrderDetails = orderDetailRepo.findByItem_ItemName(item.getItemName());
+            for (OrderDetail sameOrderDetail : sameItemOrderDetails) {
+                if (!sameOrderDetail.getOrderDetailId().equals(orderDetail.getOrderDetailId())) {
+                    // 같은 itemName을 가진 다른 주문들 삭제
+                    orderDetailRepo.delete(sameOrderDetail);
+                }
+            }
     	}
     }
     
