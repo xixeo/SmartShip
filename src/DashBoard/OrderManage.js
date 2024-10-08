@@ -9,7 +9,7 @@ import { useAlert } from "../Compo/AlertContext";
 import { useLoading } from "../Compo/LoadingContext";
 import { useParams } from "react-router-dom";
 import * as echarts from "echarts";
-import { Typography, Select } from "@mui/material";
+import { Typography } from "@mui/material";
 import "./OrderManage.scss";
 import { Select, MenuItem } from "@mui/material";
 
