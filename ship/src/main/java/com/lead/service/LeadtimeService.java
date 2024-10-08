@@ -50,15 +50,6 @@ public class LeadtimeService {
         String[] seasons = {"SPRING", "SUMMER", "FALL", "WINTER"};  // 4개의 시즌
         String[] selectedDays = {"월", "화", "수", "목", "금", "토", "일"};  // 7개의 요일
 
-//        int pageNumber = 0;
-//        int pageSize = 1000; // 한 페이지에 1000개의 아이템씩 조회
-//
-//        boolean hasNextPage;
-//        do {
-//            Pageable pageable = PageRequest.of(pageNumber, pageSize);
-//            List<Items> itemsList = itemsRepo.findLimitedItems(pageable);
-//
-//            hasNextPage = !itemsList.isEmpty(); // 다음 페이지가 있는지 확인
         int pageNumber = 0;
         int pageSize = 1000; // 한 번에 1000개의 데이터 조회
 //        int startItemsId = 25909; // 25909번부터 시작
