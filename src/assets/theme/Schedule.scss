@@ -1,0 +1,147 @@
+@import "../../App.scss";
+
+:root {
+  --fc-today-bg-color: rgb(127 176 225 / 39%);
+  --fc-event-border-color: "white";
+  --fc-event-text-color: "black";
+}
+/* 일요일 날짜: 빨간색 */
+.fc-day-sun a {
+  color: #f29898;
+}
+
+/* 토요일 날짜: 파란색 */
+.fc-day-sat a {
+  color: #89c5f6;
+}
+
+.fc-day-mon a,
+.fc-day-tue,
+.fc-day-wed,
+.fc-day-thu,
+.fc-day-fri {
+  color: white;
+}
+
+.fc-media-screen {
+  background-color: $white-card;
+  width: 100%;
+  height: calc(100% - 30px);
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.fc .fc-toolbar.fc-header-toolbar {
+  width: calc(100% - 40px);
+  margin: 14px 20px 0 20px;
+}
+
+.fc-header-toolbar {
+  width: 95%;
+}
+
+.fc-toolbar-title {
+  color: white;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.2rem;
+}
+.fc .fc-button-primary:disabled,
+.fc .fc-button-primary {
+  background-color: #ffffff00;
+  border-color: $calendar-btn-border;
+  color: white;
+  opacity: 1;
+  &:hover {
+    background-color: #ffffff20;
+    border-color: $calendar-btn-border;
+  }
+}
+
+.fc-view-harness {
+  width: calc(100% - 40px);
+  // margin-left: 40px;
+  // margin-bottom: 10px;
+  margin: 20px;
+}
+.fc .fc-daygrid-day-frame {
+  width: 95%;
+}
+
+.fc-h-event .fc-event-main {
+  color: white;
+  font-weight: 500;
+}
+
+.fc-event-main {
+  border-color: "white";
+}
+
+.fc-event-main-frame {
+  color: white;
+  font-weight: bold;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th,
+.fc-theme-standard .fc-scrollgrid {
+  border: 1px solid rgba(0, 0, 0, 0.6);
+}
+
+.fc-theme-standard td {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.fc-theme-standard th {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.fc-theme-standard .fc-scrollgrid {
+  border-bottom: 0 !important;
+  border-right: 0 !important;
+}
+
+.fc-event {
+  background-color: transparent; /* 배경 제거 */
+  border: none; /* 테두리 제거 */
+  position: relative; /* 포지션 설정 */
+}
+
+$colors: #F8FF95, #B2A4FF, #FCA3CC, #9BE3DE, #A9ECA2, #FFA952;
+
+// 각 색상에 대한 클래스를 반복적으로 생성
+@for $i from 1 through length($colors) {
+  .color-#{$i}.fc-event .event-dot {
+    background-color: nth($colors, $i); /* 색상 적용 */
+  }
+}
+
+.fc-event {
+  position: relative;
+}
+
+.fc-event .event-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #000; /* 점의 색상 */
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.fc-daygrid-day-events {
+  margin-left: 18px;
+}
+
+.css-nt424e-MuiPaper-root-MuiAccordion-root {
+  background-color: #17161D !important;
+  color: white;
+}
+
+.css-yw020d-MuiAccordionSummary-expandIconWrapper {
+color: white !important;
+}

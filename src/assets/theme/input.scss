@@ -1,0 +1,157 @@
+@import "../../App.scss";
+
+/** ✏️ INPUT CSS  */
+
+.main-text{
+    color: $blue-btn;
+}
+
+.textfield {
+  border: 1px solid $input-color;
+  color: #fff;
+  border-radius: 4px;
+  outline: 0 !important;
+  background: #ffffff00;
+  padding: 6px 10px;
+
+  &:focus {
+    border-color: $blue-btn;
+  }
+}
+
+.textfieldRead {
+  border: 1px solid $read-input-color;
+  color: #a1a1a1;
+  border-radius: 4px;
+  outline: 0 !important;
+  background: #ffffff00;
+  padding: 6px 10px;
+
+  &:focus {
+    border-color: $blue-btn;
+  }
+}
+
+.blue-btn {
+  border: 1px solid $blue-btn;
+  color: $blue-btn;
+  border-radius: 4px;
+  outline: 0 !important;
+  padding: 6px 16px;
+
+  &:hover {
+    background: $blue-btn;
+    color: #fff;
+    transition: all 0.3s;
+  }
+}
+
+.white-btn {
+  border: 1px solid #7D828D;
+  color: #7D828D;
+  border-radius: 4px;
+  outline: 0 !important;
+  padding: 6px 16px;
+
+  &:hover {
+    background: #7D828D;
+    color: #fff;
+    transition: all 0.3s;
+  }
+
+  &.active {
+    background: #7D828D;
+    color: #fff;
+}
+}
+
+.blue-btn2 {
+    background: $blue-btn;
+    color: #fff;
+    border: 1px solid $blue-btn;
+    padding: 6px 16px;
+   
+    border-radius: 4px;
+    outline: 0 !important;
+  
+    &:hover {
+      background:#7f6dce;
+      transition: all 0.3s;
+    }
+  }
+
+.inner-btn {
+  background: $inner-btn;
+    color: #fff;
+    border: 1px solid $inner-btn;
+    padding: 6px 16px;
+   
+    border-radius: 4px;
+    outline: 0 !important;
+  
+    &:hover {
+      background:#268b68;
+      transition: all 0.3s;
+    }
+}
+
+.inner-btn2 {
+  border: 1px solid $inner-btn;
+  color: $inner-btn;
+  border-radius: 4px;
+  outline: 0 !important;
+  padding: 6px 16px;
+
+  &:hover {
+    background: $inner-btn;
+    color: #fff;
+    transition: all 0.3s;
+  }
+}
+
+.MuiInputBase-input {
+  padding-top: 6.5px !important;
+  padding-bottom: 6.5px !important;
+}
+
+  // switch 동그라미
+  .MuiSwitch-root {
+    .Mui-checked + .MuiSwitch-track {
+      opacity: 1 !important;
+    }
+    .Mui-checked {
+      color: $blue-btn !important;
+    }
+    .MuiSwitch-track {
+      background-color: #46465c !important;
+    }
+  }
+
+  .MuiMenu-list{
+    background-color: #7669b3;
+    color: #fff;
+
+
+    li{
+      font-size: 0.9rem !important;
+    }
+  }
+
+  // .MuiSelect-select {
+  //   height: 36px;
+  //   min-width: 120px;
+  //   background-color: transparent;
+  //   border:  solid $input-color !important;
+  //   border-radius: 4px !important;
+  //   padding: 8px 40px 8px 12px!important;
+
+  //   svg{
+  //     color: white !important;
+  //   }
+
+  // }
+
+  .MuiTablePagination-selectIcon{
+    color: white !important;
+    margin-right: 5px;
+  }

@@ -1,0 +1,308 @@
+@import "../App.scss";
+
+.select-custom2 {
+  height: 36px;
+  min-width: 120px;
+  background-color: transparent;
+
+  fieldset{
+    border: 0 !important;
+  }
+
+  .MuiSelect-select {
+    color: white;
+    font-size: 0.85rem !important;
+    border:  0 !important;
+  }
+
+  .MuiOutlinedInput-notchedOutline {
+    border-color: $input-color !important;
+  }
+
+  .MuiSvgIcon-root {
+    color: $input-color;
+  }
+
+  &:hover .MuiOutlinedInput-notchedOutline {
+    border-color: $input-color !important;
+  }
+
+  &.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: $blue-btn !important;
+  }
+}
+
+.list-table-root {
+  // .MuiTableRow-root:last-child .MuiTableCell-root {
+  //   border-bottom: 1px solid #47464F;
+  // }
+
+  // .MuiTableCell-root:last-child {
+  //   border-bottom: 1px solid #47464F;
+  // }
+  // .MuiTableCell-root {
+  //   border-bottom: 1px solid #47464F;
+  // }
+
+  // .MuiPaper-root{
+  //   background-color: #68666E;
+  // }
+  // .bg-custom {
+  //   background-color: #68666E;
+  //   border-radius: 0.5rem; // rounded-lg에 해당하는 클래스
+  //   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); // shadow-md에 해당하는 클래스
+  // }
+
+  // /* 체크박스 기본 스타일 */
+  // .MuiCheckbox-root {
+  //   color: #fff;
+  //   border-color: #fff;
+
+  //   .MuiIconButton-root {
+  //     border-color: #fff;
+  //   }
+
+  //   &.Mui-checked {
+  //     .MuiIconButton-root {
+  //       border-color: #fff;
+  //     }
+  //   }
+  // }
+
+  // /* 체크박스 체크 아이콘 스타일 */
+  // .MuiCheckbox-root .MuiSvgIcon-root {
+  //   color: #fff;
+  // }
+
+  // /* 테이블 배경 색상 */
+  // .MuiTable-root {
+  //   background-color: #68666E;
+
+  //   .MuiTableRow-root.Mui-selected {
+  //     background-color: #525158;
+  //   }
+  // }
+
+  // /* 테이블 헤더 스타일 */
+  // .MuiTableHead-root {
+  //   background-color: #47464F;
+
+  //   .MuiTableCell-head {
+  //     color: #fff;
+  //     font-weight: bold;
+  //   }
+  // }
+
+  // .MuiTableRow-root.Mui-selected:hover {
+  //   background-color: #525158;
+  // }
+
+  // .MuiTableCell-root {
+  //   &:hover {
+  //     background-color: transparent;
+  //   }
+  // }
+
+  height: 100%;
+
+  /* 선택 필터 스타일 */
+  .select-custom {
+    height: 36px;
+    min-width: 120px;
+    background-color: transparent;
+
+    .MuiSelect-select {
+      color: white;
+      font-size: 0.85rem !important;
+      border:  $input-color !important;
+    }
+
+    .MuiOutlinedInput-notchedOutline {
+      border-color: $input-color !important;
+    }
+
+    .MuiSvgIcon-root {
+      color: $input-color;
+    }
+
+    &:hover .MuiOutlinedInput-notchedOutline {
+      border-color: $input-color !important;
+    }
+
+    &.Mui-focused .MuiOutlinedInput-notchedOutline {
+      border-color: $blue-btn !important;
+    }
+  }
+
+
+
+  .select-supplier {
+    height: $input-height;
+    min-width: 120px;
+    background-color: transparent;
+    font-size: 14px;
+    border-color: #d0d0d0 !important;
+
+    .MuiSelect-select {
+      color: white;
+    }
+
+    .MuiOutlinedInput-notchedOutline {
+      border-color: $inner-input-color !important;
+    }
+
+    .MuiSvgIcon-root {
+      color: #fff;
+    }
+
+    // &:hover .MuiOutlinedInput-notchedOutline {
+    //   border-color: $inner-input-color !important;
+    // }
+
+    &.Mui-focused .MuiOutlinedInput-notchedOutline {
+      border-color: $blue-btn !important;
+    }
+  }
+
+  /* 커스텀 텍스트필드 스타일 */
+  .custom-textfield {
+    height: 36px;
+    flex-grow: 1;
+    max-width: 300px;
+    background-color: transparent;
+
+    .MuiInputBase-input {
+      color: white;
+      height: 100%;
+    }
+
+    .MuiOutlinedInput-root {
+      height: 36px;
+
+      & fieldset {
+        border-color: $input-color !important;
+      }
+
+      &:hover fieldset {
+        border-color: $input-color !important;
+      }
+
+      &.Mui-focused fieldset {
+        border-color: $blue-btn !important;
+      }
+    }
+  }
+
+  .custom-quantity {
+    height: $input-height;
+    width: 80% !important;
+    max-width: 300px;
+    background-color: transparent;
+
+    .MuiInputBase-input {
+      color: white;
+      height: 100%;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .MuiOutlinedInput-root {
+      height: $input-height;
+      width: 100%;
+
+      & fieldset {
+        border-color: $inner-input-color !important;
+      }
+
+      &:hover fieldset {
+        border-color: $inner-input-color !important;
+      }
+
+      &.Mui-focused fieldset {
+        border-color: $blue-btn !important;
+      }
+    }
+  }
+
+  .MuiButton-root.greenbutton {
+    background-color: transparent;
+    border: 1px solid $inner-btn;
+    color: $inner-btn;
+
+    &:hover {
+      background-color: $inner-btn;
+      color: #fff;
+      border: 1px solid transparent;
+    }
+  }
+
+  .MuiButton-root.bluebutton {
+    background-color: transparent;
+    border: 1px solid $blue-btn;
+    color: $blue-btn;
+
+    &:hover {
+      background-color: $blue-btn;
+      color: #fff;
+      border: 1px solid transparent;
+    }
+  }
+
+  .MuiButton-root.bluebutton2 {
+    background-color: $blue-btn;
+    color: #fff;
+    border: 1px solid transparent;
+
+    &:hover {
+      background-color: transparent;
+      border: 1px solid $blue-btn;
+      color: $blue-btn;
+    }
+  }
+
+
+  .item-cell {
+    color: white;
+  }
+
+  .price-cell {
+    color: white;
+    text-align: right; /* 기본적으로 우측 정렬 */
+    padding-right: 3%;
+
+    /* 가격이 '-'일 때 중앙 정렬 */
+    &.price-cell-no-price {
+      text-align: center; /* '-'일 때 중앙 정렬 */
+      padding-right: 0%;
+    }
+  }
+
+  .custom-toggle {
+    .MuiFormControlLabel-label {
+      order: -1;
+      color: #ffffff;
+    }
+
+    .MuiSwitch-track {
+      background-color: #d0d0d0;
+    }
+
+    margin-left: 16px;
+  }
+
+  .select-supplier,
+  .custom-quantity {
+    width: 100%; /* 부모 요소에 맞게 너비를 조절 */
+  }
+
+  .supplier-toggle {
+    .MuiSwitch-track {
+      background-color: #d0d0d0;
+    }
+  }
+
+  .select-supplier,
+  .custom-quantity {
+    width: 100%; /* 부모 요소에 맞게 너비를 조절 */
+  }
+}

@@ -1,0 +1,122 @@
+/* App.css */
+
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap");
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+/** ✏️ 공통 변수 CSS  */
+$mainfont: Pretendard;
+$subfont: "Montserrat", sans-serif;
+$header-height: 48px;
+$footer-height: 50px;
+$footer-bg: rgba(0, 0, 0, 0.2);
+$footer-color: #fff;
+$white-card: #ffffff20;
+// $main-bg: #0c182e;
+$main-bg: #1a192b;
+$calendar-btn-border: #7d7c82;
+$input-color: #ffffff50;
+$blue-btn: #9c87ff;
+$inner-btn: #3dd19d;
+$input-height: 32px;
+$inner-input-color: #ffffff30;
+$read-input-color: #ffffff10;
+// $table-header: rgba(255, 255, 255, 0.6);
+$table-header: #302955;
+// $table-header: #415275;
+// $table-header: #303a4d;
+$table-body: #ffffff1c;
+$card-bg: rgba(255, 255, 255, 0.075);
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: $mainfont;
+  font-size: 0.95rem;
+}
+
+/** ✏️ APP.JS LAYOUT CSS  */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: $main-bg;
+}
+
+.sign-state-container {
+  height: $header-height;
+}
+
+.content-wrap:has(.collapsed) {
+  .main-wrap {
+    width: calc(100vw - 80px) !important;
+    transition: all 0.3s ease;
+    position: relative !important;
+    left: 80px !important;
+    box-sizing: border-box;
+  }
+}
+
+.content-wrap {
+  background: $main-bg;
+  .main-wrap {
+    width: calc(100vw - 255px) !important;
+    transition: all 0.3s ease;
+    position: relative !important;
+    left: 250px !important;
+    box-sizing: border-box;
+  }
+}
+
+.main {
+  height: calc(100vh - $header-height - $footer-height);
+  // overflow: hidden;
+  // min-height: calc(100vh - $header-height - $footer-height);
+}
+.footer {
+  background-color: $footer-bg;
+  height: $footer-height;
+  color: $footer-color;
+  font-weight: 200;
+  font-size: 0.8rem;
+}
+
+.card-bg {
+  background-color: $card-bg;
+}
+
+/* 전체 스크롤바 영역 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px; /* 세로 스크롤바 높이 */
+}
+
+/* 스크롤바의 트랙 (배경) */
+::-webkit-scrollbar-track {
+  background: #ffffff1c; /* 원하는 배경색 */
+  border-radius: 10px;
+}
+
+/* 스크롤바의 핸들 (바) */
+::-webkit-scrollbar-thumb {
+  background-color: #fdfdfd4b; /* 원하는 스크롤바 색 */
+  border-radius: 10px;
+  border: 2px solid #18315f; /* 배경과 겹치지 않도록 여백 */
+}
+
+/* 스크롤바 핸들에 hover 했을 때 */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.withdrawal-button {
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+  margin-top: auto;       
+  margin-bottom: 15px;    
+}
+
+.popUp{
+  margin: 0 !important;
+}

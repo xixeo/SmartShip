@@ -1,0 +1,42 @@
+@import "../../App.scss";
+
+/** ✏️ INPUT CSS  */
+
+.login {
+  background: url(../img/loginBg.png);
+  /* background: url(../img/login_bg2.jpg); */
+  background-position: center;
+  background-size: cover;
+
+  .logo-wrap {
+    position: fixed;
+    left: 1rem;
+    top: 1rem;
+
+    .logoText {
+      color: #fff;
+      font-size: 1.6rem;
+      font-family: $subfont;
+      margin-left: 0.5rem;
+    }
+  }
+
+  .form-wrap {
+    background: rgba(12, 24, 46, 0.8);
+
+    .login-input {
+      background: #ffffff00;
+      border-bottom: 1px solid #fff;
+      outline: 0 !important;
+      color: #fff;
+
+      &:focus {
+        border-bottom: 1px solid $blue-btn;
+      }
+    }
+
+    .login-btn {
+      background: $blue-btn;
+    }
+  }
+}

@@ -1,0 +1,44 @@
+@import "../App.scss";
+
+.BasicDatePicker {
+  * {
+    outline: 0 !important; // 모든 요소의 outline 제거
+  }
+
+  // Label 스타일
+  .MuiFormLabel-root {
+    color: #fff !important; // Label 색상
+  }
+
+  // Input 스타일
+  .MuiInputBase-root {
+    color: #fff !important; // Input 텍스트 색상
+    height: 32px; // 높이 설정
+
+    &.MuiOutlinedInput-root {
+      & fieldset {
+        border-color: $input-color !important; // 기본 border 색상
+      }
+
+      &:hover fieldset {
+        border-color: $input-color !important; // hover 시 border 색상
+      }
+
+      &.Mui-focused fieldset {
+        border-color: $blue-btn !important; // 포커스 시 border 색상
+      }
+    }
+  }
+
+  // IconButton 스타일
+  .MuiButtonBase-root.MuiIconButton-root {
+    color: #fff !important;
+  }
+
+  // Input 기본 스타일
+  .MuiInputBase-input {
+    height: 100%;
+    color: white;
+    font-size: 16px;
+  }
+}

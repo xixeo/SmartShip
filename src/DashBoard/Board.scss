@@ -1,0 +1,100 @@
+/* 기본 스타일과 레이아웃 설정 */
+.board {
+    display: flex;
+    flex-direction: column;
+    // height: calc(100vh - 130px);
+    gap: 16px;
+    padding: 16px;
+    overflow: hidden;
+  }
+  
+  .top-section {
+    display: flex;
+    flex: 6;
+    gap: 16px;
+    
+  }
+  
+  .left-side {
+    display: flex;
+    flex-direction: column;
+    flex: 6;
+    gap: 16px;
+  }
+  
+  /* 공지사항 */
+  .announcement {
+    background-color: #2F2E38;
+    color: white;
+    padding: 25px;
+    border-radius: 8px;
+    flex: 1;
+  }
+  
+  /* 일정 */
+  .schedule {
+    background-color: #2F2E38;
+    color: white;
+    padding: 25px;
+    border-radius: 8px;
+    flex: 1;
+  }
+  
+  /* 구매 요청 */
+  .right-side {
+    background-color: #2F2E38;
+    color: white;
+    padding: 25px;
+    border-radius: 8px;
+    flex: 4;
+  }
+  
+  /* 물품 구매 추이 */
+  .bottom-section {
+    background-color: #2F2E38;
+    color: white;
+    padding: 25px;
+    border-radius: 8px;
+    flex: 4;
+  }
+  
+  /* 상태별 아이콘 스타일 */
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 12px; 
+  }
+  
+  .status-icon {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  
+  .pending {
+    background-color: #FC666E; 
+  }
+  
+  .in-progress {
+    background-color: #A87BEA; 
+  }
+  
+  .completed {
+    background-color: #1472FF; 
+  }
+
+  .date-text {
+    color: #939393; 
+  }
+
+  .status-details {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+  }
+  
+  .status-details > div {
+    margin-left: 25px; 
+  }
