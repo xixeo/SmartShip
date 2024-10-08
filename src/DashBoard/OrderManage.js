@@ -381,7 +381,7 @@ export default function OrderTest() {
         {
             field: "quantity",
             headerName: "수량",
-            width: "50px",
+            width: 50,
             renderCell: (params) => {
                 return params.row.details
                     .filter(
