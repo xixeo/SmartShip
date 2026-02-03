@@ -1,5 +1,4 @@
 ## 🚢 Smart Ship (24.08.23 - 24.10.08)
-> ####  [K-Digital 부산대 24-7회차] AI 활용 빅데이터분석 풀스택웹서비스 SW 개발자 양성과정 AI 학습모델 웹서비스 개발 프로젝트
 > #### Frontend:김수경,이민주 / Backend: 백이서 / Data: 이지은
 > #### [![대시보드](./dashboard.png "구글 드라이브")](https://www.youtube.com/watch?v=drF5rMgZzB0) 시연영상
 > #### 선박, 육상, 공급업체간 기부속/선용품 공급망 관리 시스템
